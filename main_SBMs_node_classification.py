@@ -1,8 +1,4 @@
 
-
-
-
-
 """
     IMPORTING LIBS
 """
@@ -16,6 +12,7 @@ import random
 import glob
 import argparse, json
 import pickle
+import csv
 
 import torch
 import torch.nn as nn
@@ -53,10 +50,10 @@ from train.train_SBMs_node_classification import train_epoch, evaluate_network #
 """
 def gpu_setup(use_gpu, gpu_id):
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-    os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_id)  
+    os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
 
     if torch.cuda.is_available() and use_gpu:
-        print('cuda available with GPU:',torch.cuda.get_device_name(0))
+        print('cuda available with GPU:' ,torch.cuda.get_device_name(0))
         device = torch.device("cuda")
     else:
         print('cuda not available')
@@ -79,7 +76,7 @@ def view_model_param(MODEL_NAME, net_params):
     model = gnn_model(MODEL_NAME, net_params)
     total_param = 0
     print("MODEL DETAILS:\n")
-    #print(model)
+    # print(model)
     for param in model.parameters():
         # print(param.data.size())
         total_param += np.prod(list(param.data.size()))
@@ -92,26 +89,27 @@ def view_model_param(MODEL_NAME, net_params):
 """
 
 def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs):
-    
+
     start0 = time.time()
     per_epoch_time = []
-    
+
     DATASET_NAME = dataset.name
-    
+
     if MODEL_NAME in ['GCN', 'GAT']:
         if net_params['self_loop']:
             print("[!] Adding graph self-loops for GCN/GAT models (central node trick).")
             dataset._add_self_loops()
-    
+
     trainset, valset, testset = dataset.train, dataset.val, dataset.test
-        
+
     root_log_dir, root_ckpt_dir, write_file_name, write_config_file = dirs
     device = net_params['device']
-    
+
     # Write network and optimization hyper-parameters in folder config/
     with open(write_config_file + '.txt', 'w') as f:
-        f.write("""Dataset: {},\nModel: {}\n\nparams={}\n\nnet_params={}\n\n\nTotal Parameters: {}\n\n"""                .format(DATASET_NAME, MODEL_NAME, params, net_params, net_params['total_param']))
-        
+        f.write("""Dataset: {},\nModel: {}\n\nparams={}\n\nnet_params={}\n\n\nTotal Parameters: {}\n\n"""                .format
+            (DATASET_NAME, MODEL_NAME, params, net_params, net_params['total_param']))
+
     log_dir = os.path.join(root_log_dir, "RUN_" + str(0))
     writer = SummaryWriter(log_dir=log_dir)
 
@@ -121,7 +119,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs):
     torch.manual_seed(params['seed'])
     if device == 'cuda':
         torch.cuda.manual_seed(params['seed'])
-    
+
     print("Training Graphs: ", len(trainset))
     print("Validation Graphs: ", len(valset))
     print("Test Graphs: ", len(testset))
@@ -135,24 +133,36 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs):
                                                      factor=params['lr_reduce_factor'],
                                                      patience=params['lr_schedule_patience'],
                                                      verbose=True)
-    
+
     epoch_train_losses, epoch_val_losses = [], []
-    epoch_train_accs, epoch_val_accs = [], [] 
-    
+    epoch_train_accs, epoch_val_accs = [], []
+
     train_loader = DataLoader(trainset, batch_size=params['batch_size'], shuffle=True, collate_fn=dataset.collate)
     val_loader = DataLoader(valset, batch_size=params['batch_size'], shuffle=False, collate_fn=dataset.collate)
     test_loader = DataLoader(testset, batch_size=params['batch_size'], shuffle=False, collate_fn=dataset.collate)
-        
+
     # At any point you can hit Ctrl + C to break out of training early.
     try:
         with tqdm(range(params['epochs'])) as t:
+
+            header = ['epoch', 'epoch_train_losses', 'epoch_train_acc', 'epoch_val_losses', 'epoch_val_acc',
+                      'epoch_test_losses', 'epoch_test_acc']
+            epochs = [i + 1 for i in range(len(t))]
+            epoch_train_losses = []
+            epoch_train_acc = []
+            epoch_val_losses =[]
+            epoch_val_acc = []
+            epoch_test_losses = []
+            epoch_test_acc = []
+
             for epoch in t:
 
                 t.set_description('Epoch %d' % epoch)
 
                 start = time.time()
 
-                epoch_train_loss, epoch_train_acc, optimizer = train_epoch(model, optimizer, device, train_loader, epoch)
+                epoch_train_loss, epoch_train_acc, optimizer = train_epoch(model, optimizer, device, train_loader,
+                                                                           epoch)
                 epoch_val_loss, epoch_val_acc = evaluate_network(model, device, val_loader, epoch)
                 epoch_test_loss, epoch_test_acc = evaluate_network(model, device, test_loader, epoch)
 
@@ -160,6 +170,8 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs):
                 epoch_val_losses.append(epoch_val_loss)
                 epoch_train_accs.append(epoch_train_acc)
                 epoch_val_accs.append(epoch_val_acc)
+                epoch_test_acc.append(epoch_test_acc)
+                epoch_test_losses.append(epoch_test_loss)
 
                 writer.add_scalar('train/_loss', epoch_train_loss, epoch)
                 writer.add_scalar('val/_loss', epoch_val_loss, epoch)
@@ -167,13 +179,13 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs):
                 writer.add_scalar('val/_acc', epoch_val_acc, epoch)
                 writer.add_scalar('learning_rate', optimizer.param_groups[0]['lr'], epoch)
 
-                _, epoch_test_acc = evaluate_network(model, device, test_loader, epoch)        
-                t.set_postfix(time=time.time()-start, lr=optimizer.param_groups[0]['lr'],
+                _, epoch_test_acc = evaluate_network(model, device, test_loader, epoch)
+                t.set_postfix(time=time.time() - start, lr=optimizer.param_groups[0]['lr'],
                               train_loss=epoch_train_loss, val_loss=epoch_val_loss,
                               train_acc=epoch_train_acc, val_acc=epoch_val_acc,
                               test_acc=epoch_test_acc)
 
-                per_epoch_time.append(time.time()-start)
+                per_epoch_time.append(time.time() - start)
 
                 # Saving checkpoint
                 ckpt_dir = os.path.join(root_ckpt_dir, "RUN_")
@@ -185,7 +197,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs):
                 for file in files:
                     epoch_nb = file.split('_')[-1]
                     epoch_nb = int(epoch_nb.split('.')[0])
-                    if epoch_nb < epoch-1:
+                    if epoch_nb < epoch - 1:
                         os.remove(file)
 
                 scheduler.step(epoch_val_loss)
@@ -193,24 +205,40 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs):
                 if optimizer.param_groups[0]['lr'] < params['min_lr']:
                     print("\n!! LR SMALLER OR EQUAL TO MIN LR THRESHOLD.")
                     break
-                    
+
                 # Stop training after params['max_time'] hours
-                if time.time()-start0 > params['max_time']*3600:
+                if time.time() - start0 > params['max_time'] * 3600:
                     print('-' * 89)
                     print("Max_time for training elapsed {:.2f} hours, so stopping".format(params['max_time']))
                     break
-    
+
+            csv_file = open(f'./{params["seed"]}_{DATASET_NAME}_{MODEL_NAME}_epoch_files.csv', 'w', newline='')
+            csvwriter = csv.writer(csv_file)
+            csvwriter.writerow(header)
+            for data in (zip(epochs, epoch_train_loss, epoch_train_acc, epoch_val_loss, epoch_val_acc,
+                             epoch_test_losses, epoch_test_acc)):
+                csvwriter.writerow(data)
+            csv_file.close()
+
     except KeyboardInterrupt:
         print('-' * 89)
         print('Exiting from training early because of KeyboardInterrupt')
-    
-    
+
     _, test_acc = evaluate_network(model, device, test_loader, epoch)
     _, train_acc = evaluate_network(model, device, train_loader, epoch)
     print("Test Accuracy: {:.4f}".format(test_acc))
     print("Train Accuracy: {:.4f}".format(train_acc))
-    print("TOTAL TIME TAKEN: {:.4f}s".format(time.time()-start0))
+    print("TOTAL TIME TAKEN: {:.4f}s".format(time.time() - start0))
     print("AVG TIME PER EPOCH: {:.4f}s".format(np.mean(per_epoch_time)))
+
+    with open(f'./{params["seed"]}_test_result.csv', 'wt') as f:
+        f.write("Test Accuracy: {:.4f}".format(test_acc))
+        f.write(",")
+        f.write("Train Accuracy: {:.4f}".format(train_acc))
+        f.write(",")
+        f.write("TOTAL TIME TAKEN: {:.4f}s".format(time.time() - start0))
+        f.write(",")
+        f.write("AVG TIME PER EPOCH: {:.4f}s".format(np.mean(per_epoch_time)))
 
     writer.close()
 
@@ -220,34 +248,29 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs):
     with open(write_file_name + '.txt', 'w') as f:
         f.write("""Dataset: {},\nModel: {}\n\nparams={}\n\nnet_params={}\n\n{}\n\nTotal Parameters: {}\n\n
     FINAL RESULTS\nTEST ACCURACY: {:.4f}\nTRAIN ACCURACY: {:.4f}\n\n
-    Total Time Taken: {:.4f} hrs\nAverage Time Per Epoch: {:.4f} s\n\n\n"""\
-          .format(DATASET_NAME, MODEL_NAME, params, net_params, model, net_params['total_param'],
-                  test_acc, train_acc, (time.time()-start0)/3600, np.mean(per_epoch_time)))
+    Total Time Taken: {:.4f} hrs\nAverage Time Per Epoch: {:.4f} s\n\n\n""" \
+                .format(DATASET_NAME, MODEL_NAME, params, net_params, model, net_params['total_param'],
+                        test_acc, train_acc, (time.time() - start0) / 3600, np.mean(per_epoch_time)))
 
-        
     # send results to gmail
     try:
         from gmail import send
         subject = 'Result for Dataset: {}, Model: {}'.format(DATASET_NAME, MODEL_NAME)
         body = """Dataset: {},\nModel: {}\n\nparams={}\n\nnet_params={}\n\n{}\n\nTotal Parameters: {}\n\n
     FINAL RESULTS\nTEST ACCURACY: {:.4f}\nTRAIN ACCURACY: {:.4f}\n\n
-    Total Time Taken: {:.4f} hrs\nAverage Time Per Epoch: {:.4f} s\n\n\n"""\
-          .format(DATASET_NAME, MODEL_NAME, params, net_params, model, net_params['total_param'],
-                  test_acc, train_acc, (time.time()-start0)/3600, np.mean(per_epoch_time))
+    Total Time Taken: {:.4f} hrs\nAverage Time Per Epoch: {:.4f} s\n\n\n""" \
+            .format(DATASET_NAME, MODEL_NAME, params, net_params, model, net_params['total_param'],
+                    test_acc, train_acc, (time.time() - start0) / 3600, np.mean(per_epoch_time))
         send(subject, body)
     except:
         pass
-        
 
 
-
-
-def main():    
+def main():
     """
         USER CONTROLS
     """
-    
-    
+
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', help="Please give a config.json file with training/model/data/param details")
     parser.add_argument('--gpu_id', help="Please give a value for gpu id")
@@ -262,7 +285,7 @@ def main():
     parser.add_argument('--lr_schedule_patience', help="Please give a value for lr_schedule_patience")
     parser.add_argument('--min_lr', help="Please give a value for min_lr")
     parser.add_argument('--weight_decay', help="Please give a value for weight_decay")
-    parser.add_argument('--print_epoch_interval', help="Please give a value for print_epoch_interval")    
+    parser.add_argument('--print_epoch_interval', help="Please give a value for print_epoch_interval")
     parser.add_argument('--L', help="Please give a value for L")
     parser.add_argument('--hidden_dim', help="Please give a value for hidden_dim")
     parser.add_argument('--out_dim', help="Please give a value for out_dim")
@@ -289,7 +312,7 @@ def main():
     args = parser.parse_args()
     with open(args.config) as f:
         config = json.load(f)
-        
+
     # device
     if args.gpu_id is not None:
         config['gpu']['id'] = int(args.gpu_id)
@@ -341,11 +364,11 @@ def main():
     if args.hidden_dim is not None:
         net_params['hidden_dim'] = int(args.hidden_dim)
     if args.out_dim is not None:
-        net_params['out_dim'] = int(args.out_dim)   
+        net_params['out_dim'] = int(args.out_dim)
     if args.residual is not None:
-        net_params['residual'] = True if args.residual=='True' else False
+        net_params['residual'] = True if args.residual == 'True' else False
     if args.edge_feat is not None:
-        net_params['edge_feat'] = True if args.edge_feat=='True' else False
+        net_params['edge_feat'] = True if args.edge_feat == 'True' else False
     if args.readout is not None:
         net_params['readout'] = args.readout
     if args.kernel is not None:
@@ -353,15 +376,15 @@ def main():
     if args.n_heads is not None:
         net_params['n_heads'] = int(args.n_heads)
     if args.gated is not None:
-        net_params['gated'] = True if args.gated=='True' else False
+        net_params['gated'] = True if args.gated == 'True' else False
     if args.in_feat_dropout is not None:
         net_params['in_feat_dropout'] = float(args.in_feat_dropout)
     if args.dropout is not None:
         net_params['dropout'] = float(args.dropout)
     if args.graph_norm is not None:
-        net_params['graph_norm'] = True if args.graph_norm=='True' else False
+        net_params['graph_norm'] = True if args.graph_norm == 'True' else False
     if args.batch_norm is not None:
-        net_params['batch_norm'] = True if args.batch_norm=='True' else False
+        net_params['batch_norm'] = True if args.batch_norm == 'True' else False
     if args.sage_aggregator is not None:
         net_params['sage_aggregator'] = args.sage_aggregator
     if args.data_mode is not None:
@@ -375,41 +398,35 @@ def main():
     if args.pool_ratio is not None:
         net_params['pool_ratio'] = float(args.pool_ratio)
     if args.linkpred is not None:
-        net_params['linkpred'] = True if args.linkpred=='True' else False
+        net_params['linkpred'] = True if args.linkpred == 'True' else False
     if args.cat is not None:
-        net_params['cat'] = True if args.cat=='True' else False
+        net_params['cat'] = True if args.cat == 'True' else False
     if args.self_loop is not None:
-        net_params['self_loop'] = True if args.self_loop=='True' else False
-        
-    # SBM
-    net_params['in_dim'] = torch.unique(dataset.train[0][0].ndata['feat'],dim=0).size(0) # node_dim (feat is an integer)
-    net_params['n_classes'] = torch.unique(dataset.train[0][1],dim=0).size(0)
+        net_params['self_loop'] = True if args.self_loop == 'True' else False
 
-    root_log_dir = out_dir + 'logs/' + MODEL_NAME + "_" + DATASET_NAME + "_GPU" + str(config['gpu']['id']) + "_" + time.strftime('%Hh%Mm%Ss_on_%b_%d_%Y')
-    root_ckpt_dir = out_dir + 'checkpoints/' + MODEL_NAME + "_" + DATASET_NAME + "_GPU" + str(config['gpu']['id']) + "_" + time.strftime('%Hh%Mm%Ss_on_%b_%d_%Y')
-    write_file_name = out_dir + 'results/result_' + MODEL_NAME + "_" + DATASET_NAME + "_GPU" + str(config['gpu']['id']) + "_" + time.strftime('%Hh%Mm%Ss_on_%b_%d_%Y')
-    write_config_file = out_dir + 'configs/config_' + MODEL_NAME + "_" + DATASET_NAME + "_GPU" + str(config['gpu']['id']) + "_" + time.strftime('%Hh%Mm%Ss_on_%b_%d_%Y')
+    # SBM
+    net_params['in_dim'] = torch.unique(dataset.train[0][0].ndata['feat'], dim=0).size(
+        0)  # node_dim (feat is an integer)
+    net_params['n_classes'] = torch.unique(dataset.train[0][1], dim=0).size(0)
+
+    root_log_dir = out_dir + 'logs/' + MODEL_NAME + "_" + DATASET_NAME + "_GPU" + str(
+        config['gpu']['id']) + "_" + time.strftime('%Hh%Mm%Ss_on_%b_%d_%Y')
+    root_ckpt_dir = out_dir + 'checkpoints/' + MODEL_NAME + "_" + DATASET_NAME + "_GPU" + str(
+        config['gpu']['id']) + "_" + time.strftime('%Hh%Mm%Ss_on_%b_%d_%Y')
+    write_file_name = out_dir + 'results/result_' + MODEL_NAME + "_" + DATASET_NAME + "_GPU" + str(
+        config['gpu']['id']) + "_" + time.strftime('%Hh%Mm%Ss_on_%b_%d_%Y')
+    write_config_file = out_dir + 'configs/config_' + MODEL_NAME + "_" + DATASET_NAME + "_GPU" + str(
+        config['gpu']['id']) + "_" + time.strftime('%Hh%Mm%Ss_on_%b_%d_%Y')
     dirs = root_log_dir, root_ckpt_dir, write_file_name, write_config_file
 
     if not os.path.exists(out_dir + 'results'):
         os.makedirs(out_dir + 'results')
-        
+
     if not os.path.exists(out_dir + 'configs'):
         os.makedirs(out_dir + 'configs')
 
     net_params['total_param'] = view_model_param(MODEL_NAME, net_params)
     train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs)
 
-    
-    
-    
-    
-    
-    
-main()    
 
-
-
-
-
-
+main()
