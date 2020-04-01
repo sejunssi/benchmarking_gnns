@@ -41,13 +41,13 @@ tmux new -s benchmark_SBMs_node_classification -d
 tmux send-keys "source activate benchmark_gnn" C-m
 dataset=SBM_CLUSTER
 tmux send-keys "
-python $code --dataset $dataset --gpu_id 1 --seed $seed0 --config 'configs/SBMs_node_clustering_GCN_CLUSTER.json'
+python $code --dataset $dataset --gpu_id 0 --seed $seed0 --config 'configs/SBMs_node_clustering_GCN_CLUSTER.json'
 wait" C-m
 tmux send-keys "
-python $code --dataset $dataset --gpu_id 2 --seed $seed0 --config 'configs/SBMs_node_clustering_GraphSage_CLUSTER.json'
+python $code --dataset $dataset --gpu_id 1 --seed $seed0 --config 'configs/SBMs_node_clustering_GraphSage_CLUSTER.json'
 wait" C-m
 tmux send-keys "
-python $code --dataset $dataset --gpu_id 3 --seed $seed0 --config 'configs/SBMs_node_clustering_GAT_CLUSTER.json'
+python $code --dataset $dataset --gpu_id 2 --seed $seed0 --config 'configs/SBMs_node_clustering_GAT_CLUSTER.json'
 wait" C-m
 tmux send-keys "tmux kill-session -t benchmark_SBMs_node_classification" C-m
 
