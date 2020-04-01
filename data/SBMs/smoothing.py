@@ -1,3 +1,4 @@
+import numpy as np
 def schuffle(W, c):
     # relabel the vertices at random
     idx = np.random.permutation(W.shape[0])
@@ -155,8 +156,8 @@ def SBMs_CLUSTER(nb_graphs, name):
 
 import pickle
 
-%load_ext autoreload
-%autoreload 2
+#%load_ext autoreload
+#%autoreload 2
 
 from data.SBMs import SBMsDatasetDGL
 
