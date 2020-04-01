@@ -5,7 +5,7 @@ import torch
 import pickle
 import time
 
-%matplotlib inline
+#%matplotlib inline
 import matplotlib.pyplot as plt
 import scipy.sparse
 
