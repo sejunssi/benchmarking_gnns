@@ -1,6 +1,5 @@
 import numpy as np
-<<<<<<< HEAD
-=======
+
 import torch
 import pickle
 import time
@@ -9,7 +8,6 @@ import time
 import matplotlib.pyplot as plt
 import scipy.sparse
 
->>>>>>> 8b299f32ae5ce65b6216c03cc27318df98193968
 def schuffle(W, c):
     # relabel the vertices at random
     idx = np.random.permutation(W.shape[0])
