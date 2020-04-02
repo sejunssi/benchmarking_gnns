@@ -411,7 +411,6 @@ print('Time (sec):', time.time() - start)  # 190s
 
 import os
 
-os.chdir('../../')  # go to root folder of the project
 print(os.getcwd())
 
 # %%
