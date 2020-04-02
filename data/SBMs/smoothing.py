@@ -178,7 +178,7 @@ import networkx as nx
 W_list = list(map(lambda d: d['W'], data))
 rand_idx_list = list(map(lambda d: d['rand_idx'], data))
 node_feat_list = list(map(lambda d: d['node_feat'], data))
-node_label_lists = list(map(lambda d: d['node_label'], data))
+node_label_list = list(map(lambda d: d['node_label'], data))
 
 class ProgressSmoothing:
     def __init__(self, g_nx):
@@ -238,7 +238,7 @@ class ProgressSmoothing:
         return smoothed_labels
 
 
-for W, labels in zip(W_list, label_list):
+for W, labels in zip(W_list, node_label_list):
     # train_W =[]
     train_label = []
     W = W.numpy()
@@ -251,7 +251,7 @@ for W, labels in zip(W_list, label_list):
 node_label = torch.tensor(train_label)
 
 data = [{'W':W, 'rand_idx': rand_idx, 'node_feat': node_feat, 'node_label': node_label} 
-        for W, rand_idx, node_feat, node_label in zip(W_list, rand_idx_list, node_feat_list, node_label_list)]
+        for W, rand_idx, node_feat, node_label in zip(W_list, rand_idx_list, node_feat_list, node_label)]
 
 
 # ps = ProgressSmoothing(g_nx=g_nx)
