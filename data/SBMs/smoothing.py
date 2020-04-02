@@ -8,6 +8,9 @@ import time
 import matplotlib.pyplot as plt
 import scipy.sparse
 
+start = time.time()
+
+
 def schuffle(W, c):
     # relabel the vertices at random
     idx = np.random.permutation(W.shape[0])
@@ -239,10 +242,10 @@ class ProgressSmoothing:
 
 
 for W, labels in zip(W_list, node_label_list):
-    # train_W =[]
+   # train_W =[]
     train_label = []
     W = W.numpy()
-    labels = labels.numpy()
+    labels = node_label_list.numpy()
     g_nx = nx.from_numpy_matrix(W)
     ps = ProgressSmoothing(g_nx=g_nx)
     # train_W.append(W)
@@ -258,9 +261,9 @@ data = [{'W':W, 'rand_idx': rand_idx, 'node_feat': node_feat, 'node_label': node
 # smoothed_labels = ps.smooth_all(2, labels)
 
 
-start = time.time()
 
-with open('new_SBM_CLUSTER_train.pkl', 'wb') as f:
+
+with open('new_SBM_CLUSTER_train.pkl_0402_01', 'wb') as f:
     pickle.dump(data, f)
    
 
