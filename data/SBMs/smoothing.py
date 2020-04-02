@@ -172,13 +172,12 @@ with open('SBM_CLUSTER_train.pkl', 'rb') as f:
 
 import networkx as nx
 
-train = data
-W_list = []
-label_list = []
-for data in train:
-    W_list.append(data['W'])
-    label_list.append(data['node_label'])
+#train = data
 
+W_list = list(map(lambda d: d['W'], data))
+rand_idx_list = list(map(lambda d: d['rand_idx'], data))
+node_feat_list = list(map(lambda d: d['node_feat'], data))
+node_label_lists = list(map(lambda d: d['node_label'], data))
 
 class ProgressSmoothing:
     def __init__(self, g_nx):
@@ -248,9 +247,15 @@ for W, labels in zip(W_list, label_list):
     # train_W.append(W)
     train_label.append(ps.smooth_all(2, labels))
 
+node_label = torch.tensor(train_label)
+
+data = [{'W':W, 'rand_idx': rand_idx, 'node_feat': node_feat, 'node_label': node_label} 
+        for W, rand_idx, node_feat, node_label in zip(W_list, rand_idx_list, node_feat_list, node_label_list)]
+
+
 # ps = ProgressSmoothing(g_nx=g_nx)
 # smoothed_labels = ps.smooth_all(2, labels)
-data['node_label'] = torch.tensor(train_label)
+
 
 start = time.time()
 
