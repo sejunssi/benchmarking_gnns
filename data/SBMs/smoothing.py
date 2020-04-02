@@ -167,12 +167,6 @@ import pickle
 #%load_ext autoreload
 #%autoreload 2
 
-from data.SBMs import SBMsDatasetDGL
-
-from data.data import LoadData
-from torch.utils.data import DataLoader
-from data.SBMs import SBMsDataset
-
 with open('SBM_CLUSTER_train.pkl', 'rb') as f:
     data = pickle.load(f)
 
