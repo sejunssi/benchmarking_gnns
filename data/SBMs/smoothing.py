@@ -3,7 +3,7 @@ import torch
 import pickle
 import time
 
-%matplotlib inline
+#%matplotlib inline
 import matplotlib.pyplot as plt
 import scipy.sparse
 
@@ -164,8 +164,8 @@ def SBMs_CLUSTER(nb_graphs, name):
 
 import pickle
 
-%load_ext autoreload
-%autoreload 2
+#%load_ext autoreload
+#%autoreload 2
 
 from data.SBMs import SBMsDatasetDGL
 
