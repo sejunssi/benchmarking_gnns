@@ -9,6 +9,7 @@
 import dgl
 
 import numpy as np
+import pandas as pd
 import os
 import socket
 import time
@@ -238,18 +239,11 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs):
     writer.close()
 
 
-    with open(f'./{params["seed"]}_test_result.csv', 'wt') as f:
-        f.write("Test Accuracy: {:.4f}".format(test_acc))
-        f.write(",")
-        f.write("Train Accuracy: {:.4f}".format(train_acc))
-        f.write(",")
-        f.write("TOTAL TIME TAKEN: {:.4f}s".format(time.time() - start0))
-        f.write(",")
-        f.write("AVG TIME PER EPOCH: {:.4f}s".format(np.mean(per_epoch_time)))
-
-
-
-    """
+    with open(f'./{params["seed"]}_{DATASET_NAME}_{MODEL_NAME}_test_result.csv', 'wt', newline='') as f:
+        f.write("Test_Accuracy" + "," + "Train_Accuracy" + "," + "Total_Time_Taken" +','+ "AVG_Time_Per_Epoch")
+        f.write("\n")
+        f.write("{:.4f}".format(test_acc) + "," + "{:.4f}".format(train_acc) + "," + "{:.4f}".format(time.time() - start0) + "," + "{:.4f}".format(np.mean(per_epoch_time)))
+        """
         Write the results in out_dir/results folder
     """
     with open(write_file_name + '.txt', 'w') as f:
