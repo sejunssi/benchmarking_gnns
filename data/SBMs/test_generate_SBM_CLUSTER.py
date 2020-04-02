@@ -255,6 +255,15 @@ print(dataset.test[0])
 
 start = time.time()
 
+with open('data/SBMs/SBM_CLUSTER_train.pkl', 'wb') as f:
+    pickle.dump(dataset.train, f)
+
+with open('data/SBMs/SBM_CLUSTER_test.pkl', 'wb') as f:
+    pickle.dump(dataset.test, f)
+
+with open('data/SBMs/SBM_CLUSTER_val.pkl', 'wb') as f:
+    pickle.dump(dataset.val, f)
+
 with open('data/SBMs/SBM_CLUSTER.pkl', 'wb') as f:
     pickle.dump([dataset.train, dataset.val, dataset.test], f)
 
