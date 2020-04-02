@@ -255,7 +255,8 @@ data['node_label'] = torch.tensor(train_label)
 
 start = time.time()
 
-with open('data/SBMs/new_SBM_CLUSTER_train.pkl', 'wb') as f:
+with open('new_SBM_CLUSTER_train.pkl', 'wb') as f:
     pickle.dump(data, f)
+   
 
 print('Time (sec):', time.time() - start)
