@@ -178,10 +178,11 @@ import networkx as nx
 
 #train = data
 
-W_list = list(map(lambda d: d['W'], data))
+W_list = list(map(lambda d: d['W'].numpy(), data))
+W_lists = list(map(lambda d: d['W'].numpy(), data))
 rand_idx_list = list(map(lambda d: d['rand_idx'], data))
 node_feat_list = list(map(lambda d: d['node_feat'], data))
-node_label_list = list(map(lambda d: d['node_label'], data))
+node_label_list = list(map(lambda d: d['node_label'].numpy(), data))
 
 class ProgressSmoothing:
     def __init__(self, g_nx):
@@ -241,11 +242,11 @@ class ProgressSmoothing:
         return smoothed_labels
 
 
-for W, labels in zip(W_list, node_label_list):
+for W, labels in zip(W_lists, node_label_list):
    # train_W =[]
     train_label = []
-    W = W.numpy()
-    labels = node_label_list.numpy()
+#    W = W.numpy()
+#    labels = node_label_list.numpy()
     g_nx = nx.from_numpy_matrix(W)
     ps = ProgressSmoothing(g_nx=g_nx)
     # train_W.append(W)
