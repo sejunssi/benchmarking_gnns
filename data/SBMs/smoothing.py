@@ -253,7 +253,7 @@ for W, labels in zip(W_lists, node_label_list):
 
 node_label = torch.tensor(train_label)
 
-data = [{'W':W, 'rand_idx': rand_idx, 'node_feat': node_feat, 'node_label': node_label} 
+new_data = [{'W':W, 'rand_idx': rand_idx, 'node_feat': node_feat, 'node_label': node_label}
         for W, rand_idx, node_feat, node_label in zip(W_list, rand_idx_list, node_feat_list, node_label)]
 
 
@@ -263,8 +263,8 @@ data = [{'W':W, 'rand_idx': rand_idx, 'node_feat': node_feat, 'node_label': node
 
 
 
-with open('new_SBM_CLUSTER_train.pkl_0402_01', 'wb') as f:
-    pickle.dump(data, f)
+with open('new_SBM_CLUSTER_train_0402_01.pkl', 'wb') as f:
+    pickle.dump(new_data, f)
    
 
 print('Time (sec):', time.time() - start)
