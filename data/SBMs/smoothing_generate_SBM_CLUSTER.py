@@ -225,10 +225,10 @@ print(os.getcwd())
 
 import pickle
 
-% load_ext
-autoreload
-% autoreload
-2
+# % load_ext
+# autoreload
+# % autoreload
+
 
 from data.SBMs import SBMsDatasetDGL
 
