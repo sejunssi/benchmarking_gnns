@@ -448,13 +448,13 @@ print(dataset.test[0])
 
 start = time.time()
 
-with open('SBM_CLUSTER_train_new.pkl', 'wb') as f:
+with open('SBM_CLUSTER_train_new_0403.pkl', 'wb') as f:
     pickle.dump(dataset.train, f)
 
-with open('SBM_CLUSTER_test_new.pkl', 'wb') as f:
+with open('SBM_CLUSTER_test_new.pkl_0403', 'wb') as f:
     pickle.dump(dataset.test, f)
 
-with open('SBM_CLUSTER_val_new.pkl', 'wb') as f:
+with open('SBM_CLUSTER_val_new.pkl_0403', 'wb') as f:
     pickle.dump(dataset.val, f)
 
 with open('SBM_CLUSTER_new.pkl', 'wb') as f:
