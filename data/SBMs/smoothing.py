@@ -174,6 +174,14 @@ import pickle
 with open('SBM_CLUSTER.pkl', 'rb') as f:
     data_all = pickle.load(f)
 
+data = data_all[0]
+
+with open('new_SBM_CLUSTER_no_smoothing.pkl', 'wb') as f:
+    pickle.dump(data, f)
+
+# dataset = LoadData(DATASET_NAME) # 29s
+# trainset, valset, testset = dataset.train, dataset.val, dataset.test
+
 # with open('SBM_CLUSTER_train.pkl', 'rb') as f:
 #     data = pickle.load(f)
 
@@ -268,8 +276,10 @@ new_data = [{'W':W, 'rand_idx': rand_idx, 'node_feat': node_feat, 'node_label': 
 # ps = ProgressSmoothing(g_nx=g_nx)
 # smoothed_labels = ps.smooth_all(2, labels)
 
-with open('new_SBM_CLUSTER_train_0402_03.pkl', 'wb') as f:
-    pickle.dump(data, f)
-   
+# with open('new_SBM_CLUSTER_train_0402_03_dataset.pkl', 'wb') as f:
+#     pickle.dump(data, f)
+#
+with open('new_SBM_CLUSTER_train_0402_04.pkl', 'wb') as f:
+     pickle.dump(data, f)
 
 print('Time (sec):', time.time() - start)
