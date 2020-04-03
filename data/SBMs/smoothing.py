@@ -171,8 +171,13 @@ import pickle
 #%load_ext autoreload
 #%autoreload 2
 
-with open('SBM_CLUSTER_train.pkl', 'rb') as f:
-    data = pickle.load(f)
+with open('SBM_CLUSTER.pkl', 'rb') as f:
+    data_all = pickle.load(f)
+
+# with open('SBM_CLUSTER_train.pkl', 'rb') as f:
+#     data = pickle.load(f)
+
+data = data_all[0]
 
 import networkx as nx
 

@@ -105,20 +105,17 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs):
             print("[!] Adding graph self-loops for GCN/GAT models (central node trick).")
             dataset._add_self_loops()
 
-
-
-
-
-
-    dataset.train =
-
-
-
-
-
-
     trainset, valset, testset = dataset.train, dataset.val, dataset.test
-        
+
+    print(trainset)
+
+
+
+
+
+
+
+
     root_log_dir, root_ckpt_dir, write_file_name, write_config_file = dirs
     device = net_params['device']
     
