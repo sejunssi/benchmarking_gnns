@@ -12,12 +12,12 @@ import time
 
 import matplotlib.pyplot as plt
 import scipy.sparse
-from data.superpixels import SuperPixDataset
-from data.molecules import MoleculeDataset
-from data.TUs import TUsDataset
-from data.SBMs import SBMsDataset
-from data.TSP import TSPDataset
-from data.CitationGraphs import CitationGraphsDataset
+#from data.superpixels import SuperPixDataset
+# from data.molecules import MoleculeDataset
+# from data.TUs import TUsDataset
+# from data.SBMs import SBMsDataset
+# from data.TSP import TSPDataset
+# from data.CitationGraphs import CitationGraphsDataset
 
 # %% md
 
