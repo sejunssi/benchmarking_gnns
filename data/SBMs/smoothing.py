@@ -176,10 +176,10 @@ with open('SBM_CLUSTER.pkl', 'rb') as f:
 
 data = data_all[0]
 
-with open('new_SBM_CLUSTER_train_before_smoothing.pkl', 'wb') as f:
-    pickle.dump(data, f)
+# with open('new_SBM_CLUSTER_train_before_smoothing.pkl', 'wb') as f:
+#     pickle.dump(data, f)
 
-# dataset = LoadData(DATASET_NAME) # 29s
+# dataset = LoadData(SBM_CLUSTER) # 29s
 # trainset, valset, testset = dataset.train, dataset.val, dataset.test
 
 # with open('SBM_CLUSTER_train.pkl', 'rb') as f:
