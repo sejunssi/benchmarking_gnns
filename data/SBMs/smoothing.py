@@ -171,7 +171,7 @@ import pickle
 #%load_ext autoreload
 #%autoreload 2
 
-with open('SBM_CLUSTER.pkl', 'rb') as f:
+with open('SBM_CLUSTER_train_new.pkl', 'rb') as f:
     data_all = pickle.load(f)
 
 data = data_all[0]
@@ -278,7 +278,7 @@ for idx, smoothed_label in enumerate(node_label):
 # with open('new_SBM_CLUSTER_train_0402_03_dataset.pkl', 'wb') as f:
 #     pickle.dump(data, f)
 #
-with open('new_SBM_CLUSTER_train_0402_04.pkl', 'wb') as f:
+with open('smoothed_SBM_CLUSTER_train_new', 'wb') as f:
      pickle.dump(data, f)
 
 print('Time (sec):', time.time() - start)
