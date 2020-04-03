@@ -448,16 +448,16 @@ print(dataset.test[0])
 
 start = time.time()
 
-with open('data/SBMs/SBM_CLUSTER_train_new.pkl', 'wb') as f:
+with open('SBM_CLUSTER_train_new.pkl', 'wb') as f:
     pickle.dump(dataset.train, f)
 
-with open('data/SBMs/SBM_CLUSTER_test_new.pkl', 'wb') as f:
+with open('SBM_CLUSTER_test_new.pkl', 'wb') as f:
     pickle.dump(dataset.test, f)
 
-with open('data/SBMs/SBM_CLUSTER_val_new.pkl', 'wb') as f:
+with open('SBM_CLUSTER_val_new.pkl', 'wb') as f:
     pickle.dump(dataset.val, f)
 
-with open('data/SBMs/SBM_CLUSTER_new.pkl', 'wb') as f:
+with open('SBM_CLUSTER_new.pkl', 'wb') as f:
     pickle.dump([dataset.train, dataset.val, dataset.test], f)
 
 print('Time (sec):', time.time() - start)
