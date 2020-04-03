@@ -185,7 +185,6 @@ data = data_all[0]
 # with open('SBM_CLUSTER_train.pkl', 'rb') as f:
 #     data = pickle.load(f)
 
-data = data_all[0]
 
 import networkx as nx
 
@@ -267,11 +266,11 @@ for W, labels in zip(W_lists, node_label_list):
 
 node_label = train_label
 
-new_data = [{'W':W, 'rand_idx': rand_idx, 'node_feat': node_feat, 'node_label': node_label}
-        for W, rand_idx, node_feat, node_label in zip(W_list, rand_idx_list, node_feat_list, node_label)]
+# new_data = [{'W':W, 'rand_idx': rand_idx, 'node_feat': node_feat, 'node_label': node_label}
+#         for W, rand_idx, node_feat, node_label in zip(W_list, rand_idx_list, node_feat_list, node_label)]
 
-# for idx, smoothed_label in enumerate(node_label):
-#     data[idx]['node_label'] = torch.tensor(smoothed_label)
+for idx, smoothed_label in enumerate(node_label):
+    data[idx]['node_label'] = torch.tensor(smoothed_label)
 
 # ps = ProgressSmoothing(g_nx=g_nx)
 # smoothed_labels = ps.smooth_all(2, labels)
