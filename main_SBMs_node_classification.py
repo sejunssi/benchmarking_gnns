@@ -7,9 +7,8 @@
     IMPORTING LIBS
 """
 import dgl
-import pdb
+
 import numpy as np
-# import pandas as pd
 import os
 import socket
 import time
@@ -27,7 +26,6 @@ from torch.utils.data import DataLoader
 
 from tensorboardX import SummaryWriter
 from tqdm import tqdm
-import csv
 
 class DotDict(dict):
     def __init__(self, **kwds):
@@ -137,7 +135,9 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs):
                                                      factor=params['lr_reduce_factor'],
                                                      patience=params['lr_schedule_patience'],
                                                      verbose=True)
-
+    
+    epoch_train_losses, epoch_val_losses = [], []
+    epoch_train_accs, epoch_val_accs = [], [] 
     
     train_loader = DataLoader(trainset, batch_size=params['batch_size'], shuffle=True, collate_fn=dataset.collate)
     val_loader = DataLoader(valset, batch_size=params['batch_size'], shuffle=False, collate_fn=dataset.collate)
@@ -146,18 +146,6 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs):
     # At any point you can hit Ctrl + C to break out of training early.
     try:
         with tqdm(range(params['epochs'])) as t:
-
-            header = ['epoch', 'epoch_train_losses', 'epoch_train_acc', 'epoch_val_losses', 'epoch_val_acc',
-                      'epoch_test_losses', 'epoch_test_acc']
-            epochs = [i + 1 for i in range(len(t))]
-            epoch_train_loss_list = []
-            epoch_train_acc_list = []
-            epoch_val_loss_list = []
-            epoch_val_acc_list = []
-            epoch_test_loss_list = []
-            epoch_test_acc_list = []
-
-
             for epoch in t:
 
                 t.set_description('Epoch %d' % epoch)
@@ -168,14 +156,10 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs):
                 epoch_val_loss, epoch_val_acc = evaluate_network(model, device, val_loader, epoch)
                 epoch_test_loss, epoch_test_acc = evaluate_network(model, device, test_loader, epoch)
 
-                epoch_train_loss_list.append(epoch_train_loss)
-                epoch_val_loss_list.append(epoch_val_loss)
-                epoch_test_loss_list.append(epoch_test_loss)
-
-                epoch_train_acc_list.append(epoch_train_acc)
-                epoch_val_acc_list.append(epoch_val_acc)
-                epoch_test_acc_list.append(epoch_test_acc)
-
+                epoch_train_losses.append(epoch_train_loss)
+                epoch_val_losses.append(epoch_val_loss)
+                epoch_train_accs.append(epoch_train_acc)
+                epoch_val_accs.append(epoch_val_acc)
 
                 writer.add_scalar('train/_loss', epoch_train_loss, epoch)
                 writer.add_scalar('val/_loss', epoch_val_loss, epoch)
@@ -215,14 +199,6 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs):
                     print('-' * 89)
                     print("Max_time for training elapsed {:.2f} hours, so stopping".format(params['max_time']))
                     break
-
-            csv_file = open(f'./{params["seed"]}_{DATASET_NAME}_{MODEL_NAME}_epoch_files.csv', 'w')
-            csvwriter = csv.writer(csv_file)
-            csvwriter.writerow(header)
-            for data in (zip(epochs, epoch_train_loss_list, epoch_train_acc_list, epoch_val_loss_list, epoch_val_acc_list,
-                             epoch_test_loss_list, epoch_test_acc_list)):
-                csvwriter.writerow(data)
-            csv_file.close()
     
     except KeyboardInterrupt:
         print('-' * 89)
@@ -238,12 +214,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs):
 
     writer.close()
 
-
-    with open(f'./{params["seed"]}_{DATASET_NAME}_{MODEL_NAME}_test_result.csv', 'wt', newline='') as f:
-        f.write("Test_Accuracy" + "," + "Train_Accuracy" + "," + "Total_Time_Taken" + "," + "AVG_Time_Per_Epoch")
-        f.write("\n")
-        f.write("{:.4f}".format(test_acc) + "," + "{:.4f}".format(train_acc) + "," + "{:.4f}".format(time.time() - start0) + "," + "{:.4f}".format(np.mean(per_epoch_time)))
-        """
+    """
         Write the results in out_dir/results folder
     """
     with open(write_file_name + '.txt', 'w') as f:
@@ -278,7 +249,7 @@ def main():
     
     
     parser = argparse.ArgumentParser()
-    parser.add_argument('--config', help= "Please give a config.json file with training/model/data/param details")
+    parser.add_argument('--config', help="Please give a config.json file with training/model/data/param details")
     parser.add_argument('--gpu_id', help="Please give a value for gpu id")
     parser.add_argument('--model', help="Please give a value for model name")
     parser.add_argument('--dataset', help="Please give a value for dataset name")
@@ -316,7 +287,6 @@ def main():
     parser.add_argument('--self_loop', help="Please give a value for self_loop")
     parser.add_argument('--max_time', help="Please give a value for max_time")
     args = parser.parse_args()
-    pdb.set_trace()
     with open(args.config) as f:
         config = json.load(f)
         
