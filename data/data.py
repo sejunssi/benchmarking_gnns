@@ -4,7 +4,7 @@
 from data.superpixels import SuperPixDataset
 from data.molecules import MoleculeDataset
 from data.TUs import TUsDataset
-from data.SBMs import SBMsDataset
+from data.smoothing_SBMs import SBMsDataset
 from data.TSP import TSPDataset
 from data.CitationGraphs import CitationGraphsDataset
 
