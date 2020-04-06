@@ -189,7 +189,7 @@ def SBMs_CLUSTER(nb_graphs, name):
 
 start = time.time()
 
-nb_graphs = 10  # train
+nb_graphs = 10000  # train
 # nb_graphs = 3333 # train
 # nb_graphs = 500 # train
 # nb_graphs = 20 # train
@@ -309,13 +309,13 @@ for idx, smoothed_label in enumerate(node_label):
 with open('smoothed_SBM_CLUSTER_train_a2', 'wb') as f:
     pickle.dump(data, f)
 
-nb_graphs = 10  # val
+nb_graphs = 1000  # val
 # nb_graphs = 333 # val
 # nb_graphs = 100 # val
 # nb_graphs = 5 # val
 SBMs_CLUSTER(nb_graphs, 'SBM_CLUSTER_val')
 
-nb_graphs = 10  # test
+nb_graphs = 1000  # test
 # nb_graphs = 333 # test
 # nb_graphs = 100 # test
 # nb_graphs = 5 # test
@@ -344,7 +344,7 @@ import pickle
 # % autoreload
 # 2
 
-from . import SBMsDatasetDGL
+from data.SBMs import SBMsDatasetDGL
 
 from data.data import LoadData
 from torch.utils.data import DataLoader
