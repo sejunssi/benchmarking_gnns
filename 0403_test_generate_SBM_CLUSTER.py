@@ -9,11 +9,11 @@ import pickle
 # % autoreload
 
 
-from data.smoothing_SBMs import SBMsDatasetDGL
+from data.SBMs import SBMsDatasetDGL
 
 from data.data import LoadData
 from torch.utils.data import DataLoader
-from data.smoothing_SBMs import SBMsDataset
+from data.SBMs import SBMsDataset
 
 # %%
 
