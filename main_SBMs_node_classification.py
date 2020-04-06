@@ -7,7 +7,7 @@
     IMPORTING LIBS
 """
 import dgl
-
+import pdb
 import numpy as np
 # import pandas as pd
 import os
@@ -316,6 +316,7 @@ def main():
     parser.add_argument('--self_loop', help="Please give a value for self_loop")
     parser.add_argument('--max_time', help="Please give a value for max_time")
     args = parser.parse_args()
+    pdb.set_trace()
     with open(args.config) as f:
         config = json.load(f)
         
