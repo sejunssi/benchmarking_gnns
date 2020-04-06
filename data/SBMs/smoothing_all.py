@@ -193,7 +193,7 @@ start = time.time()
 
 
 
-nb_graphs = 10000  # train
+nb_graphs = 10  # train
 # nb_graphs = 3333 # train
 # nb_graphs = 500 # train
 # nb_graphs = 20 # train
@@ -339,7 +339,7 @@ print('Time (sec):', time.time() - start)  # 190s
 
 import os
 
-os.chdir('/')  # go to root folder of the project
+#os.chdir('/')  # go to root folder of the project
 print(os.getcwd())
 
 # %%
@@ -351,6 +351,14 @@ import pickle
 # autoreload
 # % autoreload
 # 2
+
+import os
+import sys
+#sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+os.chdir('../../')
+#sys.path.append("/home/bigdyl/sejoon/benchmarking_gnn/data/SBMs.py")
+print(os.getcwd())
+print(sys.path)
 
 from data.SBMs import SBMsDatasetDGL
 
