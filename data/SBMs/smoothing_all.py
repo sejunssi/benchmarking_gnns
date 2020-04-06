@@ -204,7 +204,7 @@ print("hello2")
 import pickle
 import os
 print(os.getcwd())
-with open('./data/SBMs/SBM_CLUSTER_train.pkl', 'rb') as f:
+with open('SBM_CLUSTER_train.pkl', 'rb') as f:
     data = pickle.load(f)
 #
 # with open('SBM_CLUSTER_train.pkl', 'rb') as f:
@@ -314,7 +314,7 @@ for idx, smoothed_label in enumerate(node_label):
 # with open('new_SBM_CLUSTER_train_0402_03_dataset.pkl', 'wb') as f:
 #     pickle.dump(data, f)
 #
-with open('./data/SBMs/SBM_CLUSTER_train.pkl', 'wb') as f:
+with open('SBM_CLUSTER_train.pkl', 'wb') as f:
     pickle.dump(data, f)
 
 nb_graphs = 1000  # val
@@ -616,7 +616,7 @@ print("hello2")
 import pickle
 import os
 print(os.getcwd())
-with open('./data/SBMs/SBM_CLUSTER_train.pkl', 'rb') as f:
+with open('SBM_CLUSTER_train.pkl', 'rb') as f:
     data = pickle.load(f)
 #
 # with open('SBM_CLUSTER_train.pkl', 'rb') as f:
@@ -726,7 +726,7 @@ for idx, smoothed_label in enumerate(node_label):
 # with open('new_SBM_CLUSTER_train_0402_03_dataset.pkl', 'wb') as f:
 #     pickle.dump(data, f)
 #
-with open('./data/SBMs/SBM_CLUSTER_train.pkl', 'wb') as f:
+with open('SBM_CLUSTER_train.pkl', 'wb') as f:
     pickle.dump(data, f)
 
 nb_graphs = 1000  # val
@@ -1017,7 +1017,7 @@ print("hello2")
 import pickle
 import os
 print(os.getcwd())
-with open('./data/SBMs/SBM_CLUSTER_train.pkl', 'rb') as f:
+with open('SBM_CLUSTER_train.pkl', 'rb') as f:
     data = pickle.load(f)
 #
 # with open('SBM_CLUSTER_train.pkl', 'rb') as f:
@@ -1127,7 +1127,7 @@ for idx, smoothed_label in enumerate(node_label):
 # with open('new_SBM_CLUSTER_train_0402_03_dataset.pkl', 'wb') as f:
 #     pickle.dump(data, f)
 #
-with open('./data/SBMs/SBM_CLUSTER_train.pkl', 'wb') as f:
+with open('SBM_CLUSTER_train.pkl', 'wb') as f:
     pickle.dump(data, f)
 
 nb_graphs = 1000  # val
@@ -1409,7 +1409,7 @@ print("hello2")
 import pickle
 import os
 print(os.getcwd())
-with open('./data/SBMs/SBM_CLUSTER_train.pkl', 'rb') as f:
+with open('SBM_CLUSTER_train.pkl', 'rb') as f:
     data = pickle.load(f)
 #
 # with open('SBM_CLUSTER_train.pkl', 'rb') as f:
@@ -1519,7 +1519,7 @@ for idx, smoothed_label in enumerate(node_label):
 # with open('new_SBM_CLUSTER_train_0402_03_dataset.pkl', 'wb') as f:
 #     pickle.dump(data, f)
 #
-with open('./data/SBMs/SBM_CLUSTER_train.pkl', 'wb') as f:
+with open('SBM_CLUSTER_train.pkl', 'wb') as f:
     pickle.dump(data, f)
 
 nb_graphs = 1000  # val
@@ -1800,7 +1800,7 @@ print("hello2")
 import pickle
 import os
 print(os.getcwd())
-with open('./data/SBMs/SBM_CLUSTER_train.pkl', 'rb') as f:
+with open('SBM_CLUSTER_train.pkl', 'rb') as f:
     data = pickle.load(f)
 #
 # with open('SBM_CLUSTER_train.pkl', 'rb') as f:
@@ -1910,7 +1910,7 @@ for idx, smoothed_label in enumerate(node_label):
 # with open('new_SBM_CLUSTER_train_0402_03_dataset.pkl', 'wb') as f:
 #     pickle.dump(data, f)
 #
-with open('./data/SBMs/SBM_CLUSTER_train.pkl', 'wb') as f:
+with open('SBM_CLUSTER_train.pkl', 'wb') as f:
     pickle.dump(data, f)
 
 nb_graphs = 1000  # val
@@ -2195,7 +2195,7 @@ print("hello2")
 import pickle
 import os
 print(os.getcwd())
-with open('./data/SBMs/SBM_CLUSTER_train.pkl', 'rb') as f:
+with open('SBM_CLUSTER_train.pkl', 'rb') as f:
     data = pickle.load(f)
 #
 # with open('SBM_CLUSTER_train.pkl', 'rb') as f:
@@ -2305,7 +2305,7 @@ for idx, smoothed_label in enumerate(node_label):
 # with open('new_SBM_CLUSTER_train_0402_03_dataset.pkl', 'wb') as f:
 #     pickle.dump(data, f)
 #
-with open('./data/SBMs/SBM_CLUSTER_train.pkl', 'wb') as f:
+with open('SBM_CLUSTER_train.pkl', 'wb') as f:
     pickle.dump(data, f)
 
 nb_graphs = 1000  # val
@@ -2693,10 +2693,10 @@ plot_histo_graphs(dataset_train, 'train')
 plot_histo_graphs(dataset_val, 'val')
 plot_histo_graphs(dataset_test, 'test')
 
-with open('SBM_PATTERN_train.pkl', "wb") as f:
+with open('../../SBM_PATTERN_train.pkl', "wb") as f:
     pickle.dump(dataset_train, f)
 
-with open('SBM_PATTERN_train.pkl', 'rb') as f:
+with open('../../SBM_PATTERN_train.pkl', 'rb') as f:
     data = pickle.load(f)
 
     #  W_list = list(map(lambda d: d['W'].numpy(), data))
@@ -2797,13 +2797,13 @@ data = dataset_train
 
 
 
-with open('SBM_PATTERN_train.pkl', "wb") as f:
+with open('../../SBM_PATTERN_train.pkl', "wb") as f:
     pickle.dump(dataset_train, f)
 
 
-with open('SBM_PATTERN_val.pkl', "wb") as f:
+with open('../../SBM_PATTERN_val.pkl', "wb") as f:
     pickle.dump(dataset_val, f)
-with open('SBM_PATTERN_test.pkl', "wb") as f:
+with open('../../SBM_PATTERN_test.pkl', "wb") as f:
     pickle.dump(dataset_test, f)
 
 print('Time (sec):', time.time() - start)  # 163s
