@@ -48,7 +48,7 @@ PATTERN size is 1.60GB and CLUSTER size is 1.26GB.
 cd data/ 
 bash script_download_SBMs.sh
 ```
-Script [script_download_SBMs.sh](../data/script_download_SBMs.sh) is located here. Codes to reproduce the datasets for [PATTERN](../data/SBMs/generate_SBM_PATTERN.ipynb) and for [CLUSTER](../data/SBMs/generate_SBM_CLUSTER.ipynb).
+Script [script_download_SBMs.sh](../data/script_download_SBMs.sh) is located here. Codes to reproduce the datasets for [PATTERN](../data/SBMs/generate_SBM_PATTERN.ipynb) and for [CLUSTER](../data/SBMs/smooth_generate_SBM_CLUSTER.ipynb).
 
 <br>
 

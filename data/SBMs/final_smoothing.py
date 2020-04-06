@@ -76,6 +76,15 @@ class generate_SBM_graph():
         # target
         target = c
 
+
+
+
+
+
+
+
+
+
         # convert to pytorch
         W = torch.from_numpy(W)
         W = W.to(torch.int8)
@@ -105,74 +114,13 @@ print(SBM_parameters)
 
 data = generate_SBM_graph(SBM_parameters)
 
-print(data)
-# print(data.nb_nodes)
-# print(data.W)
-# print(data.rand_idx)
-# print(data.node_feat)
-# print(data.node_label)
-
-W = data.W
-plt.spy(W,precision=0.01, markersize=1)
-plt.show()
-
-idx = np.argsort(data.rand_idx)
-W = data.W
-W2 = W[idx,:]
-W2 = W2[:,idx]
-plt.spy(W2,precision=0.01, markersize=1)
-plt.show()
-
-
-class DotDict(dict):
-    def __init__(self, **kwds):
-        self.update(kwds)
-        self.__dict__ = self
-
-
-def generate_semisuperclust_dataset(nb_graphs):
-    dataset = []
-    for i in range(nb_graphs):
-        if not i % 250:
-            print(i)
-        data = generate_SBM_graph(SBM_parameters)
-        graph = DotDict()
-        graph.nb_nodes = data.nb_nodes
-        graph.W = data.W
-        graph.rand_idx = data.rand_idx
-        graph.node_feat = data.node_feat
-        graph.node_label = data.node_label
-        dataset.append(graph)
-    return dataset
-
-
-def plot_histo_graphs(dataset, title):
-    # histogram of graph sizes
-    graph_sizes = []
-    for graph in dataset:
-        graph_sizes.append(graph.nb_nodes)
-    plt.figure(1)
-    plt.hist(graph_sizes, bins=50)
-    plt.title(title)
-    plt.show()
-
-
-def SBMs_CLUSTER(nb_graphs, name):
-    dataset = generate_semisuperclust_dataset(nb_graphs)
-    print(len(dataset))
-    with open(name + '.pkl', "wb") as f:
-        pickle.dump(dataset, f)
-    plot_histo_graphs(dataset, name)
-
-
-
 import pickle
 
-#%load_ext autoreload
-#%autoreload 2
-
-with open('final_data/SBM_CLUSTER_train_new.pkl', 'rb') as f:
-    data_all = pickle.load(f)
+# #%load_ext autoreload
+# #%autoreload 2
+#
+# with open('SBM_CLUSTER_train_new.pkl', 'rb') as f:
+#     data_all = pickle.load(f)
 
 data = data_all[0]
 
@@ -278,6 +226,71 @@ for idx, smoothed_label in enumerate(node_label):
 # with open('new_SBM_CLUSTER_train_0402_03_dataset.pkl', 'wb') as f:
 #     pickle.dump(data, f)
 #
+
+
+
+print(data)
+# print(data.nb_nodes)
+# print(data.W)
+# print(data.rand_idx)
+# print(data.node_feat)
+# print(data.node_label)
+
+W = data.W
+plt.spy(W,precision=0.01, markersize=1)
+plt.show()
+
+idx = np.argsort(data.rand_idx)
+W = data.W
+W2 = W[idx,:]
+W2 = W2[:,idx]
+plt.spy(W2,precision=0.01, markersize=1)
+plt.show()
+
+
+class DotDict(dict):
+    def __init__(self, **kwds):
+        self.update(kwds)
+        self.__dict__ = self
+
+
+def generate_semisuperclust_dataset(nb_graphs):
+    dataset = []
+    for i in range(nb_graphs):
+        if not i % 250:
+            print(i)
+        data = generate_SBM_graph(SBM_parameters)
+        graph = DotDict()
+        graph.nb_nodes = data.nb_nodes
+        graph.W = data.W
+        graph.rand_idx = data.rand_idx
+        graph.node_feat = data.node_feat
+        graph.node_label = data.node_label
+        dataset.append(graph)
+    return dataset
+
+
+def plot_histo_graphs(dataset, title):
+    # histogram of graph sizes
+    graph_sizes = []
+    for graph in dataset:
+        graph_sizes.append(graph.nb_nodes)
+    plt.figure(1)
+    plt.hist(graph_sizes, bins=50)
+    plt.title(title)
+    plt.show()
+
+
+def SBMs_CLUSTER(nb_graphs, name):
+    dataset = generate_semisuperclust_dataset(nb_graphs)
+    print(len(dataset))
+    with open(name + '.pkl', "wb") as f:
+        pickle.dump(dataset, f)
+    plot_histo_graphs(dataset, name)
+
+
+
+
 with open('smoothed_SBM_CLUSTER_0406', 'wb') as f:
      pickle.dump(data, f)
 

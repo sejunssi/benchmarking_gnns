@@ -1,14 +1,25 @@
-import numpy as np
+# %% md
 
+# Notebook for generating and saving SBM CLUSTER graphs
+
+# %%
+
+import numpy as np
 import torch
 import pickle
 import time
 
-#%matplotlib inline
+# % matplotlib
+# inline
 import matplotlib.pyplot as plt
 import scipy.sparse
 
-start = time.time()
+
+# %% md
+
+# Generate SBM CLUSTER graphs
+
+# %%
 
 
 def schuffle(W, c):
@@ -106,23 +117,34 @@ print(SBM_parameters)
 data = generate_SBM_graph(SBM_parameters)
 
 print(data)
-# print(data.nb_nodes)
-# print(data.W)
-# print(data.rand_idx)
-# print(data.node_feat)
-# print(data.node_label)
+print(data.nb_nodes)
+print(data.W)
+print(data.rand_idx)
+print(data.node_feat)
+print(data.node_label)
+
+# %%
+
+# Plot Adj matrix
 
 W = data.W
-plt.spy(W,precision=0.01, markersize=1)
+plt.spy(W, precision=0.01, markersize=1)
 plt.show()
 
 idx = np.argsort(data.rand_idx)
 W = data.W
-W2 = W[idx,:]
-W2 = W2[:,idx]
-plt.spy(W2,precision=0.01, markersize=1)
+W2 = W[idx, :]
+W2 = W2[:, idx]
+plt.spy(W2, precision=0.01, markersize=1)
 plt.show()
 
+
+# %%
+
+
+# %%
+
+# Generate and save SBM graphs
 
 class DotDict(dict):
     def __init__(self, **kwds):
@@ -165,16 +187,20 @@ def SBMs_CLUSTER(nb_graphs, name):
     plot_histo_graphs(dataset, name)
 
 
+start = time.time()
+
+nb_graphs = 10000  # train
+# nb_graphs = 3333 # train
+# nb_graphs = 500 # train
+# nb_graphs = 20 # train
+SBMs_CLUSTER(nb_graphs, 'SBM_CLUSTER_train')
 
 import pickle
 
-#%load_ext autoreload
-#%autoreload 2
+with open('SBM_CLUSTER_train.pkl', 'rb') as f:
+    data = pickle.load(f)
 
-with open('final_data/SBM_CLUSTER_train_new.pkl', 'rb') as f:
-    data_all = pickle.load(f)
-
-data = data_all[0]
+data[5]
 
 # with open('new_SBM_CLUSTER_train_before_smoothing.pkl', 'wb') as f:
 #     pickle.dump(data, f)
@@ -188,13 +214,14 @@ data = data_all[0]
 
 import networkx as nx
 
-#train = data
+# train = data
 
 W_list = list(map(lambda d: d['W'].numpy(), data))
 W_lists = list(map(lambda d: d['W'].numpy(), data))
 rand_idx_list = list(map(lambda d: d['rand_idx'], data))
 node_feat_list = list(map(lambda d: d['node_feat'], data))
 node_label_list = list(map(lambda d: d['node_label'].numpy(), data))
+
 
 class ProgressSmoothing:
     def __init__(self, g_nx):
@@ -254,11 +281,12 @@ class ProgressSmoothing:
             smoothed_labels[u] *= float(w)
         return smoothed_labels
 
+
 train_label = []
 for W, labels in zip(W_lists, node_label_list):
-   # train_W =[]
-#    W = W.numpy()
-#    labels = node_label_list.numpy()
+    # train_W =[]
+    #    W = W.numpy()
+    #    labels = node_label_list.numpy()
     g_nx = nx.from_numpy_matrix(W)
     ps = ProgressSmoothing(g_nx=g_nx)
     # train_W.append(W)
@@ -279,6 +307,97 @@ for idx, smoothed_label in enumerate(node_label):
 #     pickle.dump(data, f)
 #
 with open('smoothed_SBM_CLUSTER_0406', 'wb') as f:
-     pickle.dump(data, f)
+    pickle.dump(data, f)
+
+nb_graphs = 1000  # val
+# nb_graphs = 333 # val
+# nb_graphs = 100 # val
+# nb_graphs = 5 # val
+SBMs_CLUSTER(nb_graphs, 'SBM_CLUSTER_val')
+
+nb_graphs = 1000  # test
+# nb_graphs = 333 # test
+# nb_graphs = 100 # test
+# nb_graphs = 5 # test
+SBMs_CLUSTER(nb_graphs, 'SBM_CLUSTER_test')
+
+print('Time (sec):', time.time() - start)  # 190s
+
+# %% md
+
+# Convert to DGL format and save with pickle
+
+# %%
+
+import os
+
+# os.chdir('../../')  # go to root folder of the project
+# print(os.getcwd())
+
+# %%
+
+
+import pickle
+
+# % load_ext
+# autoreload
+# % autoreload
+# 2
+
+from data.SBMs import SBMsDatasetDGL
+
+from data.data import LoadData
+from torch.utils.data import DataLoader
+from data.SBMs import SBMsDataset
+
+# %%
+
+DATASET_NAME = 'SBM_CLUSTER'
+dataset = SBMsDatasetDGL(DATASET_NAME)  # 3983s
+
+# %%
+
+print(len(dataset.train))
+print(len(dataset.val))
+print(len(dataset.test))
+
+print(dataset.train[0])
+print(dataset.val[0])
+print(dataset.test[0])
+
+# %%
+
+start = time.time()
+
+with open('data/SBMs/SBM_CLUSTER.pkl', 'wb') as f:
+    pickle.dump([dataset.train, dataset.val, dataset.test], f)
 
 print('Time (sec):', time.time() - start)
+
+# %% md
+
+# Test load function
+
+# %%
+
+DATASET_NAME = 'SBM_CLUSTER'
+dataset = LoadData(DATASET_NAME)  # 29s
+trainset, valset, testset = dataset.train, dataset.val, dataset.test
+
+# %%
+
+start = time.time()
+
+batch_size = 10
+collate = SBMsDataset.collate
+print(SBMsDataset)
+train_loader = DataLoader(trainset, batch_size=batch_size, shuffle=True, collate_fn=collate)
+
+print('Time (sec):', time.time() - start)  # 0.002s
+
+# %%
+
+
+# %%
+
+
