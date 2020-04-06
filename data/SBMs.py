@@ -221,19 +221,14 @@ class SBMsDataset(torch.utils.data.Dataset):
             # with open('new_SBM_CLUSTER_train_0402_03_dataset.pkl', 'wb') as f:
             #     pickle.dump(data, f)
             #
-            with open('smoothed_SBM_CLUSTER_train_0405', 'wb') as f:
-                pickle.dump(data, f)
+            # with open('smoothed_SBM_CLUSTER_train_0405', 'wb') as f:
+            #     pickle.dump(data, f)
 
             print('Time (sec):', time.time() - start)
 
+            # f[0] = data
 
-
-
-            f[0] = data
-
-
-
-            self.train = f[0]
+            self.train = data
             self.val = f[1]
             self.test = f[2]
         print('train, test, val sizes :',len(self.train),len(self.test),len(self.val))
