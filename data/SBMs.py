@@ -81,7 +81,8 @@ class SBMsDatasetDGL(torch.utils.data.Dataset):
         start = time.time()
         print("[I] Loading data ...")
         self.name = name
-        data_dir = 'data/SBMs'
+        data_dir = './'
+	#data_dir = 'data/SBMs'
         self.train = load_SBMsDataSetDGL(data_dir, name, split='train')
         self.test = load_SBMsDataSetDGL(data_dir, name, split='test')
         self.val = load_SBMsDataSetDGL(data_dir, name, split='val')
