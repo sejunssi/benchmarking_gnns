@@ -1,27 +1,14 @@
-# %% md
 
-# Notebook for generating and saving SBM CLUSTER graphs
-
-# %%
 
 import numpy as np
 import torch
 import pickle
 import time
-
-# % matplotlib
-# inline
+import os
 import matplotlib.pyplot as plt
 import scipy.sparse
 import os
-print(os.getcwd())
-
-# %% md
-
-# Generate SBM CLUSTER graphs
-
-# %%
-
+import networkx as nx
 
 def schuffle(W, c):
     # relabel the vertices at random
@@ -105,46 +92,6 @@ class generate_SBM_graph():
         self.node_feat = u
         self.node_label = target
 
-
-# configuration
-SBM_parameters = {}
-SBM_parameters['nb_clusters'] = 6
-SBM_parameters['size_min'] = 5
-SBM_parameters['size_max'] = 35
-SBM_parameters['p'] = 0.55
-SBM_parameters['q'] = 0.25
-print(SBM_parameters)
-
-data = generate_SBM_graph(SBM_parameters)
-
-print(data)
-print(data.nb_nodes)
-print(data.W)
-print(data.rand_idx)
-print(data.node_feat)
-print(data.node_label)
-
-# %%
-
-# Plot Adj matrix
-
-W = data.W
-plt.spy(W, precision=0.01, markersize=1)
-plt.show()
-
-idx = np.argsort(data.rand_idx)
-W = data.W
-W2 = W[idx, :]
-W2 = W2[:, idx]
-plt.spy(W2, precision=0.01, markersize=1)
-plt.show()
-
-
-# %%
-
-
-# %%
-
 # Generate and save SBM graphs
 
 class DotDict(dict):
@@ -168,66 +115,18 @@ def generate_semisuperclust_dataset(nb_graphs):
         dataset.append(graph)
     return dataset
 
-print("hello")
-def plot_histo_graphs(dataset, title):
-    # histogram of graph sizes
-    graph_sizes = []
-    for graph in dataset:
-        graph_sizes.append(graph.nb_nodes)
-    plt.figure(1)
-    plt.hist(graph_sizes, bins=50)
-    plt.title(title)
-    plt.show()
-
-
 def SBMs_CLUSTER(nb_graphs, name):
     dataset = generate_semisuperclust_dataset(nb_graphs)
     print(len(dataset))
     with open(name + '.pkl', "wb") as f:
         pickle.dump(dataset, f)
-    plot_histo_graphs(dataset, name)
+  #  plot_histo_graphs(dataset, name)
 
 
-start = time.time()
-
-
-
-
-nb_graphs = 10000  # train
-# nb_graphs = 3333 # train
-# nb_graphs = 500 # train
-# nb_graphs = 20 # train
-SBMs_CLUSTER(nb_graphs, 'SBM_CLUSTER_train')
-
-print("hello2")
-
-import pickle
-import os
-print(os.getcwd())
 with open('SBM_CLUSTER_train.pkl', 'rb') as f:
     data = pickle.load(f)
-#
-# with open('SBM_CLUSTER_train.pkl', 'rb') as f:
-#     data = pickle.load(f)
 
-# with open('new_SBM_CLUSTER_train_before_smoothing.pkl', 'wb') as f:
-#     pickle.dump(data, f)
-
-# dataset = LoadData(SBM_CLUSTER) # 29s
-# trainset, valset, testset = dataset.train, dataset.val, dataset.test
-
-# with open('SBM_CLUSTER_train.pkl', 'rb') as f:
-#     data = pickle.load(f)
-
-
-import networkx as nx
-
-# train = data
-
-#W_list = list(map(lambda d: d['W'].numpy(), data))
 W_lists = list(map(lambda d: d['W'].numpy(), data))
-#rand_idx_list = list(map(lambda d: d['rand_idx'], data))
-#node_feat_list = list(map(lambda d: d['node_feat'], data))
 node_label_list = list(map(lambda d: d['node_label'].numpy(), data))
 
 
@@ -240,16 +139,9 @@ class ProgressSmoothing:
         weight_list = [0 for _ in range(m)]
         for h in range(0, m):
             weighting = np.power(a, (m - h))
-            # print(len(neighbor_list_dict[h]))
             num_nodes = len(neighbor_list_dict[h])
             weight_list[h] = weighting * num_nodes
-
-            #             print(weighting, "@")
-            #             print(num_nodes, "#")
             denominator += weighting * num_nodes
-        #         print(type(denominator))
-        #         print(type(weight_list))
-        #        print(weight_list/denominator)
         return weight_list / denominator
 
     def nei_dict(self, hop_dict):
@@ -266,10 +158,8 @@ class ProgressSmoothing:
         #         hop_dict = nx.single_source_shortest_path_length(self.g_nx, v)
         hop_dict = nx.single_source_shortest_path_length(self.g_nx, v, 2)
         neighbor_list_dict = self.nei_dict(hop_dict)
-        #         print(neighbor_list_dict)
         m = np.max(list(neighbor_list_dict.keys()))
         weight_list = self._get_weight_list(a, m, neighbor_list_dict)
-        # print(weight_list)
         nidx_weight_list = []
         for h in range(0, m):
             for u in neighbor_list_dict[h]:
@@ -292,28 +182,15 @@ class ProgressSmoothing:
 
 train_label = []
 for W, labels in zip(W_lists, node_label_list):
-    # train_W =[]
-    #    W = W.numpy()
-    #    labels = node_label_list.numpy()
     g_nx = nx.from_numpy_matrix(W)
     ps = ProgressSmoothing(g_nx=g_nx)
-    # train_W.append(W)
     train_label.append(ps.smooth_all(2, labels))
 
 node_label = train_label
 
-# new_data = [{'W':W, 'rand_idx': rand_idx, 'node_feat': node_feat, 'node_label': node_label}
-#         for W, rand_idx, node_feat, node_label in zip(W_list, rand_idx_list, node_feat_list, node_label)]
-
 for idx, smoothed_label in enumerate(node_label):
     data[idx]['node_label'] = torch.tensor(smoothed_label)
 
-# ps = ProgressSmoothing(g_nx=g_nx)
-# smoothed_labels = ps.smooth_all(2, labels)
-
-# with open('new_SBM_CLUSTER_train_0402_03_dataset.pkl', 'wb') as f:
-#     pickle.dump(data, f)
-#
 
 with open('SBM_CLUSTER_train.pkl', 'wb') as f:
     pickle.dump(data, f)

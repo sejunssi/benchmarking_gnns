@@ -4,7 +4,7 @@
 #from data.superpixels import SuperPixDataset
 #from data.molecules import MoleculeDataset
 #from data.TUs import TUsDataset
-from data.SBMs import SBMsDataset
+from data.SBMs import SBMsDataset, SmoothedSBMsDataset
 #from data.TSP import TSPDataset
 #from data.CitationGraphs import CitationGraphsDataset
 
@@ -31,7 +31,11 @@ def LoadData(DATASET_NAME):
     SBM_DATASETS = ['SBM_CLUSTER', 'SBM_PATTERN']
     if DATASET_NAME in SBM_DATASETS: 
         return SBMsDataset(DATASET_NAME)
-    
+
+    SMOOTHED_SBM_DATASETS = ['SBM_CLUSTER_a1']
+    if DATASET_NAME in SMOOTHED_SBM_DATASETS:
+        return SmoothedSBMsDataset(DATASET_NAME)
+
     # handling for TSP dataset
     if DATASET_NAME == 'TSP':
         return TSPDataset(DATASET_NAME)
