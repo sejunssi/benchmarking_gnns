@@ -371,7 +371,11 @@ for idx, smoothed_label in enumerate(node_label):
     data[0].dataset[idx]['node_label'] = torch.tensor(smoothed_label)
 
 # %%
+<<<<<<< HEAD
 with open('out_0401/SBM_CLUSTER_a1.pkl', 'wb') as f:
+=======
+with open('SBM_CLUSTER_a1.pkl', 'wb') as f:
+>>>>>>> eb1ea92fd805d40fc75b9893f7668deb78debad6
     pickle.dump(data, f)
 
 
@@ -445,10 +449,15 @@ node_label = train_label
 for idx, smoothed_label in enumerate(node_label):
     data[0].dataset[idx]['node_label'] = torch.tensor(smoothed_label)
 
+<<<<<<< HEAD
 
 
 # %%
 with open('out_0401/SBM_CLUSTER_a2.pkl', 'wb') as f:
+=======
+# %%
+with open('SBM_CLUSTER_a2.pkl', 'wb') as f:
+>>>>>>> eb1ea92fd805d40fc75b9893f7668deb78debad6
     pickle.dump(data, f)
 
 
@@ -524,7 +533,11 @@ for idx, smoothed_label in enumerate(node_label):
     data[0].dataset[idx]['node_label'] = torch.tensor(smoothed_label)
 
 # %%
+<<<<<<< HEAD
 with open('out_0401/SBM_CLUSTER_a3.pkl', 'wb') as f:
+=======
+with open('SBM_CLUSTER_a3.pkl', 'wb') as f:
+>>>>>>> eb1ea92fd805d40fc75b9893f7668deb78debad6
     pickle.dump(data, f)
 
 
@@ -599,7 +612,11 @@ for idx, smoothed_label in enumerate(node_label):
     data[0].dataset[idx]['node_label'] = torch.tensor(smoothed_label)
 
 # %%
+<<<<<<< HEAD
 with open('out_0401/SBM_CLUSTER_a4.pkl', 'wb') as f:
+=======
+with open('SBM_CLUSTER_a4.pkl', 'wb') as f:
+>>>>>>> eb1ea92fd805d40fc75b9893f7668deb78debad6
     pickle.dump(data, f)
 
 
@@ -674,7 +691,11 @@ for idx, smoothed_label in enumerate(node_label):
     data[0].dataset[idx]['node_label'] = torch.tensor(smoothed_label)
 
 # %%
+<<<<<<< HEAD
 with open('out_0401/SBM_CLUSTER_a8.pkl', 'wb') as f:
+=======
+with open('SBM_CLUSTER_a8.pkl', 'wb') as f:
+>>>>>>> eb1ea92fd805d40fc75b9893f7668deb78debad6
     pickle.dump(data, f)
 
 
@@ -755,7 +776,11 @@ for idx, smoothed_label in enumerate(node_label):
     data[0].dataset[idx]['node_label'] = torch.tensor(smoothed_label)
 
 # %%
+<<<<<<< HEAD
 with open('out_0401/SBM_PATTERN_a1.pkl', 'wb') as f:
+=======
+with open('SBM_PATTERN_a1.pkl', 'wb') as f:
+>>>>>>> eb1ea92fd805d40fc75b9893f7668deb78debad6
     pickle.dump(data, f)
 
 
@@ -838,7 +863,11 @@ for idx, smoothed_label in enumerate(node_label):
     data[0].dataset[idx]['node_label'] = torch.tensor(smoothed_label)
 
 # %%
+<<<<<<< HEAD
 with open('out_0401/SBM_PATTERN_a2.pkl', 'wb') as f:
+=======
+with open('SBM_PATTERN_a2.pkl', 'wb') as f:
+>>>>>>> eb1ea92fd805d40fc75b9893f7668deb78debad6
     pickle.dump(data, f)
 
 
@@ -848,6 +877,7 @@ with open('out_0401/SBM_PATTERN_a2.pkl', 'wb') as f:
 
 
 
+<<<<<<< HEAD
 
 
     with open('SBM_PATTERN.pkl', 'rb') as f:
@@ -934,6 +964,8 @@ with open('out_0401/SBM_PATTERN_a2.pkl', 'wb') as f:
 
 
 
+=======
+>>>>>>> eb1ea92fd805d40fc75b9893f7668deb78debad6
 with open('SBM_PATTERN.pkl', 'rb') as f:
     data = pickle.load(f)
 
@@ -1004,7 +1036,11 @@ for idx, smoothed_label in enumerate(node_label):
     data[0].dataset[idx]['node_label'] = torch.tensor(smoothed_label)
 
 # %%
+<<<<<<< HEAD
 with open('out_0401/SBM_PATTERN_a4.pkl', 'wb') as f:
+=======
+with open('SBM_PATTERN_a4.pkl', 'wb') as f:
+>>>>>>> eb1ea92fd805d40fc75b9893f7668deb78debad6
     pickle.dump(data, f)
 
 
@@ -1084,5 +1120,10 @@ with open('out_0401/SBM_PATTERN_a4.pkl', 'wb') as f:
         data[0].dataset[idx]['node_label'] = torch.tensor(smoothed_label)
 
     # %%
+<<<<<<< HEAD
     with open('out_0401/SBM_PATTERN_a8.pkl', 'wb') as f:
         pickle.dump(data, f)
+=======
+    with open('SBM_PATTERN_a8.pkl', 'wb') as f:
+        pickle.dump(data, f)
+>>>>>>> eb1ea92fd805d40fc75b9893f7668deb78debad6

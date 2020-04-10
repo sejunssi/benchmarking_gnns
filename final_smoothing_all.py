@@ -193,7 +193,11 @@ DATASET_NAME = 'SBM_CLUSTER'
 dataset = SBMsDatasetDGL(DATASET_NAME)  # 3983s
 
 
+<<<<<<< HEAD
 with open('data/SBMs/SBM_CLUSTER_without_smoothing.pkl', 'wb') as f:
+=======
+with open('data/SBMs/no_smoothing_SBM_CLUSTER.pkl', 'wb') as f:
+>>>>>>> eb1ea92fd805d40fc75b9893f7668deb78debad6
     pickle.dump([dataset.train, dataset.val, dataset.test], f)
 
 
@@ -276,7 +280,11 @@ node_label = train_label
 for idx, smoothed_label in enumerate(node_label):
     data[idx]['node_label'] = torch.tensor(smoothed_label)
 
+<<<<<<< HEAD
 with open('data/SBMs/SBM_CLUSTER_train.pkl', 'wb') as f:
+=======
+with open('a2_SBM_CLUSTER_train.pkl', 'wb') as f:
+>>>>>>> eb1ea92fd805d40fc75b9893f7668deb78debad6
     pickle.dump(data, f)
 
 

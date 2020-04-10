@@ -9,9 +9,12 @@ tmux send-keys "source activate benchmark_gnn" C-m
 
 dataset=SBM_CLUSTER_a1
 
+<<<<<<< HEAD
 python main_SBMs_node_classification --dataset SBM_CLUSTER_a1 --gpu_id 0 --seed 41 --config 'configs/SBMs_node_clustering_GCN_CLUSTER_a1.json'
 
 
+=======
+>>>>>>> eb1ea92fd805d40fc75b9893f7668deb78debad6
 tmux send-keys "
 python $code --dataset $dataset --gpu_id 0 --seed $seed0 --config 'configs/SBMs_node_clustering_GCN_CLUSTER.json' &
 python $code --dataset $dataset --gpu_id 1 --seed $seed1 --config 'configs/SBMs_node_clustering_GCN_CLUSTER.json' &

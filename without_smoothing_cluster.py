@@ -168,6 +168,7 @@ def SBMs_CLUSTER(nb_graphs, name):
     #plot_histo_graphs(dataset, name)
 
 
+<<<<<<< HEAD
 nb_graphs = 3  # train
 SBMs_CLUSTER(nb_graphs, 'SBM_CLUSTER_train')
 
@@ -175,6 +176,15 @@ nb_graphs = 3  # val
 SBMs_CLUSTER(nb_graphs, 'SBM_CLUSTER_val')
 
 nb_graphs = 3  # test
+=======
+nb_graphs = 10000  # train
+SBMs_CLUSTER(nb_graphs, 'SBM_CLUSTER_train')
+
+nb_graphs = 1000  # val
+SBMs_CLUSTER(nb_graphs, 'SBM_CLUSTER_val')
+
+nb_graphs = 1000  # test
+>>>>>>> eb1ea92fd805d40fc75b9893f7668deb78debad6
 # nb_graphs = 333 # test
 # nb_graphs = 100 # test
 # nb_graphs = 5 # test
@@ -189,9 +199,17 @@ from data.SBMs import SBMsDataset
 
 # %%
 
+<<<<<<< HEAD
 DATASET_NAME = 'a2_SBM_CLUSTER'
 dataset = SBMsDatasetDGL(DATASET_NAME)  # 3983s
 
 
 with open('data/SBMs/a2_SBM_CLUSTER.pkl', 'wb') as f:
+=======
+DATASET_NAME = 'SBM_CLUSTER'
+dataset = SBMsDatasetDGL(DATASET_NAME)  # 3983s
+
+
+with open('data/SBMs/SBM_CLUSTER.pkl', 'wb') as f:
+>>>>>>> eb1ea92fd805d40fc75b9893f7668deb78debad6
     pickle.dump([dataset.train, dataset.val, dataset.test], f)

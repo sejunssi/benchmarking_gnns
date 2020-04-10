@@ -58,7 +58,18 @@ class load_SBMsDataSetDGL(torch.utils.data.Dataset):
         return self.n_samples
 
     def __getitem__(self, idx):
-
+        """
+            Get the idx^th sample.
+            Parameters
+            ---------
+            idx : int
+                The sample index.
+            Returns
+            -------
+            (dgl.DGLGraph, int)
+                DGLGraph with node feature stored in `feat` field
+                And its label.
+        """
         return self.graph_lists[idx], self.node_labels[idx]
 
 
@@ -80,7 +91,13 @@ class SBMsDatasetDGL(torch.utils.data.Dataset):
 
 
 def self_loop(g):
+    """
+        Utility function only, to be used only when necessary as per user self_loop flag
+        : Overwriting the function dgl.transform.add_self_loop() to not miss ndata['feat'] and edata['feat']
 
+
+        This function is called inside a function in SBMsDataset class.
+    """
     new_g = dgl.DGLGraph()
     new_g.add_nodes(g.number_of_nodes())
     new_g.ndata['feat'] = g.ndata['feat']
@@ -230,6 +247,39 @@ class generate_SBM_graph():
         self.node_label = target
 
 
+# # configuration
+# SBM_parameters = {}
+# SBM_parameters['nb_clusters'] = 6
+# SBM_parameters['size_min'] = 5
+# SBM_parameters['size_max'] = 35
+# SBM_parameters['p'] = 0.55
+# SBM_parameters['q'] = 0.25
+# print(SBM_parameters)
+
+# data = generate_SBM_graph(SBM_parameters)
+#
+# print(data)
+# print(data.nb_nodes)
+# print(data.W)
+# print(data.rand_idx)
+# print(data.node_feat)
+# print(data.node_label)
+
+# Plot Adj matrix
+
+# W = data.W
+# plt.spy(W, precision=0.01, markersize=1)
+# plt.show()
+#
+# idx = np.argsort(data.rand_idx)
+# W = data.W
+# W2 = W[idx, :]
+# W2 = W2[:, idx]
+# plt.spy(W2, precision=0.01, markersize=1)
+# plt.show()
+
+# Generate and save SBM graphs
+
 class DotDict(dict):
     def __init__(self, **kwds):
         self.update(kwds)
@@ -252,6 +302,17 @@ def generate_semisuperclust_dataset(nb_graphs):
     return dataset
 
 
+# def plot_histo_graphs(dataset, title):
+#     # histogram of graph sizes
+#     graph_sizes = []
+#     for graph in dataset:
+#         graph_sizes.append(graph.nb_nodes)
+#     plt.figure(1)
+#     plt.hist(graph_sizes, bins=50)
+#     plt.title(title)
+#     plt.show()
+
+
 def SBMs_CLUSTER(nb_graphs, name):
     dataset = generate_semisuperclust_dataset(nb_graphs)
     print(len(dataset))
@@ -260,8 +321,17 @@ def SBMs_CLUSTER(nb_graphs, name):
     # plot_histo_graphs(dataset, name)
 
 
-
-
+# %%
+with open('SBM_CLUSTER.pkl', 'rb') as f:
+    data = pickle.load(f)
+#
+#
+# with open('SBM_PATTERN.pkl', 'rb') as f:
+#     data2 = pickle.load(f)
+# %%
+"""
+    File to load dataset based on user control from main file
+"""
 from data.SBMs import SBMsDataset
 
 
@@ -299,93 +369,80 @@ def LoadData(DATASET_NAME):
         return CitationGraphsDataset(DATASET_NAME)
 
 
+# %%
+# DATASET_NAME = 'SBM_CLUSTER'
+# dataset = LoadData(DATASET_NAME) # 29s
+# trainset, valset, testset = dataset.train, dataset.val, dataset.test
 
-
-with open('SBM_CLUSTER.pkl', 'rb') as f:
-    data = pickle.load(f)
+# %%
+data[0].dataset
 
 # %%
 
 
+W_lists = list(map(lambda d: d['W'].numpy(), data[0].dataset))
+node_label_list = list(map(lambda d: d['node_label'].numpy(), data[0].dataset))
 
 
+class ProgressSmoothing:
+    def __init__(self, g_nx):
+        self.g_nx = g_nx
+
+    def _get_weight_list(self, a, m, neighbor_list_dict):
+        denominator = 0
+        weight_list = [0 for _ in range(m)]
+        for h in range(0, m):
+            weighting = np.power(a, (m - h))
+            num_nodes = len(neighbor_list_dict[h])
+            weight_list[h] = weighting * num_nodes
+            denominator += weighting * num_nodes
+        return weight_list / denominator
+
+    def nei_dict(self, hop_dict):
+        neighbor_list_dict = {}  # neighbor_list_dict = {which_hop: [index1, index5, ....]}
+        for u, h in hop_dict.items():  # hop_dict = {neighbor_id : which_hop}
+            if not h in neighbor_list_dict.keys():
+                n_list = [u]  # include self node
+                neighbor_list_dict[h] = n_list
+            else:
+                neighbor_list_dict[h].append(u)
+        return neighbor_list_dict
+
+    def get_neigh_smooth_weight(self, v, a):
+        #         hop_dict = nx.single_source_shortest_path_length(self.g_nx, v)
+        hop_dict = nx.single_source_shortest_path_length(self.g_nx, v, 2)
+        neighbor_list_dict = self.nei_dict(hop_dict)
+        m = np.max(list(neighbor_list_dict.keys()))
+        weight_list = self._get_weight_list(a, m, neighbor_list_dict)
+        nidx_weight_list = []
+        for h in range(0, m):
+            for u in neighbor_list_dict[h]:
+                nidx_weight_list.append((int(u), weight_list[h]))
+        return nidx_weight_list
+
+    def smooth_all(self, a, labels):
+        total_nidx_weight_list = []
+        for v in list(g_nx.nodes):
+            nidx_weight_list = self.get_neigh_smooth_weight(v, a)
+            total_nidx_weight_list.extend(nidx_weight_list)
+        smoothed_labels = labels.copy()
+        smoothed_labels = smoothed_labels.astype(float)
+        for u, w in total_nidx_weight_list:
+            smoothed_labels[u] *= float(w)
+        return smoothed_labels
 
 
+train_label = []
+for W, labels in zip(W_lists, node_label_list):
+    g_nx = nx.from_numpy_matrix(W)
+    ps = ProgressSmoothing(g_nx=g_nx)
+    train_label.append(ps.smooth_all(2, labels))
 
+node_label = train_label
 
-    with open('SBM_PATTERN.pkl', 'rb') as f:
-        data = pickle.load(f)
+for idx, smoothed_label in enumerate(node_label):
+    data[0].dataset[idx]['node_label'] = torch.tensor(smoothed_label)
 
-    # %%
-
-    W_lists = list(map(lambda d: d['W'].numpy(), data[0].dataset))
-    node_label_list = list(map(lambda d: d['node_label'].numpy(), data[0].dataset))
-
-
-    class ProgressSmoothing:
-        def __init__(self, g_nx):
-            self.g_nx = g_nx
-
-        def _get_weight_list(self, a, m, neighbor_list_dict):
-            denominator = 0
-            weight_list = [0 for _ in range(m)]
-            for h in range(0, m):
-                weighting = np.power(a, (m - h))
-                num_nodes = len(neighbor_list_dict[h])
-                weight_list[h] = weighting * num_nodes
-                denominator += weighting * num_nodes
-            return weight_list / denominator
-
-        def nei_dict(self, hop_dict):
-            neighbor_list_dict = {}  # neighbor_list_dict = {which_hop: [index1, index5, ....]}
-            for u, h in hop_dict.items():  # hop_dict = {neighbor_id : which_hop}
-                if not h in neighbor_list_dict.keys():
-                    n_list = [u]  # include self node
-                    neighbor_list_dict[h] = n_list
-                else:
-                    neighbor_list_dict[h].append(u)
-            return neighbor_list_dict
-
-        def get_neigh_smooth_weight(self, v, a):
-            #         hop_dict = nx.single_source_shortest_path_length(self.g_nx, v)
-            hop_dict = nx.single_source_shortest_path_length(self.g_nx, v, 2)
-            neighbor_list_dict = self.nei_dict(hop_dict)
-            m = np.max(list(neighbor_list_dict.keys()))
-            weight_list = self._get_weight_list(a, m, neighbor_list_dict)
-            nidx_weight_list = []
-            for h in range(0, m):
-                for u in neighbor_list_dict[h]:
-                    nidx_weight_list.append((int(u), weight_list[h]))
-            return nidx_weight_list
-
-        def smooth_all(self, a, labels):
-            total_nidx_weight_list = []
-            for v in list(g_nx.nodes):
-                nidx_weight_list = self.get_neigh_smooth_weight(v, a)
-                total_nidx_weight_list.extend(nidx_weight_list)
-            smoothed_labels = labels.copy()
-            smoothed_labels = smoothed_labels.astype(float)
-            for u, w in total_nidx_weight_list:
-                smoothed_labels[u] *= float(w)
-            return smoothed_labels
-
-
-    train_label = []
-    for W, labels in zip(W_lists, node_label_list):
-        g_nx = nx.from_numpy_matrix(W)
-        ps = ProgressSmoothing(g_nx=g_nx)
-        train_label.append(ps.smooth_all(3, labels))
-
-    node_label = train_label
-
-    for idx, smoothed_label in enumerate(node_label):
-        data[0].dataset[idx]['node_label'] = torch.tensor(smoothed_label)
-
-    # %%
-<<<<<<< HEAD
-    with open('out_0401/SBM_PATTERN_a3.pkl', 'wb') as f:
-=======
-    with open('SBM_PATTERN_a3.pkl', 'wb') as f:
->>>>>>> eb1ea92fd805d40fc75b9893f7668deb78debad6
-        pickle.dump(data, f)
-
+# %%
+with open('SBM_CLUSTER_a2.pkl', 'wb') as f:
+    pickle.dump(data, f)

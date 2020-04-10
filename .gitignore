@@ -6,6 +6,11 @@ out/
 
 *.csv
 *.pkl
+data/SBMs/previous_data/*
+previous_0405/*
+
+*.pkl
+result_0410/*
 
 gmail.py
 

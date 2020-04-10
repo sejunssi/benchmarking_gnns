@@ -301,10 +301,184 @@ def LoadData(DATASET_NAME):
 
 
 
-with open('SBM_CLUSTER.pkl', 'rb') as f:
+
+
+
+
+
+with open('_SBM_CLUSTER_a1.pkl', 'rb') as f:
     data = pickle.load(f)
 
-# %%
+
+with open('SBM_CLUSTER_train.pkl', 'wb') as f:
+    pickle.dump(data[0].dataset, f)
+
+with open('SBM_CLUSTER_val.pkl', 'wb') as f:
+    pickle.dump(data[1].dataset, f)
+
+with open('SBM_CLUSTER_test.pkl', 'wb') as f:
+    pickle.dump(data[2].dataset, f)
+
+
+from data.SBMs import SBMsDatasetDGL
+from data.data import LoadData
+from torch.utils.data import DataLoader
+from data.SBMs import SBMsDataset
+
+
+DATASET_NAME = 'SBM_CLUSTER'
+dataset = SBMsDatasetDGL(DATASET_NAME)  # 3983s
+
+with open('SBM_CLUSTER_a1.pkl', 'wb') as f:
+    pickle.dump(dataset, f)
+
+
+
+
+
+with open('_SBM_CLUSTER_a2.pkl', 'rb') as f:
+    data = pickle.load(f)
+
+
+with open('SBM_CLUSTER_train.pkl', 'wb') as f:
+    pickle.dump(data[0].dataset, f)
+
+with open('SBM_CLUSTER_val.pkl', 'wb') as f:
+    pickle.dump(data[1].dataset, f)
+
+with open('SBM_CLUSTER_test.pkl', 'wb') as f:
+    pickle.dump(data[2].dataset, f)
+
+
+from data.SBMs import SBMsDatasetDGL
+from data.data import LoadData
+from torch.utils.data import DataLoader
+from data.SBMs import SBMsDataset
+
+
+DATASET_NAME = 'SBM_CLUSTER'
+dataset = SBMsDatasetDGL(DATASET_NAME)  # 3983s
+
+with open('SBM_CLUSTER_a2.pkl', 'wb') as f:
+    pickle.dump(dataset, f)
+
+
+
+
+with open('_SBM_CLUSTER_a3.pkl', 'rb') as f:
+    data = pickle.load(f)
+
+
+with open('SBM_CLUSTER_train.pkl', 'wb') as f:
+    pickle.dump(data[0].dataset, f)
+
+with open('SBM_CLUSTER_val.pkl', 'wb') as f:
+    pickle.dump(data[1].dataset, f)
+
+with open('SBM_CLUSTER_test.pkl', 'wb') as f:
+    pickle.dump(data[2].dataset, f)
+
+
+from data.SBMs import SBMsDatasetDGL
+from data.data import LoadData
+from torch.utils.data import DataLoader
+from data.SBMs import SBMsDataset
+
+
+DATASET_NAME = 'SBM_CLUSTER'
+dataset = SBMsDatasetDGL(DATASET_NAME)  # 3983s
+
+with open('SBM_CLUSTER_a3.pkl', 'wb') as f:
+    pickle.dump(dataset, f)
+
+
+
+with open('_SBM_CLUSTER_a4.pkl', 'rb') as f:
+    data = pickle.load(f)
+
+
+with open('SBM_CLUSTER_train.pkl', 'wb') as f:
+    pickle.dump(data[0].dataset, f)
+
+with open('SBM_CLUSTER_val.pkl', 'wb') as f:
+    pickle.dump(data[1].dataset, f)
+
+with open('SBM_CLUSTER_test.pkl', 'wb') as f:
+    pickle.dump(data[2].dataset, f)
+
+
+from data.SBMs import SBMsDatasetDGL
+from data.data import LoadData
+from torch.utils.data import DataLoader
+from data.SBMs import SBMsDataset
+
+
+DATASET_NAME = 'SBM_CLUSTER'
+dataset = SBMsDatasetDGL(DATASET_NAME)  # 3983s
+
+with open('SBM_CLUSTER_a4.pkl', 'wb') as f:
+    pickle.dump(dataset, f)
+
+
+
+
+
+
+with open('_SBM_CLUSTER_a8.pkl', 'rb') as f:
+    data = pickle.load(f)
+
+with open('SBM_CLUSTER_train.pkl', 'wb') as f:
+    pickle.dump(data[0].dataset, f)
+
+with open('SBM_CLUSTER_val.pkl', 'wb') as f:
+    pickle.dump(data[1].dataset, f)
+
+with open('SBM_CLUSTER_test.pkl', 'wb') as f:
+    pickle.dump(data[2].dataset, f)
+
+
+from data.SBMs import SBMsDatasetDGL
+from data.data import LoadData
+from torch.utils.data import DataLoader
+from data.SBMs import SBMsDataset
+
+
+DATASET_NAME = 'SBM_CLUSTER'
+dataset = SBMsDatasetDGL(DATASET_NAME)  # 3983s
+
+with open('SBM_CLUSTER_a8.pkl', 'wb') as f:
+    pickle.dump(dataset, f)
+
+
+
+
+
+
+with open('_SBM_PATTERN_a1.pkl', 'rb') as f:
+    data = pickle.load(f)
+
+
+with open('SBM_PATTERN_train.pkl', 'wb') as f:
+    pickle.dump(data[0].dataset, f)
+
+with open('SBM_PATTERN_val.pkl', 'wb') as f:
+    pickle.dump(data[1].dataset, f)
+
+with open('SBM_PATTERN_test.pkl', 'wb') as f:
+    pickle.dump(data[2].dataset, f)
+
+
+from data.SBMs import SBMsDatasetDGL
+from data.data import LoadData
+from torch.utils.data import DataLoader
+from data.SBMs import SBMsDataset
+
+
+DATASET_NAME = 'SBM_PATTERN'
+dataset = SBMsDatasetDGL(DATASET_NAME)  # 3983s
+
+with open('SBM_PATTERN_a1.pkl', 'wb') as f:
+    pickle.dump(dataset, f)
 
 
 
@@ -313,79 +487,113 @@ with open('SBM_CLUSTER.pkl', 'rb') as f:
 
 
 
-    with open('SBM_PATTERN.pkl', 'rb') as f:
-        data = pickle.load(f)
-
-    # %%
-
-    W_lists = list(map(lambda d: d['W'].numpy(), data[0].dataset))
-    node_label_list = list(map(lambda d: d['node_label'].numpy(), data[0].dataset))
 
 
-    class ProgressSmoothing:
-        def __init__(self, g_nx):
-            self.g_nx = g_nx
+with open('_SBM_PATTERN_a2.pkl', 'rb') as f:
+    data = pickle.load(f)
 
-        def _get_weight_list(self, a, m, neighbor_list_dict):
-            denominator = 0
-            weight_list = [0 for _ in range(m)]
-            for h in range(0, m):
-                weighting = np.power(a, (m - h))
-                num_nodes = len(neighbor_list_dict[h])
-                weight_list[h] = weighting * num_nodes
-                denominator += weighting * num_nodes
-            return weight_list / denominator
+with open('SBM_PATTERN_train.pkl', 'wb') as f:
+    pickle.dump(data[0].dataset, f)
 
-        def nei_dict(self, hop_dict):
-            neighbor_list_dict = {}  # neighbor_list_dict = {which_hop: [index1, index5, ....]}
-            for u, h in hop_dict.items():  # hop_dict = {neighbor_id : which_hop}
-                if not h in neighbor_list_dict.keys():
-                    n_list = [u]  # include self node
-                    neighbor_list_dict[h] = n_list
-                else:
-                    neighbor_list_dict[h].append(u)
-            return neighbor_list_dict
+with open('SBM_PATTERN_val.pkl', 'wb') as f:
+    pickle.dump(data[1].dataset, f)
 
-        def get_neigh_smooth_weight(self, v, a):
-            #         hop_dict = nx.single_source_shortest_path_length(self.g_nx, v)
-            hop_dict = nx.single_source_shortest_path_length(self.g_nx, v, 2)
-            neighbor_list_dict = self.nei_dict(hop_dict)
-            m = np.max(list(neighbor_list_dict.keys()))
-            weight_list = self._get_weight_list(a, m, neighbor_list_dict)
-            nidx_weight_list = []
-            for h in range(0, m):
-                for u in neighbor_list_dict[h]:
-                    nidx_weight_list.append((int(u), weight_list[h]))
-            return nidx_weight_list
+with open('SBM_PATTERN_test.pkl', 'wb') as f:
+    pickle.dump(data[2].dataset, f)
 
-        def smooth_all(self, a, labels):
-            total_nidx_weight_list = []
-            for v in list(g_nx.nodes):
-                nidx_weight_list = self.get_neigh_smooth_weight(v, a)
-                total_nidx_weight_list.extend(nidx_weight_list)
-            smoothed_labels = labels.copy()
-            smoothed_labels = smoothed_labels.astype(float)
-            for u, w in total_nidx_weight_list:
-                smoothed_labels[u] *= float(w)
-            return smoothed_labels
+from data.SBMs import SBMsDatasetDGL
+from data.data import LoadData
+from torch.utils.data import DataLoader
+from data.SBMs import SBMsDataset
+
+DATASET_NAME = 'SBM_PATTERN'
+dataset = SBMsDatasetDGL(DATASET_NAME)  # 3983s
+
+with open('SBM_PATTERN_a2.pkl', 'wb') as f:
+    pickle.dump(dataset, f)
 
 
-    train_label = []
-    for W, labels in zip(W_lists, node_label_list):
-        g_nx = nx.from_numpy_matrix(W)
-        ps = ProgressSmoothing(g_nx=g_nx)
-        train_label.append(ps.smooth_all(3, labels))
 
-    node_label = train_label
 
-    for idx, smoothed_label in enumerate(node_label):
-        data[0].dataset[idx]['node_label'] = torch.tensor(smoothed_label)
 
-    # %%
-<<<<<<< HEAD
-    with open('out_0401/SBM_PATTERN_a3.pkl', 'wb') as f:
-=======
-    with open('SBM_PATTERN_a3.pkl', 'wb') as f:
->>>>>>> eb1ea92fd805d40fc75b9893f7668deb78debad6
-        pickle.dump(data, f)
 
+with open('_SBM_PATTERN_a3.pkl', 'rb') as f:
+    data = pickle.load(f)
+
+with open('SBM_PATTERN_train.pkl', 'wb') as f:
+    pickle.dump(data[0].dataset, f)
+
+with open('SBM_PATTERN_val.pkl', 'wb') as f:
+    pickle.dump(data[1].dataset, f)
+
+with open('SBM_PATTERN_test.pkl', 'wb') as f:
+    pickle.dump(data[2].dataset, f)
+
+from data.SBMs import SBMsDatasetDGL
+from data.data import LoadData
+from torch.utils.data import DataLoader
+from data.SBMs import SBMsDataset
+
+DATASET_NAME = 'SBM_PATTERN'
+dataset = SBMsDatasetDGL(DATASET_NAME)  # 3983s
+
+with open('SBM_PATTERN_a3.pkl', 'wb') as f:
+    pickle.dump(dataset, f)
+
+
+
+
+
+
+
+
+
+with open('_SBM_PATTERN_a4.pkl', 'rb') as f:
+    data = pickle.load(f)
+
+with open('SBM_PATTERN_train.pkl', 'wb') as f:
+    pickle.dump(data[0].dataset, f)
+
+with open('SBM_PATTERN_val.pkl', 'wb') as f:
+    pickle.dump(data[1].dataset, f)
+
+with open('SBM_PATTERN_test.pkl', 'wb') as f:
+    pickle.dump(data[2].dataset, f)
+
+from data.SBMs import SBMsDatasetDGL
+from data.data import LoadData
+from torch.utils.data import DataLoader
+from data.SBMs import SBMsDataset
+
+DATASET_NAME = 'SBM_PATTERN'
+dataset = SBMsDatasetDGL(DATASET_NAME)  # 3983s
+
+with open('SBM_PATTERN_a4.pkl', 'wb') as f:
+    pickle.dump(dataset, f)
+
+
+
+
+
+with open('_SBM_PATTERN_a8.pkl', 'rb') as f:
+    data = pickle.load(f)
+
+with open('SBM_PATTERN_train.pkl', 'wb') as f:
+    pickle.dump(data[0].dataset, f)
+
+with open('SBM_PATTERN_val.pkl', 'wb') as f:
+    pickle.dump(data[1].dataset, f)
+
+with open('SBM_PATTERN_test.pkl', 'wb') as f:
+    pickle.dump(data[2].dataset, f)
+
+from data.SBMs import SBMsDatasetDGL
+from data.data import LoadData
+from torch.utils.data import DataLoader
+from data.SBMs import SBMsDataset
+
+DATASET_NAME = 'SBM_PATTERN'
+dataset = SBMsDatasetDGL(DATASET_NAME)  # 3983s
+
+with open('SBM_PATTERN_a8.pkl', 'wb') as f:
+    pickle.dump(dataset, f)
