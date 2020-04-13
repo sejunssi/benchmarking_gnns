@@ -73,7 +73,10 @@ class GINNet(nn.Module):
 
         # calculating label weights for weighted loss computation
         V = label.size(0)
-        label_count = torch.bincount(label).double()
+        #label_count = torch.bincount(label)
+        label_unique = label.unique(sorted=True)
+        label_count = torch.stack((label==l_u).sum() for l_u in label_unique)
+
         label_count = label_count[label_count.nonzero()].squeeze()
         cluster_sizes = torch.zeros(self.n_classes).long().to(self.device)
         cluster_sizes[torch.unique(label)] = label_count
