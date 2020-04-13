@@ -445,10 +445,14 @@ for W, labels in zip(W_lists, node_label_list):
     train_label.append(ps.smooth_all(2, labels))
 
 node_label = train_label
+total_node_data = []
+for label in node_label:
+    total_node_data.extend(label)
+
 
 for idx, smoothed_label in enumerate(node_label):
     data[0].dataset[idx]['node_label'] = torch.tensor(smoothed_label)
-
+data[0]['node_label'] = total_node_data
 <<<<<<< HEAD
 
 
