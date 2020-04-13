@@ -11,7 +11,7 @@ a_list = [1,2,3,4,8]
 
 for name in NAME:
     for a in a_list:
-        print(a)
+        print(name, a)
         with open(f'{name}_a{a}.pkl', 'rb') as f:
             data = pickle.load(f)
             train = data[0]
