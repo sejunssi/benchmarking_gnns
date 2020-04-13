@@ -13,7 +13,7 @@ tmux send-keys "source activate benchmark_gnn" C-m
 
 tmux send-keys "
 python $code --dataset 'SBM_CLUSTER_a1' --gpu_id 0 --seed $seed0 --config 'configs/SBMs_node_clustering_MLP_CLUSTER_a1.json' &
-python $code --dataset 'SBM_CLUSTER_a2' --gpu_id 1 --seed $seed1 --config 'configs/SBMs_node_clustering_MLP_CLUSTER_a2.json' &
+python $code --dataset 'SBM_CLUSTER_a2' --gpu_id 1 --seed $seed0 --config 'configs/SBMs_node_clustering_MLP_CLUSTER_a2.json' &
 wait" C-m
 
 for a in 1 2 3 4 8
