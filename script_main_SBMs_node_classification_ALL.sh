@@ -11,12 +11,17 @@ code=main_SBMs_node_classification.py
 tmux new -s benchmark_SBMs_node_classification -d
 tmux send-keys "source activate benchmark_gnn" C-m
 
-for a in 2 3 4 8 1
-do
-  tmux send-keys "
-  python $code --dataset 'SBM_CLUSTER_a${a}' --gpu_id 0 --seed $seed0 --config 'configs/SBMs_node_clustering_GAT_CLUSTER_a${a}.json' &
-  wait" C-m
-done
+tmux send-keys "
+python $code --dataset 'SBM_CLUSTER_a2' --gpu_id 0 --seed $seed0 --config 'configs/SBMs_node_clustering_GAT_CLUSTER_a2.json' &
+python $code --dataset 'SBM_CLUSTER_a3' --gpu_id 1 --seed $seed0 --config 'configs/SBMs_node_clustering_GAT_CLUSTER_a3.json' &
+python $code --dataset 'SBM_CLUSTER_a4' --gpu_id 2 --seed $seed0 --config 'configs/SBMs_node_clustering_GAT_CLUSTER_a4.json' &
+wait" C-m
+
+tmux send-keys "
+python $code --dataset 'SBM_CLUSTER_a8' --gpu_id 0 --seed $seed0 --config 'configs/SBMs_node_clustering_GAT_CLUSTER_a8.json' &
+python $code --dataset 'SBM_CLUSTER_a1' --gpu_id 1 --seed $seed0 --config 'configs/SBMs_node_clustering_GAT_CLUSTER_a1.json' &
+wait" C-m
+
 
 for a in 2 3 4 8 1
 do
