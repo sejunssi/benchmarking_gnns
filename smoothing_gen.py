@@ -54,7 +54,7 @@ class ProgressSmoothing:
                     smoothed_labels[v] = smoothed_labels[v] * weight_list[h]
                 else:
                     smoothed_labels[v] += smoothed_labels[u] * weight_list[h]
-    def smooth_all(self, a, labels):
+    def smooth_all(self, labels):
         smoothed_labels = labels.copy()
         smoothed_labels = smoothed_labels.astype(float)
         a = len(labels)
@@ -71,7 +71,7 @@ def generate_smoothing_file(W_lists, node_label_list):
     for W, labels in zip(W_lists, node_label_list):
         g_nx = nx.from_numpy_matrix(W)
         ps = ProgressSmoothing(g_nx=g_nx)
-        train_label.append(ps.smooth_all(a, labels))
+        train_label.append(ps.smooth_all(labels))
     node_label = train_label
     for idx, smoothed_label in enumerate(node_label):
         data[0].dataset[idx]['node_label'] = torch.tensor(smoothed_label)
