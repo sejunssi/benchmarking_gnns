@@ -68,7 +68,6 @@ node_label_list = list(map(lambda d: d['node_label'].numpy(), data[0].dataset))
 
 def generate_smoothing_file(W_lists, node_label_list):
     train_label = []
-    print("Smoothing [a]:",a)
     for W, labels in zip(W_lists, node_label_list):
         g_nx = nx.from_numpy_matrix(W)
         ps = ProgressSmoothing(g_nx=g_nx)
