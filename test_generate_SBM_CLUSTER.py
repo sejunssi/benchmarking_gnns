@@ -156,8 +156,10 @@ class SBMsDataset(torch.utils.data.Dataset):
     # form a mini batch from a given list of samples = [(graph, label) pairs]
     def collate(self, samples):
         # The input samples is a list of pairs (graph, label).
+        # graphs=[sample[0] for sample in samples]
+        # labels=[sample[1] for sample in samples]
         graphs, labels = map(list, zip(*samples))
-        labels = torch.cat(labels).long()
+        # labels = torch.cat(labels).long()
         tab_sizes_n = [graphs[i].number_of_nodes() for i in range(len(graphs))]
         tab_snorm_n = [torch.FloatTensor(size, 1).fill_(1. / float(size)) for size in tab_sizes_n]
         snorm_n = torch.cat(tab_snorm_n).sqrt()
