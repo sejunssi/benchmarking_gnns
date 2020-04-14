@@ -172,6 +172,7 @@ class SmoothedSBMsDataset(torch.utils.data.Dataset):
         """
         start = time.time()
         print("[I] Loading dataset %s..." % (name))
+        print(os.getcwd())
         self.name = name
         data_dir = './'
         with open(data_dir + name + '.pkl', "rb") as f:
@@ -186,8 +187,12 @@ class SmoothedSBMsDataset(torch.utils.data.Dataset):
     # form a mini batch from a given list of samples = [(graph, label) pairs]
     def collate(self, samples):
         # The input samples is a list of pairs (graph, label).
-        graphs, labels = map(list, zip(*samples))
-        labels = torch.cat(labels).long()
+        # graphs, labels = map(list, zip(*samples))
+        graphs = []
+        graphs.append([sample[0] for sample in samples])
+        labels = []
+        labels.extend([sample[1] for sample in samples])
+        # labels = torch.cat(labels).long()
         tab_sizes_n = [graphs[i].number_of_nodes() for i in range(len(graphs))]
         tab_snorm_n = [torch.FloatTensor(size, 1).fill_(1. / float(size)) for size in tab_sizes_n]
         snorm_n = torch.cat(tab_snorm_n).sqrt()
