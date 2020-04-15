@@ -62,13 +62,11 @@ class ProgressSmoothing:
             self.get_neigh_smooth_weight(v, a, smoothed_labels)
         return smoothed_labels
 
-
-a_list = [100]
 W_lists = list(map(lambda d: d['W'].numpy(), data[0].dataset))
 node_label_list = list(map(lambda d: d['node_label'].numpy(), data[0].dataset))
 
 
-def generate_smoothing_file(W_lists, node_label_list, a):
+def generate_smoothing_file(W_lists, node_label_list):
     train_label = []
     print("Smoothing [a]:",a)
     for W, labels in zip(W_lists, node_label_list):
@@ -82,8 +80,7 @@ def generate_smoothing_file(W_lists, node_label_list, a):
     for train_dataset in data[0].dataset:
         data[0].node_labels.extend(train_dataset)
     print("Write")
-    with open(f'SBM_CLUSTER_a{a}.pkl', 'wb') as f:
+    with open(f'SBM_CLUSTER_Smoothing.pkl', 'wb') as f:
         pickle.dump(data, f)
 
-for a in a_list:
-    generate_smoothing_file(W_lists, node_label_list, a)
+generate_smoothing_file(W_lists, node_label_list)
