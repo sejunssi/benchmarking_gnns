@@ -37,6 +37,8 @@ def LoadData(DATASET_NAME):
     SMOOTHED_SBM_PATTERN_DATASETS = [f'SBM_PATTERN_a{x}' for x in a]
     if DATASET_NAME in SMOOTHED_SBM_CLUSTER_DATASETS or DATASET_NAME in SMOOTHED_SBM_PATTERN_DATASETS:
         return SmoothedSBMsDataset(DATASET_NAME)
+    if DATASET_NAME in ['SBM_CLUSTER_smoothing', 'SBM_PATTERN_smoothing']:
+        return SmoothedSBMsDataset(DATASET_NAME)
 
     # handling for TSP dataset
     if DATASET_NAME == 'TSP':
