@@ -71,8 +71,8 @@ class GINNet(nn.Module):
         
     def loss(self, pred, label, smooth=False):
         if smooth == True:
-            criteron = nn.CrossEntropyLoss()
-            loss = criteron(pred, label)
+            criterian = nn.MultiLabelSoftMarginLoss(pred.shape(0), self.n_classes)
+            loss = criterian(pred, label)
             return loss
         else:
             # calculating label weights for weighted loss computation
