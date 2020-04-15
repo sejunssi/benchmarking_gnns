@@ -18,8 +18,7 @@ class DotDict(dict):
 
 
 
-with open('SBM_CLUSTER.pkl', 'rb') as f:
-    data = pickle.load(f)
+
 class ProgressSmoothing:
     def __init__(self, g_nx):
         self.g_nx = g_nx
@@ -62,11 +61,9 @@ class ProgressSmoothing:
             self.get_neigh_smooth_weight(v, a, smoothed_labels)
         return smoothed_labels
 
-W_lists = list(map(lambda d: d['W'].numpy(), data[0].dataset))
-node_label_list = list(map(lambda d: d['node_label'].numpy(), data[0].dataset))
 
 
-def generate_smoothing_file(W_lists, node_label_list):
+def generate_smoothing_file(dataname, W_lists, node_label_list):
     train_label = []
     for W, labels in zip(W_lists, node_label_list):
         g_nx = nx.from_numpy_matrix(W)
@@ -79,7 +76,14 @@ def generate_smoothing_file(W_lists, node_label_list):
     for train_dataset in data[0].dataset:
         data[0].node_labels.extend(train_dataset)
     print("Write")
-    with open(f'SBM_CLUSTER_Smoothing.pkl', 'wb') as f:
+    with open(f'{dataname}_Smoothing.pkl', 'wb') as f:
         pickle.dump(data, f)
 
-generate_smoothing_file(W_lists, node_label_list)
+
+DataSetName = ['SBM_CLUSTER', 'SBM_PATTERN']
+for dataname in DataSetName:
+    with open(f'{dataname}.pkl', 'rb') as f:
+        data = pickle.load(f)
+    W_lists = list(map(lambda d: d['W'].numpy(), data[0].dataset))
+    node_label_list = list(map(lambda d: d['node_label'].numpy(), data[0].dataset))
+    generate_smoothing_file(dataname, W_lists, node_label_list)
