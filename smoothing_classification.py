@@ -18,7 +18,6 @@ class DotDict(dict):
 
 
 
-
 class ProgressSmoothing:
     def __init__(self, g_nx):
         self.g_nx = g_nx
@@ -53,37 +52,51 @@ class ProgressSmoothing:
                     smoothed_labels[v] = smoothed_labels[v] * weight_list[h]
                 else:
                     smoothed_labels[v] += smoothed_labels[u] * weight_list[h]
-    def smooth_all(self, labels):
+    def smooth_all(self, labels, a):
         smoothed_labels = labels.copy()
         smoothed_labels = smoothed_labels.astype(float)
-        a = len(labels)
         for v in list(self.g_nx.nodes):
             self.get_neigh_smooth_weight(v, a, smoothed_labels)
         return smoothed_labels
 
-
-
-def generate_smoothing_file(dataname, W_lists, node_label_list):
+def generate_smoothing_file(dataname, W_lists, node_label_list, a):
+    print(f"Smoothing {dataname} [a]", a)
     train_label = []
     for W, labels in zip(W_lists, node_label_list):
         g_nx = nx.from_numpy_matrix(W)
         ps = ProgressSmoothing(g_nx=g_nx)
-        train_label.append(ps.smooth_all(labels))
+        train_label.append(ps.smooth_all(labels, a))
     node_label = train_label
     for idx, smoothed_label in enumerate(node_label):
         data[0].dataset[idx]['node_label'] = torch.tensor(smoothed_label)
     data[0].node_labels = []
     for train_dataset in data[0].dataset:
-        data[0].node_labels.extend(train_dataset)
+        data[0].node_labels.extend(train_dataset['node_label'])
     print("Write")
-    with open(f'{dataname}_smoothing.pkl', 'wb') as f:
+    with open(f'{dataname}_a{a}.pkl', 'wb') as f:
         pickle.dump(data, f)
 
 
-DataSetName = ['SBM_PATTERN']
-for dataname in DataSetName:
-    with open(f'{dataname}.pkl', 'rb') as f:
-        data = pickle.load(f)
-    W_lists = list(map(lambda d: d['W'].numpy(), data[0].dataset))
-    node_label_list = list(map(lambda d: d['node_label'].numpy(), data[0].dataset))
-    generate_smoothing_file(dataname, W_lists, node_label_list)
+import numpy as np
+
+
+def make_onehot_data(data):
+    onehot_data_list = []
+    for i,  one_data in enumerate(data[0].dataset):
+        n_class = torch.unique(one_data['node_label'], dim=0).size(0)
+        node_label = one_data['node_label'].to(torch.int64)
+        node_onehot_label = torch.nn.functional.one_hot(node_label, n_class)
+        data[0].dataset[i]['node_label'] = node_onehot_label
+        onehot_data_list.extend(node_onehot_label)
+    data[0].node_labels = onehot_data_list
+
+
+DataSetName = ['SBM_CLUSTER', 'SBM_PATTERN']
+for a in [2,3,4,8,1]:
+    for dataname in DataSetName:
+        with open(f'{dataname}.pkl', 'rb') as f:
+            data = pickle.load(f)
+        make_onehot_data(data)
+        W_lists = list(map(lambda d: d['W'].numpy(), data[0].dataset))
+        node_label_list = list(map(lambda d: d['node_label'].numpy(), data[0].dataset))
+        generate_smoothing_file(dataname, W_lists, node_label_list,a)
