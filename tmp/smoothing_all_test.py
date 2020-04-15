@@ -2889,7 +2889,7 @@ print(dataset.test[0])
 
 start = time.time()
 
-with open('data/SBMs/SBM_PATTERN_a2.pkl', 'wb') as f:
+with open('../data/SBMs/SBM_PATTERN_a2.pkl', 'wb') as f:
     pickle.dump([dataset.train, dataset.val, dataset.test], f)
 
 print('Time (sec):', time.time() - start)  # 21s
