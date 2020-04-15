@@ -76,7 +76,7 @@ def generate_smoothing_file(dataname, W_lists, node_label_list):
     for train_dataset in data[0].dataset:
         data[0].node_labels.extend(train_dataset)
     print("Write")
-    with open(f'{dataname}_Smoothing.pkl', 'wb') as f:
+    with open(f'{dataname}_smoothing.pkl', 'wb') as f:
         pickle.dump(data, f)
 
 
