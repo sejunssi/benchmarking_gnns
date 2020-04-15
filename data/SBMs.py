@@ -162,6 +162,51 @@ class SBMsDataset(torch.utils.data.Dataset):
         self.train.graph_lists = [self_loop(g) for g in self.train.graph_lists]
         self.val.graph_lists = [self_loop(g) for g in self.val.graph_lists]
         self.test.graph_lists = [self_loop(g) for g in self.test.graph_lists]
+#
+#
+# class SmoothedSBMsDataset(torch.utils.data.Dataset):
+#
+#     def __init__(self, name):
+#         """
+#             Loading SBM datasets
+#         """
+#         start = time.time()
+#         print("[I] Loading dataset %s..." % (name))
+#         print(os.getcwd())
+#         self.name = name
+#         data_dir = './'
+#         with open(data_dir + name + '.pkl', "rb") as f:
+#             f = pickle.load(f)
+#             self.train = f[0]
+#             self.val = f[1]
+#             self.test = f[2]
+#         print('train, test, val sizes :', len(self.train), len(self.test), len(self.val))
+#         print("[I] Finished loading.")
+#         print("[I] Data load time: {:.4f}s".format(time.time() - start))
+#
+#     # form a mini batch from a given list of samples = [(graph, label) pairs]
+#     def collate(self, samples):
+#         # The input samples is a list of pairs (graph, label).
+#         graphs, labels = map(list, zip(*samples))
+#         labels = torch.cat(labels)
+#         # labels = torch.cat(labels).long()
+#         tab_sizes_n = [graphs[i].number_of_nodes() for i in range(len(graphs))]
+#         tab_snorm_n = [torch.FloatTensor(size, 1).fill_(1. / float(size)) for size in tab_sizes_n]
+#         snorm_n = torch.cat(tab_snorm_n).sqrt()
+#         tab_sizes_e = [graphs[i].number_of_edges() for i in range(len(graphs))]
+#         tab_snorm_e = [torch.FloatTensor(size, 1).fill_(1. / float(size)) for size in tab_sizes_e]
+#         snorm_e = torch.cat(tab_snorm_e).sqrt()
+#         batched_graph = dgl.batch(graphs)
+#
+#         return batched_graph, labels, snorm_n, snorm_e
+#
+#     def _add_self_loops(self):
+#         # function for adding self loops
+#         # this function will be called only if self_loop flag is True
+#
+#         self.train.graph_lists = [self_loop(g) for g in self.train.graph_lists]
+#         self.val.graph_lists = [self_loop(g) for g in self.val.graph_lists]
+#         self.test.graph_lists = [self_loop(g) for g in self.test.graph_lists]
 
 
 class SmoothedSBMsDataset(torch.utils.data.Dataset):

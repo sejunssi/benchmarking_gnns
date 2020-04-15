@@ -62,7 +62,9 @@ class GATNet(nn.Module):
     
     def loss(self, pred, label, smooth=False):
         if smooth == True:
-            return
+            criterion = nn.CrossEntropyLoss()
+            loss = criterion(pred, label)
+            return loss
         else:
             # calculating label weights for weighted loss computation
             V = label.size(0)

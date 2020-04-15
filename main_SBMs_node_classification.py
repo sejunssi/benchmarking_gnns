@@ -109,6 +109,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs):
         
     root_log_dir, root_ckpt_dir, write_file_name, write_config_file = dirs
     device = net_params['device']
+    smooth = net_params['smooth']
     
     # Write network and optimization hyper-parameters in folder config/
     with open(write_config_file + '.txt', 'w') as f:
@@ -138,7 +139,6 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs):
                                                      patience=params['lr_schedule_patience'],
                                                      verbose=True)
 
-    
     train_loader = DataLoader(trainset, batch_size=params['batch_size'], shuffle=True, collate_fn=dataset.collate)
     val_loader = DataLoader(valset, batch_size=params['batch_size'], shuffle=False, collate_fn=dataset.collate)
     test_loader = DataLoader(testset, batch_size=params['batch_size'], shuffle=False, collate_fn=dataset.collate)
@@ -164,7 +164,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs):
 
                 start = time.time()
 
-                epoch_train_loss, epoch_train_acc, optimizer = train_epoch(model, optimizer, device, train_loader, epoch)
+                epoch_train_loss, epoch_train_acc, optimizer = train_epoch(model, optimizer, device, train_loader, epoch, smooth)
                 epoch_val_loss, epoch_val_acc = evaluate_network(model, device, val_loader, epoch)
                 epoch_test_loss, epoch_test_acc = evaluate_network(model, device, test_loader, epoch)
 
@@ -315,6 +315,7 @@ def main():
     parser.add_argument('--cat', help="Please give a value for cat")
     parser.add_argument('--self_loop', help="Please give a value for self_loop")
     parser.add_argument('--max_time', help="Please give a value for max_time")
+    parser.add_argument('--smooth', help="Please give a value for smooth")
     args = parser.parse_args()
 #    pdb.set_trace()
     with open(args.config) as f:
