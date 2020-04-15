@@ -57,12 +57,13 @@ class ProgressSmoothing:
     def smooth_all(self, a, labels):
         smoothed_labels = labels.copy()
         smoothed_labels = smoothed_labels.astype(float)
+        a = len(labels)
         for v in list(self.g_nx.nodes):
             self.get_neigh_smooth_weight(v, a, smoothed_labels)
         return smoothed_labels
 
 
-a_list = [8, 12, 16]
+a_list = [100]
 W_lists = list(map(lambda d: d['W'].numpy(), data[0].dataset))
 node_label_list = list(map(lambda d: d['node_label'].numpy(), data[0].dataset))
 
