@@ -71,7 +71,9 @@ class GINNet(nn.Module):
         
     def loss(self, pred, label, smooth=False):
         if smooth == True:
-            return
+            criteron = nn.CrossEntropyLoss()
+            loss = criteron(pred, label)
+            return loss
         else:
             # calculating label weights for weighted loss computation
             V = label.size(0)
