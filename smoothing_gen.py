@@ -62,7 +62,7 @@ class ProgressSmoothing:
         return smoothed_labels
 
 
-a_list = [8,1,2,3,4]
+a_list = [8, 12, 16]
 W_lists = list(map(lambda d: d['W'].numpy(), data[0].dataset))
 node_label_list = list(map(lambda d: d['node_label'].numpy(), data[0].dataset))
 
