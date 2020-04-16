@@ -109,7 +109,6 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs):
         
     root_log_dir, root_ckpt_dir, write_file_name, write_config_file = dirs
     device = net_params['device']
-    smooth = net_params['smooth']
     
     # Write network and optimization hyper-parameters in folder config/
     with open(write_config_file + '.txt', 'w') as f:
@@ -413,6 +412,9 @@ def main():
         net_params['self_loop'] = True if args.self_loop=='True' else False
     if args.smooth is not None:
         net_params['smooth'] = True if args.smooth=='True' else False
+        smooth = net_params['smooth']
+    else:
+        smooth = None
         
     # SBM
     net_params['in_dim'] = torch.unique(dataset.train[0][0].ndata['feat'],dim=0).size(0) # node_dim (feat is an integer)
