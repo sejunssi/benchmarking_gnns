@@ -414,7 +414,7 @@ def main():
         net_params['smooth'] = True if args.smooth=='True' else False
         smooth = net_params['smooth']
     else:
-        smooth = None
+        smooth = False
         
     # SBM
     net_params['in_dim'] = torch.unique(dataset.train[0][0].ndata['feat'],dim=0).size(0) # node_dim (feat is an integer)
