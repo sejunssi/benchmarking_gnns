@@ -73,8 +73,7 @@ def generate_smoothing_file(dataname, W_lists, node_label_list, a):
         node_label_list_data.append(smoothed_label)
     list_tensor_node_label_data = []
     for node_label_data in node_label_list_data:
-        for x in node_label_data:
-            list_tensor_node_label_data.append(list(x))
+        list_tensor_node_label_data.append(node_label_data)
     data[0].node_labels = torch.Tensor(list_tensor_node_label_data)
     print("Write")
     with open(f'{dataname}_a{a}.pkl', 'wb') as f:
