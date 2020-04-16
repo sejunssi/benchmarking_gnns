@@ -58,7 +58,9 @@ class GCNNet(nn.Module):
     
     def loss(self, pred, label, smooth=False):
         if smooth == True:
-            return
+            criterion = nn.MultiLabelSoftMarginLoss()
+            loss = criterion(pred, label)
+            return loss
         else:
             # calculating label weights for weighted loss computation
             V = label.size(0)
