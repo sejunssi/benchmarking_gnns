@@ -71,7 +71,7 @@ def generate_smoothing_file(dataname, W_lists, node_label_list, a):
         data[0].dataset[idx]['node_label'] = torch.tensor(smoothed_label)
     data[0].node_labels = []
     for train_dataset in data[0].dataset:
-        data[0].node_labels.extend(train_dataset['node_label'])
+        data[0].node_labels.append(train_dataset['node_label'])
     print("Write")
     with open(f'{dataname}_a{a}.pkl', 'wb') as f:
         pickle.dump(data, f)
