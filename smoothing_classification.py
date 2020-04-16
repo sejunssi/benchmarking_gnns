@@ -87,7 +87,7 @@ def make_onehot_data(data):
         node_label = one_data['node_label'].to(torch.int64)
         node_onehot_label = torch.nn.functional.one_hot(node_label, n_class)
         data[0].dataset[i]['node_label'] = node_onehot_label
-        onehot_data_list.extend(node_onehot_label)
+        onehot_data_list.append(node_onehot_label)
     data[0].node_labels = onehot_data_list
 
 

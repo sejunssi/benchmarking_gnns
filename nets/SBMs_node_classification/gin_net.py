@@ -71,7 +71,7 @@ class GINNet(nn.Module):
         
     def loss(self, pred, label, smooth=False):
         if smooth == True:
-            criterian = nn.MultiLabelSoftMarginLoss(len(label), self.n_classes)
+            criterian = nn.MultiLabelSoftMarginLoss(pred.shape[0], self.n_classes)
             loss = criterian(pred, label)
             return loss
         else:
