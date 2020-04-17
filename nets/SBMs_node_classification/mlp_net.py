@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
+from utils.loss import LabelSmoothingLoss
 import dgl
 
 from layers.mlp_readout_layer import MLPReadout
@@ -60,8 +60,10 @@ class MLPNet(nn.Module):
 
         
     def loss(self, pred, label, smooth=False):
-        if smooth==False:
-            return
+        if smooth == True:
+            criterion = LabelSmoothingLoss()
+            loss = criterion(pred, label)
+            return loss
         else:
             # calculating label weights for weighted loss computation
             V = label.size(0)

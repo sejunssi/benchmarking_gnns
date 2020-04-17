@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from utils.loss import LabelSmoothingLoss
 
 import dgl
 import numpy as np
@@ -55,8 +56,10 @@ class GatedGCNNet(nn.Module):
         
 
     def loss(self, pred, label, smooth=False):
-        if smooth==False:
-            pass
+        if smooth == True:
+            criterion = LabelSmoothingLoss()
+            loss = criterion(pred, label)
+            return loss
         else:
             # calculating label weights for weighted loss computation
             V = label.size(0)

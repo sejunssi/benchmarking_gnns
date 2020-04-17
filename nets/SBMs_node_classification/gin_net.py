@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from utils.loss import LabelSmoothingLoss
 
 import dgl
 from dgl.nn.pytorch.glob import SumPooling, AvgPooling, MaxPooling
@@ -71,8 +72,8 @@ class GINNet(nn.Module):
         
     def loss(self, pred, label, smooth=False):
         if smooth == True:
-            criterian = nn.MultiLabelSoftMarginLoss(pred.shape[0], self.n_classes)
-            loss = criterian(pred, label)
+            criterion = LabelSmoothingLoss()
+            loss = criterion(pred, label)
             return loss
         else:
             # calculating label weights for weighted loss computation
