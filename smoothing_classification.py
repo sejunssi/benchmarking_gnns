@@ -62,7 +62,7 @@ class ProgressSmoothing:
 def generate_smoothing_file(dataname, W_lists, node_label_list, a):
     print(f"Smoothing {dataname} [a]", a)
     train_label = []
-    for W, labels in zip(W_lists, node_label_list):
+    for W, labels in zip(W_lists[:2], node_label_list[:2]):
         g_nx = nx.from_numpy_matrix(W)
         ps = ProgressSmoothing(g_nx=g_nx)
         train_label.append(ps.smooth_all(labels, a))
@@ -73,7 +73,7 @@ def generate_smoothing_file(dataname, W_lists, node_label_list, a):
         node_label_list_data.append(smoothed_label)
     list_tensor_node_label_data = []
     for node_label_data in node_label_list_data:
-        list_tensor_node_label_data.append(node_label_data)
+        list_tensor_node_label_data.append(list(node_label_data))
     data[0].node_labels = torch.Tensor(list_tensor_node_label_data)
     print("Write")
     with open(f'{dataname}_a{a}.pkl', 'wb') as f:
