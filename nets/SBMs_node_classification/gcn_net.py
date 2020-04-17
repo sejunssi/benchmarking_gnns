@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from utils.loss import LabelSmoothingLoss
 
 import dgl
 import numpy as np
@@ -58,8 +59,7 @@ class GCNNet(nn.Module):
     
     def loss(self, pred, label, smooth=False):
         if smooth == True:
-
-            criterion = nn.CrossEntropyLoss()
+            criterion = LabelSmoothingLoss()
             loss = criterion(pred, label)
             return loss
         else:
