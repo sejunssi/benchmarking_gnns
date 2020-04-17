@@ -70,8 +70,8 @@ def generate_smoothing_file(dataname, W_lists, node_label_list, a):
     node_label_list_data = []
     for idx, smoothed_label in enumerate(node_label):
         data[0].dataset[idx]['node_label'] = torch.tensor(smoothed_label)
-        node_label_list_data.append([list(labels) for labels in smoothed_label])
-    data[0].node_labels = torch.Tensor(node_label_list_data)
+        node_label_list_data.append(torch.Tensor([list(labels) for labels in smoothed_label]))
+    data[0].node_labels = node_label_list_data
     print("Write")
     with open(f'{dataname}_a{a}.pkl', 'wb') as f:
         pickle.dump(data, f)
