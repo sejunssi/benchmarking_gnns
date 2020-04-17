@@ -30,6 +30,25 @@ def accuracy_CITATION_GRAPH(scores, targets):
     return acc
 
 
+def accuracy_smoothing(scores, targets):
+    C = np.argmax(torch.nn.Softmax(dim=0)(scores).cpu().detach().numpy(), axis=1)
+    S = np.argmax(targets, axis=1)
+    CM = confusion_matrix(S, C).astype(np.float32)
+    nb_classes = CM.shape[0]
+    targets = targets.cpu().detach().numpy()
+    nb_non_empty_classes = 0
+    pr_classes = np.zeros(nb_classes)
+    for r in range(nb_classes):
+        cluster = np.where(targets == r)[0]
+        if cluster.shape[0] != 0:
+            pr_classes[r] = CM[r, r] / float(cluster.shape[0])
+            if CM[r, r] > 0:
+                nb_non_empty_classes += 1
+        else:
+            pr_classes[r] = 0.0
+    acc = 100. * np.sum(pr_classes) / float(nb_non_empty_classes)
+    return acc
+
 def accuracy_SBM(scores, targets):
     S = targets.cpu().numpy()
     C = np.argmax( torch.nn.Softmax(dim=0)(scores).cpu().detach().numpy() , axis=1 )

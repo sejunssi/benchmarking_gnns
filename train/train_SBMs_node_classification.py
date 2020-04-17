@@ -8,6 +8,7 @@ import math
 import dgl
 
 from train.metrics import accuracy_SBM as accuracy
+from train.metrics import accuracy_smoothing
 
 
 def train_epoch(model, optimizer, device, data_loader, epoch, smooth=False):
@@ -29,7 +30,10 @@ def train_epoch(model, optimizer, device, data_loader, epoch, smooth=False):
         loss.backward()
         optimizer.step()
         epoch_loss += loss.detach().item()
-        epoch_train_acc += accuracy(batch_scores, batch_labels)
+        if smooth:
+            epoch_train_acc += accuracy_smoothing(batch_scores, batch_labels)
+        else:
+            epoch_train_acc += accuracy(batch_scores, batch_labels)
     epoch_loss /= (iter + 1)
     epoch_train_acc /= (iter + 1)
     
