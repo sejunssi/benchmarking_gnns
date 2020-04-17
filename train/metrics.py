@@ -35,7 +35,8 @@ def accuracy_smoothing(scores, targets):
     S = np.argmax(targets.cpu().detach().numpy(), axis=1)
     CM = confusion_matrix(S, C).astype(np.float32)
     nb_classes = CM.shape[0]
-    targets = targets.cpu().detach().numpy()
+    targets = np.argmax(targets.cpu.detach().numpy(), axis=1)
+    # targets = targets.cpu().detach().numpy()
     nb_non_empty_classes = 0
     pr_classes = np.zeros(nb_classes)
     for r in range(nb_classes):
