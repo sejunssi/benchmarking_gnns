@@ -56,7 +56,7 @@ class GatedGCNNet(nn.Module):
 
     def loss(self, pred, label, smooth=False):
         if smooth==False:
-            return
+            pass
         else:
             # calculating label weights for weighted loss computation
             V = label.size(0)

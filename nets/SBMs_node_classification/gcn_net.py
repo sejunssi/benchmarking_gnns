@@ -58,7 +58,8 @@ class GCNNet(nn.Module):
     
     def loss(self, pred, label, smooth=False):
         if smooth == True:
-            criterion = nn.MultiLabelSoftMarginLoss()
+
+            criterion = nn.CrossEntropyLoss()
             loss = criterion(pred, label)
             return loss
         else:
