@@ -83,7 +83,7 @@ import numpy as np
 def make_onehot_data(data):
     onehot_data_list = []
     for i,  one_data in enumerate(data[0].dataset):
-        n_class = torch.unique(one_data['node_label'], dim=0).size(0)
+        n_class = torch.unique(one_data['node_label'], dim=0).size(0) #TODO fix later
         node_label = one_data['node_label'].to(torch.int64)
         node_onehot_label = torch.nn.functional.one_hot(node_label, n_class)
         data[0].dataset[i]['node_label'] = node_onehot_label
