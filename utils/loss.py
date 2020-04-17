@@ -6,6 +6,8 @@ class LabelSmoothingLoss(nn.Module):
         super(LabelSmoothingLoss, self).__init__()
 
     def forward(self, pred, label):
-        return torch.mean((-label * nn.LogSoftmax(dim=1)(pred)).sum(dim=0))
+        loss = (- label * nn.LogSoftmax(dim=1)(pred))
+        loss = loss.sum(dim=0)
+        return torch.mean(loss)
 
 
