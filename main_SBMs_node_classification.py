@@ -164,8 +164,8 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, smooth):
                 start = time.time()
 
                 epoch_train_loss, epoch_train_acc, optimizer = train_epoch(model, optimizer, device, train_loader, epoch, smooth)
-                epoch_val_loss, epoch_val_acc = evaluate_network(model, device, val_loader, epoch, smooth)
-                epoch_test_loss, epoch_test_acc = evaluate_network(model, device, test_loader, epoch, smooth)
+                epoch_val_loss, epoch_val_acc = evaluate_network(model, device, val_loader, epoch, smooth=False)
+                epoch_test_loss, epoch_test_acc = evaluate_network(model, device, test_loader, epoch, smooth=False)
 
                 epoch_train_loss_list.append(epoch_train_loss)
                 epoch_val_loss_list.append(epoch_val_loss)
