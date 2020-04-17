@@ -52,9 +52,10 @@ class ProgressSmoothing:
                     smoothed_labels[v] = smoothed_labels[v] * weight_list[h]
                 else:
                     smoothed_labels[v] += smoothed_labels[u] * weight_list[h]
-    def smooth_all(self, labels, a):
+    def smooth_all(self, labels, b):
         smoothed_labels = labels.copy()
         smoothed_labels = smoothed_labels.astype(float)
+        a = int(len(smoothed_labels)/b)
         for v in list(self.g_nx.nodes):
             self.get_neigh_smooth_weight(v, a, smoothed_labels)
         return smoothed_labels
@@ -92,11 +93,12 @@ def make_onehot_data(data):
 
 
 DataSetName = ['SBM_CLUSTER', 'SBM_PATTERN']
-for a in [8, 10, 12, 13]:
+# for a in [9, 10, 12, 13]:
+for b in [9, 8, 7, 6, 5]:
     for dataname in DataSetName:
         with open(f'{dataname}.pkl', 'rb') as f:
             data = pickle.load(f)
         make_onehot_data(data)
         W_lists = list(map(lambda d: d['W'].numpy(), data[0].dataset))
         node_label_list = list(map(lambda d: d['node_label'].numpy(), data[0].dataset))
-        generate_smoothing_file(dataname, W_lists, node_label_list,a)
+        generate_smoothing_file(dataname, W_lists, node_label_list, b)
