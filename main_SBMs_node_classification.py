@@ -161,8 +161,6 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, smooth):
 
 
             for epoch in t:
-                if epoch < 57:
-                    continue
                 t.set_description('Epoch %d' % epoch)
 
                 start = time.time()
