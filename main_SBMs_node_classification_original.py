@@ -147,6 +147,8 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs):
     try:
         with tqdm(range(params['epochs'])) as t:
             for epoch in t:
+                if epoch < 56:
+                    continue
 
                 t.set_description('Epoch %d' % epoch)
 
