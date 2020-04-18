@@ -5,7 +5,7 @@ for model_name in Model_Name:
     CONFIG_NAME.append((f'SBMs_node_clustering_{model_name}_CLUSTER', 'SBM_CLUSTER'))
     CONFIG_NAME.append((f'SBMs_node_clustering_{model_name}_PATTERN', 'SBM_PATTERN'))
 
-a_list = [6, 7, 10, 12, 13]
+a_list = [6, 7, 10, 12, 13, 9]
 for name in CONFIG_NAME:
     filename, data_name = name
     for a in a_list:
