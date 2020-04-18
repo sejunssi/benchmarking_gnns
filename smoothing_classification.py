@@ -92,7 +92,7 @@ def make_onehot_data(data):
 
 
 DataSetName = ['SBM_CLUSTER', 'SBM_PATTERN']
-for a in [9, 10, 12, 13]:
+for a in [4, 6, 9, 10, 12, 13]:
     for dataname in DataSetName:
         with open(f'{dataname}.pkl', 'rb') as f:
             data = pickle.load(f)
