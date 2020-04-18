@@ -57,7 +57,7 @@ def evaluate_network(model, device, data_loader, epoch, smooth=False):
             loss = model.loss(batch_scores, batch_labels, smooth)
             epoch_test_loss += loss.detach().item()
             if smooth:
-                epoch_test_loss = accuracy_smoothing(batch_scores, batch_labels)
+                epoch_test_acc += accuracy_smoothing(batch_scores, batch_labels)
             else:
                 epoch_test_acc += accuracy(batch_scores, batch_labels)
         epoch_test_loss /= (iter + 1)

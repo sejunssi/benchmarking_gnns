@@ -231,7 +231,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, smooth):
     
     
     _, test_acc = evaluate_network(model, device, test_loader, epoch)
-    _, train_acc = evaluate_network(model, device, train_loader, epoch, smooth=True)
+    _, train_acc = evaluate_network(model, device, train_loader, epoch, smooth=smooth)
     print("Test Accuracy: {:.4f}".format(test_acc))
     print("Train Accuracy: {:.4f}".format(train_acc))
     print("TOTAL TIME TAKEN: {:.4f}s".format(time.time()-start0))
