@@ -62,7 +62,7 @@ class ProgressSmoothing:
 def generate_smoothing_file(dataname, W_lists, node_label_list, a):
     print(f"Smoothing {dataname} [a]", a)
     train_label = []
-    for W, labels in zip(W_lists, node_label_list):
+    for W, labels in zip(W_lists[:10], node_label_list[:10]):
         g_nx = nx.from_numpy_matrix(W)
         ps = ProgressSmoothing(g_nx=g_nx)
         train_label.append(ps.smooth_all(labels, a))
@@ -78,8 +78,6 @@ def generate_smoothing_file(dataname, W_lists, node_label_list, a):
 
 
 import numpy as np
-
-
 def make_onehot_data(data):
     onehot_data_list = []
     for i,  one_data in enumerate(data[0].dataset):
@@ -92,7 +90,7 @@ def make_onehot_data(data):
 
 
 DataSetName = ['SBM_CLUSTER', 'SBM_PATTERN']
-for a in [8, 10, 12, 13]:
+for a in [12]:
     for dataname in DataSetName:
         with open(f'{dataname}.pkl', 'rb') as f:
             data = pickle.load(f)
