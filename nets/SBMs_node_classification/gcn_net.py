@@ -68,7 +68,7 @@ class GCNNet(nn.Module):
             if type(label) is not torch.LongTensor:
                 print(label)
                 with open('error_label', 'w') as f:
-                    f.write(label)
+                    f.write(list(label.numpy()))
                 try:
                     label = label.long()
                 except:
