@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from utils.loss import LabelSmoothingLoss
+from utils.find_error_label import find_error_label
 
 import dgl
 import numpy as np
@@ -65,15 +66,7 @@ class GCNNet(nn.Module):
         else:
             # calculating label weights for weighted loss computation
             V = label.size(0)
-            if label.dtype != torch.int64:
-                print(label)
-                with open('error_label', 'w') as f:
-                    f.write(str(list(label.cpu().detach().numpy())))
-                try:
-                    label = label.long()
-                except:
-                    import pdb
-                    pdb.set_trace()
+            find_error_label(label)
             label_count = torch.bincount(label)
             label_count = label_count[label_count.nonzero()].squeeze()
             cluster_sizes = torch.zeros(self.n_classes).long().to(self.device)
