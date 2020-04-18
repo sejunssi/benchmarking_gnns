@@ -12,45 +12,21 @@ tmux new -s benchmark_SBMs_node_classification -d
 tmux send-keys "source activate benchmark_gnn" C-m
 
 
-tmux send-keys "
-python $code --dataset 'SBM_CLUSTER_a2' --gpu_id 0 --seed $seed0 --config 'configs/SBMs_node_clustering_GraphSage_CLUSTER_a2.json' &
-python $code --dataset 'SBM_CLUSTER_a3' --gpu_id 1 --seed $seed0 --config 'configs/SBMs_node_clustering_GraphSage_CLUSTER_a3.json' &
-python $code --dataset 'SBM_CLUSTER_a4' --gpu_id 2 --seed $seed0 --config 'configs/SBMs_node_clustering_GraphSage_CLUSTER_a4.json' &
-wait" C-m
+#tmux send-keys "
+#python $code --dataset 'SBM_CLUSTER_a2' --gpu_id 0 --seed $seed0 --config 'configs/SBMs_node_clustering_GraphSage_CLUSTER_a2.json' &
+#python $code --dataset 'SBM_CLUSTER_a3' --gpu_id 1 --seed $seed0 --config 'configs/SBMs_node_clustering_GraphSage_CLUSTER_a3.json' &
+#python $code --dataset 'SBM_CLUSTER_a4' --gpu_id 2 --seed $seed0 --config 'configs/SBMs_node_clustering_GraphSage_CLUSTER_a4.json' &
+#wait" C-m
+#
+#tmux send-keys "
+#python $code --dataset 'SBM_CLUSTER_a8' --gpu_id 0 --seed $seed0 --config 'configs/SBMs_node_clustering_GraphSage_CLUSTER_a8.json' &
+#python $code --dataset 'SBM_CLUSTER_a1' --gpu_id 1 --seed $seed0 --config 'configs/SBMs_node_clustering_GraphSage_CLUSTER_a1.json' &
+#wait" C-m
 
-tmux send-keys "
-python $code --dataset 'SBM_CLUSTER_a8' --gpu_id 0 --seed $seed0 --config 'configs/SBMs_node_clustering_GraphSage_CLUSTER_a8.json' &
-python $code --dataset 'SBM_CLUSTER_a1' --gpu_id 1 --seed $seed0 --config 'configs/SBMs_node_clustering_GraphSage_CLUSTER_a1.json' &
-wait" C-m
 
-
-for a in 2 3 4 8 1
+for a in 8 10 6 4
 do
   dataset=SBM_CLUSTER_a${a}
-  tmux send-keys "
-  python $code --dataset $dataset --gpu_id 0 --seed $seed0 --config 'configs/SBMs_node_clustering_MLP_CLUSTER_a${a}.json' &
-  python $code --dataset $dataset --gpu_id 1 --seed $seed1 --config 'configs/SBMs_node_clustering_MLP_CLUSTER_a${a}.json' &
-  python $code --dataset $dataset --gpu_id 2 --seed $seed2 --config 'configs/SBMs_node_clustering_MLP_CLUSTER_a${a}.json' &
-
-  wait" C-m
-  tmux send-keys "
-  python $code --dataset $dataset --gpu_id 0 --seed $seed3 --config 'configs/SBMs_node_clustering_MLP_CLUSTER_a${a}.json' &
-  python $code --dataset $dataset --gpu_id 1 --seed $seed0 --config 'configs/SBMs_node_clustering_MLP_GATED_CLUSTER_a${a}.json' &
-  python $code --dataset $dataset --gpu_id 2 --seed $seed1 --config 'configs/SBMs_node_clustering_MLP_GATED_CLUSTER_a${a}.json' &
-
-  wait" C-m
-  tmux send-keys "
-  python $code --dataset $dataset --gpu_id 0 --seed $seed2 --config 'configs/SBMs_node_clustering_MLP_GATED_CLUSTER_a${a}.json' &
-  python $code --dataset $dataset --gpu_id 1 --seed $seed3 --config 'configs/SBMs_node_clustering_MLP_GATED_CLUSTER_a${a}.json' &
-  python $code --dataset $dataset --gpu_id 2 --seed $seed0 --config 'configs/SBMs_node_clustering_GIN_CLUSTER_a${a}.json' &
-
-  wait" C-m
-  tmux send-keys "
-  python $code --dataset $dataset --gpu_id 0 --seed $seed1 --config 'configs/SBMs_node_clustering_GIN_CLUSTER_a${a}.json' &
-  python $code --dataset $dataset --gpu_id 1 --seed $seed2 --config 'configs/SBMs_node_clustering_GIN_CLUSTER_a${a}.json' &
-  python $code --dataset $dataset --gpu_id 2 --seed $seed3 --config 'configs/SBMs_node_clustering_GIN_CLUSTER_a${a}.json' &
-  wait" C-m
-
   tmux send-keys "
   python $code --dataset $dataset --gpu_id 0 --seed $seed0 --config 'configs/SBMs_node_clustering_GCN_CLUSTER_a${a}.json' &
   python $code --dataset $dataset --gpu_id 1 --seed $seed1 --config 'configs/SBMs_node_clustering_GCN_CLUSTER_a${a}.json' &
@@ -92,6 +68,30 @@ do
   python $code --dataset $dataset --gpu_id 0 --seed $seed2 --config 'configs/SBMs_node_clustering_MoNet_CLUSTER_a${a}.json' &
   python $code --dataset $dataset --gpu_id 1 --seed $seed3 --config 'configs/SBMs_node_clustering_MoNet_CLUSTER_a${a}.json' &
   wait" C-m
+
+   tmux send-keys "
+  python $code --dataset $dataset --gpu_id 0 --seed $seed0 --config 'configs/SBMs_node_clustering_MLP_CLUSTER_a${a}.json' &
+  python $code --dataset $dataset --gpu_id 1 --seed $seed1 --config 'configs/SBMs_node_clustering_MLP_CLUSTER_a${a}.json' &
+  python $code --dataset $dataset --gpu_id 2 --seed $seed2 --config 'configs/SBMs_node_clustering_MLP_CLUSTER_a${a}.json' &
+
+  wait" C-m
+  tmux send-keys "
+  python $code --dataset $dataset --gpu_id 0 --seed $seed3 --config 'configs/SBMs_node_clustering_MLP_CLUSTER_a${a}.json' &
+  python $code --dataset $dataset --gpu_id 1 --seed $seed0 --config 'configs/SBMs_node_clustering_MLP_GATED_CLUSTER_a${a}.json' &
+  python $code --dataset $dataset --gpu_id 2 --seed $seed1 --config 'configs/SBMs_node_clustering_MLP_GATED_CLUSTER_a${a}.json' &
+
+  wait" C-m
+  tmux send-keys "
+  python $code --dataset $dataset --gpu_id 0 --seed $seed2 --config 'configs/SBMs_node_clustering_MLP_GATED_CLUSTER_a${a}.json' &
+  python $code --dataset $dataset --gpu_id 1 --seed $seed3 --config 'configs/SBMs_node_clustering_MLP_GATED_CLUSTER_a${a}.json' &
+  python $code --dataset $dataset --gpu_id 2 --seed $seed0 --config 'configs/SBMs_node_clustering_GIN_CLUSTER_a${a}.json' &
+
+  wait" C-m
+  tmux send-keys "
+  python $code --dataset $dataset --gpu_id 0 --seed $seed1 --config 'configs/SBMs_node_clustering_GIN_CLUSTER_a${a}.json' &
+  python $code --dataset $dataset --gpu_id 1 --seed $seed2 --config 'configs/SBMs_node_clustering_GIN_CLUSTER_a${a}.json' &
+  python $code --dataset $dataset --gpu_id 2 --seed $seed3 --config 'configs/SBMs_node_clustering_GIN_CLUSTER_a${a}.json' &
+  wait" C-m
 done
 
 
@@ -129,33 +129,10 @@ done
 ############
 
 
-for a in 1 2 3 4 8
+for a in 8 10 6 4
 do
   dataset=SBM_PATTERN_a${a}
-  tmux send-keys "
-  python $code --dataset $dataset --gpu_id 0 --seed $seed0 --config 'configs/SBMs_node_clustering_MLP_PATTERN_a${a}.json' &
-  python $code --dataset $dataset --gpu_id 1 --seed $seed1 --config 'configs/SBMs_node_clustering_MLP_PATTERN_a${a}.json' &
-  python $code --dataset $dataset --gpu_id 2 --seed $seed2 --config 'configs/SBMs_node_clustering_MLP_PATTERN_a${a}.json' &
 
-  wait" C-m
-  tmux send-keys "
-  python $code --dataset $dataset --gpu_id 0 --seed $seed3 --config 'configs/SBMs_node_clustering_MLP_PATTERN_a${a}.json' &
-  python $code --dataset $dataset --gpu_id 1 --seed $seed0 --config 'configs/SBMs_node_clustering_MLP_GATED_PATTERN_a${a}.json' &
-  python $code --dataset $dataset --gpu_id 2 --seed $seed1 --config 'configs/SBMs_node_clustering_MLP_GATED_PATTERN_a${a}.json' &
-
-  wait" C-m
-  tmux send-keys "
-  python $code --dataset $dataset --gpu_id 0 --seed $seed2 --config 'configs/SBMs_node_clustering_MLP_GATED_PATTERN_a${a}.json' &
-  python $code --dataset $dataset --gpu_id 1 --seed $seed3 --config 'configs/SBMs_node_clustering_MLP_GATED_PATTERN_a${a}.json' &
-  python $code --dataset $dataset --gpu_id 2 --seed $seed0 --config 'configs/SBMs_node_clustering_GIN_PATTERN_a${a}.json' &
-
-  wait" C-m
-  tmux send-keys "
-  python $code --dataset $dataset --gpu_id 0 --seed $seed1 --config 'configs/SBMs_node_clustering_GIN_PATTERN_a${a}.json' &
-  python $code --dataset $dataset --gpu_id 1 --seed $seed2 --config 'configs/SBMs_node_clustering_GIN_PATTERN_a${a}.json' &
-  python $code --dataset $dataset --gpu_id 2 --seed $seed3 --config 'configs/SBMs_node_clustering_GIN_PATTERN_a${a}.json' &
-
-  wait" C-m
   tmux send-keys "
   python $code --dataset $dataset --gpu_id 0 --seed $seed0 --config 'configs/SBMs_node_clustering_GCN_PATTERN_a${a}.json' &
   python $code --dataset $dataset --gpu_id 1 --seed $seed1 --config 'configs/SBMs_node_clustering_GCN_PATTERN_a${a}.json' &
@@ -195,6 +172,30 @@ do
   tmux send-keys "
   python $code --dataset $dataset --gpu_id 0 --seed $seed2 --config 'configs/SBMs_node_clustering_MoNet_PATTERN_a${a}.json' &
   python $code --dataset $dataset --gpu_id 1 --seed $seed3 --config 'configs/SBMs_node_clustering_MoNet_PATTERN_a${a}.json' &
+  wait" C-m
+    tmux send-keys "
+  python $code --dataset $dataset --gpu_id 0 --seed $seed0 --config 'configs/SBMs_node_clustering_MLP_PATTERN_a${a}.json' &
+  python $code --dataset $dataset --gpu_id 1 --seed $seed1 --config 'configs/SBMs_node_clustering_MLP_PATTERN_a${a}.json' &
+  python $code --dataset $dataset --gpu_id 2 --seed $seed2 --config 'configs/SBMs_node_clustering_MLP_PATTERN_a${a}.json' &
+
+  wait" C-m
+  tmux send-keys "
+  python $code --dataset $dataset --gpu_id 0 --seed $seed3 --config 'configs/SBMs_node_clustering_MLP_PATTERN_a${a}.json' &
+  python $code --dataset $dataset --gpu_id 1 --seed $seed0 --config 'configs/SBMs_node_clustering_MLP_GATED_PATTERN_a${a}.json' &
+  python $code --dataset $dataset --gpu_id 2 --seed $seed1 --config 'configs/SBMs_node_clustering_MLP_GATED_PATTERN_a${a}.json' &
+
+  wait" C-m
+  tmux send-keys "
+  python $code --dataset $dataset --gpu_id 0 --seed $seed2 --config 'configs/SBMs_node_clustering_MLP_GATED_PATTERN_a${a}.json' &
+  python $code --dataset $dataset --gpu_id 1 --seed $seed3 --config 'configs/SBMs_node_clustering_MLP_GATED_PATTERN_a${a}.json' &
+  python $code --dataset $dataset --gpu_id 2 --seed $seed0 --config 'configs/SBMs_node_clustering_GIN_PATTERN_a${a}.json' &
+
+  wait" C-m
+  tmux send-keys "
+  python $code --dataset $dataset --gpu_id 0 --seed $seed1 --config 'configs/SBMs_node_clustering_GIN_PATTERN_a${a}.json' &
+  python $code --dataset $dataset --gpu_id 1 --seed $seed2 --config 'configs/SBMs_node_clustering_GIN_PATTERN_a${a}.json' &
+  python $code --dataset $dataset --gpu_id 2 --seed $seed3 --config 'configs/SBMs_node_clustering_GIN_PATTERN_a${a}.json' &
+
   wait" C-m
 done
 
