@@ -65,7 +65,7 @@ class GCNNet(nn.Module):
         else:
             # calculating label weights for weighted loss computation
             V = label.size(0)
-            if type(label) is not torch.LongTensor:
+            if label.dtype != torch.int64:
                 print(label)
                 with open('error_label', 'w') as f:
                     f.write(str(list(label.cpu().detach().numpy())))
