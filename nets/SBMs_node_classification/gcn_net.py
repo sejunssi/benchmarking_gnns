@@ -65,6 +65,15 @@ class GCNNet(nn.Module):
         else:
             # calculating label weights for weighted loss computation
             V = label.size(0)
+            if type(label) is not torch.LongTensor:
+                print(label)
+                with open('error_label') as f:
+                    f.write(label)
+                try:
+                    label = label.long()
+                except:
+                    import pdb
+                    pdb.set_trace()
             label_count = torch.bincount(label)
             label_count = label_count[label_count.nonzero()].squeeze()
             cluster_sizes = torch.zeros(self.n_classes).long().to(self.device)
