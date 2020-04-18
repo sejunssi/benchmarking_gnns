@@ -7,6 +7,7 @@
 from data.SBMs import SBMsDataset, SmoothedSBMsDataset
 #from data.TSP import TSPDataset
 #from data.CitationGraphs import CitationGraphsDataset
+import re
 
 def LoadData(DATASET_NAME):
     """
@@ -32,10 +33,10 @@ def LoadData(DATASET_NAME):
     if DATASET_NAME in SBM_DATASETS: 
         return SBMsDataset(DATASET_NAME)
 
-    a = [1,2,3,4,8]
-    SMOOTHED_SBM_CLUSTER_DATASETS = [f'SBM_CLUSTER_a{x}' for x in a]
-    SMOOTHED_SBM_PATTERN_DATASETS = [f'SBM_PATTERN_a{x}' for x in a]
-    if DATASET_NAME in SMOOTHED_SBM_CLUSTER_DATASETS or DATASET_NAME in SMOOTHED_SBM_PATTERN_DATASETS:
+    # a = [1,2,3,4,8]
+    # SMOOTHED_SBM_CLUSTER_DATASETS = [f'SBM_CLUSTER_a{x}' for x in a]
+    # SMOOTHED_SBM_PATTERN_DATASETS = [f'SBM_PATTERN_a{x}' for x in a]
+    if DATASET_NAME in re.match('(SBM_CLUSTER_a\d)', DATASET_NAME) or DATASET_NAME in re.match('(SBM_PATTERN_a\d)', DATASET_NAME):
         return SmoothedSBMsDataset(DATASET_NAME)
     if DATASET_NAME in ['SBM_CLUSTER_smoothing', 'SBM_PATTERN_smoothing']:
         return SmoothedSBMsDataset(DATASET_NAME)
