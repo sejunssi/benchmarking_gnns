@@ -15,7 +15,7 @@ from layers.gcn_layer import GCNLayer
 from layers.mlp_readout_layer import MLPReadout
 
 
-class GCNNet(nn.Module):
+class Smooth_GCNNet(nn.Module):
 
     def __init__(self, net_params):
         super().__init__()

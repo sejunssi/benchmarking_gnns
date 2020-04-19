@@ -4,7 +4,7 @@
         "id": 0
     },
     
-    "model": "GCN",
+    "model": "SMOOTH_GCN",
     "dataset": "SBM_CLUSTER",
     
     "out_dir": "out/SBMs_node_classification/",
