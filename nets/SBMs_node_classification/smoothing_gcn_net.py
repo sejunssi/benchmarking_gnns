@@ -43,7 +43,7 @@ class Smooth_GCNNet(nn.Module):
             GCNLayer(hidden_dim, out_dim, F.relu, dropout, self.graph_norm, self.batch_norm, self.residual))
         self.MLP_layer = MLPReadout(out_dim, n_classes)
 
-    def forward(self, **kwargs):
+    def forward(self, *args, **kwargs):
         # g = kwargs['g']
         h = kwargs['h']
         # e = kwargs['e']
