@@ -24,7 +24,16 @@ def smooth_train_epoch(model, optimizer, device, data_loader, epoch,  delta=1.0,
         batch_snorm_e = batch_snorm_e.to(device)
         batch_labels = batch_labels.to(device)
         batch_snorm_n = batch_snorm_n.to(device)  # num x 1
-        batch_score, smoothed_label = model.forward(batch_graphs, batch_x, batch_e, batch_labels, delta, batch_snorm_n, batch_snorm_e, smooth)
+        model_param = {
+            'h': batch_x,
+            'e': batch_e,
+            'label': batch_labels,
+            'delta': delta,
+            'snorm_n': batch_snorm_n,
+            'snorm_e': batch_snorm_e,
+            'smooth': smooth
+        }
+        batch_score, smoothed_label = model.forward(model_param)
         smoothed_labels.append(smoothed_label)
         loss = model.loss(batch_score, smoothed_label, smooth)
         loss.backward()

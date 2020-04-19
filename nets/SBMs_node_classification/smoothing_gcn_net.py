@@ -43,7 +43,14 @@ class Smooth_GCNNet(nn.Module):
             GCNLayer(hidden_dim, out_dim, F.relu, dropout, self.graph_norm, self.batch_norm, self.residual))
         self.MLP_layer = MLPReadout(out_dim, n_classes)
 
-    def forward(self, g, h, e, label, delta, snorm_n, snorm_e):
+    def forward(self, **kwargs):
+        # g = kwargs['g']
+        h = kwargs['h']
+        # e = kwargs['e']
+        delta = kwargs['delta']
+        snorm_n = kwargs['snorm_n']
+        # snorm_e = kwargs['snorm_e']
+        label = kwargs['label']
         # input embedding
         g = label
         h = self.embedding_h(h)
