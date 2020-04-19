@@ -11,6 +11,33 @@ from train.metrics import accuracy_SBM as accuracy
 from train.metrics import accuracy_smoothing
 
 
+def smooth_train_epoch(model, optimizer, device, data_loader, epoch,  delta=1.0, smooth=False):
+    model.train()
+    epoch_loss = 0
+    epoch_train_acc = 0
+    nb_data = 0
+    gpu_mem = 0
+    for iter, (batch_graphs, batch_labels, batch_snorm_n, batch_snorm_e) in enumerate(data_loader):
+        batch_x = batch_graphs.ndata['feat'].to(device)  # num x feat
+        batch_e = batch_graphs.edata['feat'].to(device)
+        batch_snorm_e = batch_snorm_e.to(device)
+        batch_labels = batch_labels.to(device)
+        batch_snorm_n = batch_snorm_n.to(device)  # num x 1
+        batch_score, smoothed_label = model.forward(batch_graphs, batch_x, batch_e, batch_labels, delta, batch_snorm_n, batch_snorm_e, smooth)
+        loss = model.loss(batch_score, smoothed_label, smooth)
+        loss.backward()
+        optimizer.step()
+        epoch_loss += loss.detach().item()
+        if smooth:
+            epoch_train_acc += accuracy_smoothing(batch_score, smoothed_label)
+        else:
+            epoch_train_acc += accuracy(batch_score, smoothed_label)
+    epoch_loss /= (iter + 1)
+    epoch_train_acc /= (iter + 1)
+
+    return epoch_loss, epoch_train_acc, optimizer
+
+
 def train_epoch(model, optimizer, device, data_loader, epoch, smooth=False):
 
     model.train()
