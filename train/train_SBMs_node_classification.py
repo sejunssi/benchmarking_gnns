@@ -18,15 +18,12 @@ def train_epoch(model, optimizer, device, data_loader, epoch, smooth=False):
     epoch_train_acc = 0
     nb_data = 0
     gpu_mem = 0
-    for iter, (batch_graphs, batch_labels, batch_snorm_n, batch_snorm_e) in enumerate(data_loader):
-        test_x = batch_graphs.ndata['feat']
-        test_e = batch_graphs.edata['feat']
+    for iter, (batch_graphs, batch_labels, batch_snorm_n, batch_snorm_e) in enumerate(data_loader)
         batch_x = batch_graphs.ndata['feat'].to(device)  # num x feat
         batch_e = batch_graphs.edata['feat'].to(device)
         batch_snorm_e = batch_snorm_e.to(device)
         batch_labels = batch_labels.to(device)
         batch_snorm_n = batch_snorm_n.to(device)         # num x 1
-        optimizer.zero_grad()
         batch_scores = model.forward(batch_graphs, batch_x, batch_e, batch_snorm_n, batch_snorm_e)
         loss = model.loss(batch_scores, batch_labels, smooth)
         loss.backward()
