@@ -422,6 +422,8 @@ def main():
 
     if args.delta is not None:
         net_params['delta'] = float(args.delta)
+    else:
+        net_params['delta'] = 1.0
         
     # SBM
     net_params['in_dim'] = torch.unique(dataset.train[0][0].ndata['feat'],dim=0).size(0) # node_dim (feat is an integer)
