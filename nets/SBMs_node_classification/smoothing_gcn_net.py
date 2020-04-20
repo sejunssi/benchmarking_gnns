@@ -86,8 +86,8 @@ class Smooth_GCNNet(nn.Module):
         p = self.softmax(p)
         return p, g_hat
 
-    def loss(self, pred, label, smooth=False):
-        if smooth == True:
+    def loss(self, pred, label, onehot=False):
+        if onehot == True:
             criterion = LabelSmoothingLoss()
             loss = criterion(pred, label)
             return loss

@@ -69,8 +69,8 @@ class MoNet(nn.Module):
 
         return self.MLP_layer(h)
         
-    def loss(self, pred, label, smooth):
-        if smooth == True:
+    def loss(self, pred, label, onehot):
+        if onehot == True:
             criterion = LabelSmoothingLoss()
             loss = criterion(pred, label)
             return loss

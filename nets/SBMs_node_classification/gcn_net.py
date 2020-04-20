@@ -57,8 +57,8 @@ class GCNNet(nn.Module):
         return h_out
 
     
-    def loss(self, pred, label, smooth=False):
-        if smooth == True:
+    def loss(self, pred, label, onehot=False):
+        if onehot == True:
             criterion = LabelSmoothingLoss()
             loss = criterion(pred, label)
             return loss

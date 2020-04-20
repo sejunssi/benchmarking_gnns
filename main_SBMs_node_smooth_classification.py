@@ -94,7 +94,7 @@ def view_model_param(MODEL_NAME, net_params):
     TRAINING CODE
 """
 
-def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, smooth=False):
+def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, onehot=False):
     
     start0 = time.time()
     per_epoch_time = []
@@ -107,13 +107,15 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, smooth=Fal
             dataset._add_self_loops()
     
     trainset, valset, testset = dataset.train, dataset.val, dataset.test
-    if not smooth:
-        make_onehot_node_label(trainset, net_params['n_classes'])
-    if smooth:
+
+    if onehot:
         valset.node_labels = [x.long() for x in valset.node_labels]
         testset.node_labels = [x.long() for x in testset.node_labels]
-    make_onehot_node_label(valset, net_params['n_classes'])
-    make_onehot_node_label(testset, net_params['n_classes'])
+    if not onehot:
+        make_onehot_node_label(trainset, net_params['n_classes'])
+        make_onehot_node_label(valset, net_params['n_classes'])
+        make_onehot_node_label(testset, net_params['n_classes'])
+        onehot=True
         
     root_log_dir, root_ckpt_dir, write_file_name, write_config_file = dirs
     device = net_params['device']
@@ -171,9 +173,9 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, smooth=Fal
 
                 start = time.time()
 
-                epoch_train_loss, epoch_train_acc, optimizer = smooth_train_epoch(model, optimizer, device, train_loader, epoch, delta, smooth=True)
-                epoch_val_loss, epoch_val_acc = smooth_evaluate_network(model, device, val_loader, epoch, delta)
-                epoch_test_loss, epoch_test_acc = smooth_evaluate_network(model, device, test_loader, epoch, delta)
+                epoch_train_loss, epoch_train_acc, optimizer = smooth_train_epoch(model, optimizer, device, train_loader, epoch, delta, onehot=onehot)
+                epoch_val_loss, epoch_val_acc = smooth_evaluate_network(model, device, val_loader, epoch, delta, onehot=onehot)
+                epoch_test_loss, epoch_test_acc = smooth_evaluate_network(model, device, test_loader, epoch, delta, onehot=onehot)
 
                 epoch_train_loss_list.append(epoch_train_loss)
                 epoch_val_loss_list.append(epoch_val_loss)
@@ -190,7 +192,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, smooth=Fal
                 writer.add_scalar('val/_acc', epoch_val_acc, epoch)
                 writer.add_scalar('learning_rate', optimizer.param_groups[0]['lr'], epoch)
 
-                _, epoch_test_acc = smooth_evaluate_network(model, device, test_loader, epoch, delta)
+                _, epoch_test_acc = smooth_evaluate_network(model, device, test_loader, epoch, delta, onehot=onehot)
                 t.set_postfix(time=time.time()-start, lr=optimizer.param_groups[0]['lr'],
                               train_loss=epoch_train_loss, val_loss=epoch_val_loss,
                               train_acc=epoch_train_acc, val_acc=epoch_val_acc,
@@ -236,8 +238,8 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, smooth=Fal
         print('Exiting from training early because of KeyboardInterrupt')
     
     
-    _, test_acc = smooth_evaluate_network(model, device, test_loader, epoch, delta)
-    _, train_acc = smooth_evaluate_network(model, device, train_loader, epoch, delta, smooth=smooth)
+    _, test_acc = smooth_evaluate_network(model, device, test_loader, epoch, delta, onehot=onehot)
+    _, train_acc = smooth_evaluate_network(model, device, train_loader, epoch, delta, onehot=onehot)
     print("Test Accuracy: {:.4f}".format(test_acc))
     print("Train Accuracy: {:.4f}".format(train_acc))
     print("TOTAL TIME TAKEN: {:.4f}s".format(time.time()-start0))
@@ -422,10 +424,10 @@ def main():
         net_params['cat'] = True if args.cat=='True' else False
     if args.self_loop is not None:
         net_params['self_loop'] = True if args.self_loop=='True' else False
-    smooth = False
-    if args.smooth is not None:
-        net_params['smooth'] = True if args.smooth=='True' else False
-        smooth = net_params['smooth']
+    onehot = False
+    if args.onehot is not None:
+        net_params['onehot'] = True if args.onehot=='True' else False
+        onehot = net_params['onehot']
 
     if args.delta is not None:
         net_params['delta'] = float(args.delta)
@@ -436,7 +438,7 @@ def main():
     net_params['in_dim'] = torch.unique(dataset.train[0][0].ndata['feat'],dim=0).size(0) # node_dim (feat is an integer)
 
     net_params['n_classes'] = torch.unique(dataset.train[0][1],dim=0).size(0)
-    if smooth:
+    if onehot:
         net_params['n_classes'] = len(dataset.train.dataset[0]['node_label'][0])
 
     root_log_dir = out_dir + 'logs/' + MODEL_NAME + "_" + DATASET_NAME + "_GPU" + str(config['gpu']['id']) + "_" + time.strftime('%Hh%Mm%Ss_on_%b_%d_%Y')
@@ -452,7 +454,7 @@ def main():
         os.makedirs(out_dir + 'configs')
 
     net_params['total_param'] = view_model_param(MODEL_NAME, net_params)
-    train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, smooth)
+    train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, onehot)
 
     
     

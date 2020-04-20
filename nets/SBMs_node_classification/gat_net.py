@@ -61,7 +61,7 @@ class GATNet(nn.Module):
         return h_out
     
     
-    def loss(self, pred, label, smooth=False):
+    def loss(self, pred, label, onehot=False):
         if smooth == True:
             criterion = LabelSmoothingLoss()
             loss = criterion(pred, label)
