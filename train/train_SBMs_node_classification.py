@@ -36,9 +36,9 @@ def smooth_train_epoch(model, optimizer, device, data_loader, epoch,  delta=1.0,
         epoch_train_acc += accuracy_smoothing(batch_score, smoothed_label)
     epoch_loss /= (iter + 1)
     epoch_train_acc /= (iter + 1)
-    with open('smoothed_labels') as f:
+    with open('smoothed_labels.csv') as f:
         for origin, smooth in zip(original_labels, smoothed_labels):
-            f.write(str(origin), str(smooth)+"\n")
+            f.write(str(origin)+","+str(smooth)+"\n")
 
     return epoch_loss, epoch_train_acc, optimizer
 
