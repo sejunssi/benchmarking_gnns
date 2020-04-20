@@ -324,7 +324,7 @@ def main():
     parser.add_argument('--cat', help="Please give a value for cat")
     parser.add_argument('--self_loop', help="Please give a value for self_loop")
     parser.add_argument('--max_time', help="Please give a value for max_time")
-    parser.add_argument('--smooth', help="Please give a value for smooth")
+    parser.add_argument('--onehot', help="Please give a value for onehot")
     parser.add_argument('--delta', help="Please give a value for delta")
     args = parser.parse_args()
 #    pdb.set_trace()
