@@ -17,8 +17,9 @@ def smooth_train_epoch(model, optimizer, device, data_loader, epoch,  delta=1.0,
     epoch_train_acc = 0
     nb_data = 0
     gpu_mem = 0
-    # smoothed_labels = []
-    # original_labels = []
+    smoothed_labels = []
+    original_labels = []
+    predicts = []
     for iter, (batch_graphs, batch_labels, batch_snorm_n, batch_snorm_e) in enumerate(data_loader):
         # one_hot_batch_labels = [ torch.nn.functional.one_hot(label.to(torch.int64)) for label in batch_labels]
         batch_x = batch_graphs.ndata['feat'].to(device)  # num x feat
@@ -27,8 +28,9 @@ def smooth_train_epoch(model, optimizer, device, data_loader, epoch,  delta=1.0,
         batch_labels = batch_labels.to(device)
         batch_snorm_n = batch_snorm_n.to(device)  # num x 1
         batch_scores, smoothed_label = model.forward(g=batch_graphs, h=batch_x, e=batch_e, label=batch_labels, delta=delta, snorm_e=batch_snorm_e, snorm_n=batch_snorm_n, onehot=onehot)
-        # original_labels.append(original_labels)
-        # smoothed_labels.append(smoothed_label)
+        original_labels.append(original_labels)
+        smoothed_labels.append(smoothed_label)
+        predicts.append(batch_scores)
         loss = model.loss(batch_scores, smoothed_label, onehot=onehot)
         loss.backward()
         optimizer.step()
@@ -36,10 +38,10 @@ def smooth_train_epoch(model, optimizer, device, data_loader, epoch,  delta=1.0,
         epoch_train_acc += accuracy_smoothing(batch_scores, smoothed_label)
     epoch_loss /= (iter + 1)
     epoch_train_acc /= (iter + 1)
-    # with open(f'smoothed_labels.csv') as f:
-    #     for origin, smooth in zip(original_labels, smoothed_labels):
-    #         f.write(str(origin)+","+str(smooth)+"\n")
-
+    with open(f'test_smoothed_labels_{epoch}.csv') as f:
+        f.write("GT,smoothed Label,predict\n")
+        for origin, smooth, predict in zip(original_labels, smoothed_labels, predicts):
+            f.write(str(origin) + "," + str(smooth) + "," + predict + "\n")
     return epoch_loss, epoch_train_acc, optimizer
 
 
@@ -48,6 +50,9 @@ def smooth_evaluate_network(model, device, data_loader, epoch, delta=1.0, onehot
     epoch_test_loss = 0
     epoch_test_acc = 0
     nb_data = 0
+    smoothed_labels = []
+    original_labels = []
+    predicts = []
     with torch.no_grad():
         for iter, (batch_graphs, batch_labels, batch_snorm_n, batch_snorm_e) in enumerate(data_loader):
             batch_x = batch_graphs.ndata['feat'].to(device)
@@ -56,11 +61,21 @@ def smooth_evaluate_network(model, device, data_loader, epoch, delta=1.0, onehot
             batch_labels = batch_labels.to(device)
             batch_snorm_n = batch_snorm_n.to(device)
             batch_scores, smoothed_label = model.forward(g=batch_graphs, h=batch_x, e=batch_e, label=batch_labels, delta=delta, snorm_e=batch_snorm_e, snorm_n=batch_snorm_n, onehot=onehot)
+            original_labels.append(batch_labels)
+            smoothed_labels.append(smoothed_label)
+            predicts.append(batch_scores)
             loss = model.loss(batch_scores, smoothed_label, onehot)
             epoch_test_loss += loss.detach().item()
-            epoch_test_acc += accuracy_smoothing(batch_scores, smoothed_label)
+            if onehot:
+                epoch_test_acc += accuracy_smoothing(batch_scores, smoothed_label)
+            else:
+                epoch_test_acc += accuracy(batch_scores, smoothed_label)
         epoch_test_loss /= (iter + 1)
         epoch_test_acc /= (iter + 1)
+    with open(f'test_smoothed_labels_{epoch}.csv') as f:
+        f.write("GT,smoothed Label,predict\n")
+        for origin, smooth, predict in zip(original_labels, smoothed_labels, predicts):
+            f.write(str(origin)+","+str(smooth)+","+predict+"\n")
 
     return epoch_test_loss, epoch_test_acc
 
