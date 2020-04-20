@@ -330,7 +330,10 @@ def main():
     if args.gpu_id is not None:
         config['gpu']['id'] = int(args.gpu_id)
         config['gpu']['use'] = True
-    device = gpu_setup(config['gpu']['use'], config['gpu']['id'])
+        device = gpu_setup(config['gpu']['use'], config['gpu']['id'])
+    else:
+        device = torch.device("cpu")
+
     # model, dataset, out_dir
     if args.model is not None:
         MODEL_NAME = args.model
