@@ -44,7 +44,7 @@ class Smooth_GCNNet(nn.Module):
         self.MLP_layer = MLPReadout(out_dim, n_classes)
 
     def forward(self, *args, **kwargs):
-        # g = kwargs['g']
+        g = kwargs['g']
         h = kwargs['h']
         # e = kwargs['e']
         delta = kwargs['delta']
