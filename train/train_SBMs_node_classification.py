@@ -18,6 +18,7 @@ def smooth_train_epoch(model, optimizer, device, data_loader, epoch,  delta=1.0,
     nb_data = 0
     gpu_mem = 0
     smoothed_labels = []
+    losses = []
     for iter, (batch_graphs, batch_labels, batch_snorm_n, batch_snorm_e) in enumerate(data_loader):
         # one_hot_batch_labels = [ torch.nn.functional.one_hot(label.to(torch.int64)) for label in batch_labels]
         batch_x = batch_graphs.ndata['feat'].to(device)  # num x feat
