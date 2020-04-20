@@ -47,6 +47,7 @@ class Smooth_GCNNet(nn.Module):
         self.layers2.append(
             GCNLayer(hidden_dim+n_classes, out_dim, F.relu, dropout, self.graph_norm, self.batch_norm, self.residual))
         self.MLP_layer = MLPReadout(out_dim, n_classes)
+        self.MLP_layer2 = MLPReadout(out_dim, 1)
         self.softmax = nn.Softmax(dim=1)
         self.logSoftmax = nn.LogSoftmax(dim=1)
 
@@ -78,7 +79,8 @@ class Smooth_GCNNet(nn.Module):
 
         # output
         p = self.MLP_layer(h1)
-        w = self.MLP_layer(h2)
+        w = self.MLP_layer2(h2)
+        w = w.repeat(1, self.n_classes)
         w = torch.clamp(w, min=0, max=delta)
         ones = torch.ones(label.shape[0], label.shape[1]).to(device=self.device)
         max_entropy = torch.Tensor([1/ label.shape[1]]).repeat(label.shape[0], label.shape[1]).to(device=self.device)
