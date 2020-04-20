@@ -11,7 +11,7 @@ from train.metrics import accuracy_SBM as accuracy
 from train.metrics import accuracy_smoothing
 
 
-def smooth_train_epoch(model, optimizer, device, data_loader, epoch,  delta=1.0, smooth=False):
+def smooth_train_epoch(model, optimizer, device, data_loader, epoch,  delta=1.0, smooth=True):
     model.train()
     epoch_loss = 0
     epoch_train_acc = 0
