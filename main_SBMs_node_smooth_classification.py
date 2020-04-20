@@ -112,6 +112,8 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, smooth=Fal
     if smooth:
         valset.node_labels = [x.long() for x in valset.node_labels]
         testset.node_labels = [x.long() for x in testset.node_labels]
+    make_onehot_node_label(valset, net_params['n_classes'])
+    make_onehot_node_label(testset, net_params['n_classes'])
         
     root_log_dir, root_ckpt_dir, write_file_name, write_config_file = dirs
     device = net_params['device']
