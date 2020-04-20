@@ -41,6 +41,11 @@ class Smooth_GCNNet(nn.Module):
                                      range(n_layers - 1)])
         self.layers.append(
             GCNLayer(hidden_dim, out_dim, F.relu, dropout, self.graph_norm, self.batch_norm, self.residual))
+        self.layers2 = nn.ModuleList([GCNLayer(hidden_dim+n_classes, hidden_dim+n_classes, F.relu, dropout,
+                                              self.graph_norm, self.batch_norm, self.residual) for _ in
+                                     range(n_layers - 1)])
+        self.layers2.append(
+            GCNLayer(hidden_dim+n_classes, out_dim, F.relu, dropout, self.graph_norm, self.batch_norm, self.residual))
         self.MLP_layer = MLPReadout(out_dim, n_classes)
 
     def forward(self, *args, **kwargs):
@@ -55,18 +60,18 @@ class Smooth_GCNNet(nn.Module):
         h1 = self.embedding_h(h)
         h1 = self.in_feat_dropout(h1)
 
-        h2 = torch.cat((h.reshape(len(h), -1), label), dim=1)
+        # h2 = torch.cat((h.reshape(len(h), -1), label), dim=1)
         # input embedding
-        h2 = self.embedding_h(h2)
+        h2 = self.embedding_h(h)
         h2 = self.in_feat_dropout(h2)
-        # h2 = torch.cat((h, label.to(torch.float)), dim=1)
+        h2 = torch.cat((h2, label.to(torch.float)), dim=1)
 
         # GCN1
         for conv in self.layers:
             h1 = conv(g, h1, snorm_n)
 
         #GCN2
-        for conv in self.layers:
+        for conv in self.layers2:
             h2 = conv(g, h2, snorm_n)
 
         # output
