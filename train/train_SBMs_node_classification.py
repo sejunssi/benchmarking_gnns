@@ -38,7 +38,7 @@ def smooth_train_epoch(model, optimizer, device, data_loader, epoch,  delta=1.0,
         epoch_train_acc += accuracy_smoothing(batch_scores, smoothed_label)
     epoch_loss /= (iter + 1)
     epoch_train_acc /= (iter + 1)
-    with open(f'test_smoothed_labels_{epoch}.csv') as f:
+    with open(f'train_smoothed_labels_{epoch}.csv', 'w') as f:
         f.write("GT,smoothed Label,predict\n")
         for origin, smooth, predict in zip(original_labels, smoothed_labels, predicts):
             f.write(str(origin) + "," + str(smooth) + "," + predict + "\n")
@@ -72,7 +72,7 @@ def smooth_evaluate_network(model, device, data_loader, epoch, delta=1.0, onehot
                 epoch_test_acc += accuracy(batch_scores, smoothed_label)
         epoch_test_loss /= (iter + 1)
         epoch_test_acc /= (iter + 1)
-    with open(f'test_smoothed_labels_{epoch}.csv') as f:
+    with open(f'test_smoothed_labels_{epoch}.csv','w') as f:
         f.write("GT,smoothed Label,predict\n")
         for origin, smooth, predict in zip(original_labels, smoothed_labels, predicts):
             f.write(str(origin)+","+str(smooth)+","+predict+"\n")
