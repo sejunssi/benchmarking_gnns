@@ -63,7 +63,7 @@ class Smooth_GCNNet(nn.Module):
 
         # GCN1
         for conv in self.layers:
-            h1 = conv(g, h1, snorm_n)
+            h1 = conv(g, h, snorm_n)
 
         #GCN2
         for conv in self.layers:
