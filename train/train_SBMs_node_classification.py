@@ -11,7 +11,7 @@ from train.metrics import accuracy_SBM as accuracy
 from train.metrics import accuracy_smoothing
 
 
-def smooth_train_epoch(model, optimizer, device, data_loader, epoch,  delta=1.0, smooth=True):
+def smooth_train_epoch(model, optimizer, device, data_loader, epoch,  delta=1.0, smooth=False):
     model.train()
     epoch_loss = 0
     epoch_train_acc = 0
@@ -26,14 +26,11 @@ def smooth_train_epoch(model, optimizer, device, data_loader, epoch,  delta=1.0,
         batch_snorm_n = batch_snorm_n.to(device)  # num x 1
         batch_score, smoothed_label = model.forward(h=batch_x, e=batch_e, label=batch_labels, delta=delta, snorm_e=batch_snorm_e, snorm_n=batch_snorm_n, smooth=smooth)
         smoothed_labels.append(smoothed_label)
-        loss = model.loss(batch_score, smoothed_label, smooth)
+        loss = model.loss(batch_score, smoothed_label, smooth=True)
         loss.backward()
         optimizer.step()
         epoch_loss += loss.detach().item()
-        if smooth:
-            epoch_train_acc += accuracy_smoothing(batch_score, smoothed_label)
-        else:
-            epoch_train_acc += accuracy(batch_score, smoothed_label)
+        epoch_train_acc += accuracy_smoothing(batch_score, smoothed_label)
     epoch_loss /= (iter + 1)
     epoch_train_acc /= (iter + 1)
     with open('smoothed_labels') as f:
