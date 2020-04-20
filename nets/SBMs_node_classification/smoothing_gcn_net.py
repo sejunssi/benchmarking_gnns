@@ -77,7 +77,7 @@ class Smooth_GCNNet(nn.Module):
         # output
         p = self.MLP_layer(h1)
         w = self.MLP_layer(h2)
-        w = torch.clmap(w, min=0, max=delta)
+        w = torch.clamp(w, min=0, max=delta)
         g_hat = (torch.ones(label.size)-w) * label + w * torch.Tensor([1/ label.size for r in range(label.size)])
         return p, g_hat
 
