@@ -18,7 +18,7 @@ def smooth_train_epoch(model, optimizer, device, data_loader, epoch,  delta=1.0,
     nb_data = 0
     gpu_mem = 0
     smoothed_labels = []
-    losses = []
+    original_labels = []
     for iter, (batch_graphs, batch_labels, batch_snorm_n, batch_snorm_e) in enumerate(data_loader):
         # one_hot_batch_labels = [ torch.nn.functional.one_hot(label.to(torch.int64)) for label in batch_labels]
         batch_x = batch_graphs.ndata['feat'].to(device)  # num x feat
@@ -27,6 +27,7 @@ def smooth_train_epoch(model, optimizer, device, data_loader, epoch,  delta=1.0,
         batch_labels = batch_labels.to(device)
         batch_snorm_n = batch_snorm_n.to(device)  # num x 1
         batch_score, smoothed_label = model.forward(g=batch_graphs, h=batch_x, e=batch_e, label=batch_labels, delta=delta, snorm_e=batch_snorm_e, snorm_n=batch_snorm_n, smooth=smooth)
+        original_labels.append(original_labels)
         smoothed_labels.append(smoothed_label)
         loss = model.loss(batch_score, smoothed_label, smooth=True)
         loss.backward()
@@ -36,8 +37,8 @@ def smooth_train_epoch(model, optimizer, device, data_loader, epoch,  delta=1.0,
     epoch_loss /= (iter + 1)
     epoch_train_acc /= (iter + 1)
     with open('smoothed_labels') as f:
-        for label in smoothed_labels:
-            f.write(str(label)+"\n")
+        for origin, smooth in zip(original_labels, smoothed_labels):
+            f.write(str(origin), str(smooth)+"\n")
 
     return epoch_loss, epoch_train_acc, optimizer
 
