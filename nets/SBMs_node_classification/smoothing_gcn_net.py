@@ -54,12 +54,12 @@ class Smooth_GCNNet(nn.Module):
         # input embedding
         h = self.embedding_h(h)
         h = self.in_feat_dropout(h)
+        concated_f = torch.cat(h, label)
 
         # GCN1
         for conv in self.layers:
             h1 = conv(g, h, snorm_n)
 
-        concated_f = torch.cat(h, label)
         #GCN2
         for conv in self.layers:
             h2 = conv(g, concated_f, snorm_n)
