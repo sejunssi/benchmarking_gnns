@@ -108,7 +108,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, smooth=Fal
     
     trainset, valset, testset = dataset.train, dataset.val, dataset.test
     if not smooth:
-        make_onehot(trainset)
+        make_onehot(trainset, net_params['n_classes'])
     if smooth:
         valset.node_labels = [x.long() for x in valset.node_labels]
         testset.node_labels = [x.long() for x in testset.node_labels]
