@@ -21,7 +21,7 @@ import pickle
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from utils.make_onehot import make_onehot
+from utils.make_onehot import make_onehot_node_label
 
 import torch.optim as optim
 from torch.utils.data import DataLoader
@@ -108,7 +108,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, smooth=Fal
     
     trainset, valset, testset = dataset.train, dataset.val, dataset.test
     if not smooth:
-        make_onehot(trainset, net_params['n_classes'])
+        make_onehot_node_label(trainset, net_params['n_classes'])
     if smooth:
         valset.node_labels = [x.long() for x in valset.node_labels]
         testset.node_labels = [x.long() for x in testset.node_labels]
