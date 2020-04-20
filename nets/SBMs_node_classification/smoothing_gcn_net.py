@@ -51,7 +51,7 @@ class Smooth_GCNNet(nn.Module):
         snorm_n = kwargs['snorm_n']
         # snorm_e = kwargs['snorm_e']
         label = kwargs['label']
-        concated_a = torch.cat((h.reshape(h.size()[0], -1), label), dim=0)
+        concated_a = torch.cat((h.reshape(len(h), -1), label), dim=0)
         # input embedding
         h = self.embedding_h(h)
         h = self.in_feat_dropout(h)
