@@ -115,6 +115,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, smooth=Fal
         
     root_log_dir, root_ckpt_dir, write_file_name, write_config_file = dirs
     device = net_params['device']
+    delta = net_params['delta']
     
     # Write network and optimization hyper-parameters in folder config/
     with open(write_config_file + '.txt', 'w') as f:
@@ -168,9 +169,9 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, smooth=Fal
 
                 start = time.time()
 
-                epoch_train_loss, epoch_train_acc, optimizer = smooth_train_epoch(model, optimizer, device, train_loader, epoch, net_params['delta'], smooth=True)
-                epoch_val_loss, epoch_val_acc = smooth_evaluate_network(model, device, val_loader, epoch)
-                epoch_test_loss, epoch_test_acc = smooth_evaluate_network(model, device, test_loader, epoch)
+                epoch_train_loss, epoch_train_acc, optimizer = smooth_train_epoch(model, optimizer, device, train_loader, epoch, delta, smooth=True)
+                epoch_val_loss, epoch_val_acc = smooth_evaluate_network(model, device, val_loader, epoch, delta)
+                epoch_test_loss, epoch_test_acc = smooth_evaluate_network(model, device, test_loader, epoch, delta)
 
                 epoch_train_loss_list.append(epoch_train_loss)
                 epoch_val_loss_list.append(epoch_val_loss)
@@ -187,7 +188,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, smooth=Fal
                 writer.add_scalar('val/_acc', epoch_val_acc, epoch)
                 writer.add_scalar('learning_rate', optimizer.param_groups[0]['lr'], epoch)
 
-                _, epoch_test_acc = smooth_evaluate_network(model, device, test_loader, epoch)
+                _, epoch_test_acc = smooth_evaluate_network(model, device, test_loader, epoch, delta)
                 t.set_postfix(time=time.time()-start, lr=optimizer.param_groups[0]['lr'],
                               train_loss=epoch_train_loss, val_loss=epoch_val_loss,
                               train_acc=epoch_train_acc, val_acc=epoch_val_acc,
@@ -233,8 +234,8 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, smooth=Fal
         print('Exiting from training early because of KeyboardInterrupt')
     
     
-    _, test_acc = smooth_evaluate_network(model, device, test_loader, epoch)
-    _, train_acc = smooth_evaluate_network(model, device, train_loader, epoch, smooth=smooth)
+    _, test_acc = smooth_evaluate_network(model, device, test_loader, epoch, delta)
+    _, train_acc = smooth_evaluate_network(model, device, train_loader, epoch, delta, smooth=smooth)
     print("Test Accuracy: {:.4f}".format(test_acc))
     print("Train Accuracy: {:.4f}".format(train_acc))
     print("TOTAL TIME TAKEN: {:.4f}s".format(time.time()-start0))

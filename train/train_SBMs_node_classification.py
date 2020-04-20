@@ -43,7 +43,7 @@ def smooth_train_epoch(model, optimizer, device, data_loader, epoch,  delta=1.0,
     return epoch_loss, epoch_train_acc, optimizer
 
 
-def smooth_evaluate_network(model, device, data_loader, epoch, smooth=False):
+def smooth_evaluate_network(model, device, data_loader, epoch, delta=1.0, smooth=False):
     model.eval()
     epoch_test_loss = 0
     epoch_test_acc = 0
