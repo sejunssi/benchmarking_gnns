@@ -52,7 +52,6 @@ class Smooth_GCNNet(nn.Module):
         # snorm_e = kwargs['snorm_e']
         label = kwargs['label']
         # input embedding
-        g = label
         h = self.embedding_h(h)
         h = self.in_feat_dropout(h)
 
@@ -69,7 +68,7 @@ class Smooth_GCNNet(nn.Module):
         p = self.MLP_layer(h1)
         w = self.MLP_layer(h2)
         w = torch.clmap(w, min=0, max=delta)
-        g_hat = (torch.ones(label.size)-w) * g + w * torch.Tensor([1/ label.size for r in range(label.size)])
+        g_hat = (torch.ones(label.size)-w) * label + w * torch.Tensor([1/ label.size for r in range(label.size)])
         return p, g_hat
 
     def loss(self, pred, label, smooth=False):
