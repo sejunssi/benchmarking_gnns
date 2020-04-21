@@ -15,7 +15,7 @@ def smooth_train_epoch(model, optimizer, device, data_loader, epoch, prev_smooth
     if epoch == 0:
         test_data = []
         for iter, (batch_graphs, batch_labels, batch_snorm_n, batch_snorm_e) in enumerate(data_loader):
-            test_data.append(batch_labels)
+            test_data.append(batch_labels.to(torch.float))
         # model.train()
         # epoch_loss = 0
         # epoch_train_acc = 0
