@@ -1,4 +1,3 @@
-import torch
 import pickle
 from data.SBMs import SBMsSampleDatasetDGL
 
@@ -15,7 +14,7 @@ def read_pickle(dataname, split):
 def load_sample_data(data_name):
     dataset = SBMsSampleDatasetDGL('./', data_name)
     with open('SBM_CLUSTER_SAMPLE.pkl', 'wb') as f:
-        pickle.dumps([dataset.train, dataset.val, dataset.test], 'f')
+        pickle.dump([dataset.train, dataset.val, dataset.test], f)
 
 data_name = "SBM_CLUSTER_SAMPLE"
 
