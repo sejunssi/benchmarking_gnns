@@ -68,7 +68,7 @@ def smooth_train_epoch(model, optimizer, device, data_loader, epoch, prev_smooth
         batch_scores, smoothed_label = model.forward(g=batch_graphs, h=batch_x, e=batch_e, label=batch_labels,
                                                      delta=delta, snorm_e=batch_snorm_e, snorm_n=batch_snorm_n,
                                                      onehot=onehot)
-        smoothed_labels.append(smoothed_label)
+        smoothed_labels.append(smoothed_label.data)
         # predicts.append(batch_scores)
         loss = model.loss(batch_scores, smoothed_label, onehot=onehot)
         loss.backward()
