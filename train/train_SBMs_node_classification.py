@@ -16,13 +16,10 @@ def smooth_train_epoch(model, optimizer, device, data_loader, epoch, prev_smooth
         model.train()
         epoch_loss = 0
         epoch_train_acc = 0
-        nb_data = 0
-        gpu_mem = 0
         smoothed_labels = []
         original_labels = []
         predicts = []
         for iter, (batch_graphs, batch_labels, batch_snorm_n, batch_snorm_e) in enumerate(data_loader):
-            # one_hot_batch_labels = [ torch.nn.functional.one_hot(label.to(torch.int64)) for label in batch_labels]
             batch_x = batch_graphs.ndata['feat'].to(device)  # num x feat
             batch_e = batch_graphs.edata['feat'].to(device)
             batch_snorm_e = batch_snorm_e.to(device)
@@ -51,14 +48,11 @@ def smooth_train_epoch(model, optimizer, device, data_loader, epoch, prev_smooth
     model.train()
     epoch_loss = 0
     epoch_train_acc = 0
-    nb_data = 0
-    gpu_mem = 0
     original_labels = []
     smoothed_labels = []
     predicts = []
 
     for iter, prev_smoothed_label, (batch_graphs, batch_labels , batch_snorm_n, batch_snorm_e) in enumerate(zip(prev_smoothed_labels, data_loader)):
-        # one_hot_batch_labels = [ torch.nn.functional.one_hot(label.to(torch.int64)) for label in batch_labels]
         batch_x = batch_graphs.ndata['feat'].to(device)  # num x feat
         batch_e = batch_graphs.edata['feat'].to(device)
         batch_snorm_e = batch_snorm_e.to(device)
