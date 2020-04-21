@@ -128,18 +128,18 @@ nb_graphs = 100  # train
 # nb_graphs = 3333 # train
 # nb_graphs = 500 # train
 # nb_graphs = 20 # train
-SBMs_CLUSTER(nb_graphs, 'SBM_CLUSTER_train')
+SBMs_CLUSTER(nb_graphs, 'SBM_CLUSTER_SAMPLE_train')
 
 nb_graphs = 10  # val
 # nb_graphs = 333 # val
 # nb_graphs = 100 # val
 # nb_graphs = 5 # val
-SBMs_CLUSTER(nb_graphs, 'SBM_CLUSTER_val')
+SBMs_CLUSTER(nb_graphs, 'SBM_CLUSTER_SAMPLE_val')
 
 nb_graphs = 10  # test
 # nb_graphs = 333 # test
 # nb_graphs = 100 # test
 # nb_graphs = 5 # test
-SBMs_CLUSTER(nb_graphs, 'SBM_CLUSTER_test')
+SBMs_CLUSTER(nb_graphs, 'SBM_CLUSTER_SAMPLE_test')
 
 print('Time (sec):', time.time() - start)

@@ -90,6 +90,25 @@ class SBMsDatasetDGL(torch.utils.data.Dataset):
         print("[I] Data load time: {:.4f}s".format(time.time()-start))
 
 
+class SBMsSampleDatasetDGL(torch.utils.data.Dataset):
+
+    def __init__(self, path,  name):
+        """
+            TODO
+        """
+        start = time.time()
+        print("[I] Loading data ...")
+        self.name = name
+        data_dir = path
+
+        self.train = load_SBMsDataSetDGL(data_dir, name, split='train')
+        self.test = load_SBMsDataSetDGL(data_dir, name, split='test')
+        self.val = load_SBMsDataSetDGL(data_dir, name, split='val')
+        print("[I] Finished loading.")
+        print("[I] Data load time: {:.4f}s".format(time.time()-start))
+
+
+
 
 
 def self_loop(g):
