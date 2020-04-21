@@ -56,12 +56,12 @@ def smooth_train_epoch(model, optimizer, device, data_loader, epoch, prev_smooth
     smoothed_labels = []
     predicts = []
 
-    for iter, prev_smoothed_label, (batch_graphs, batch_labels , batch_snorm_n, batch_snorm_e) in enumerate(zip(prev_smoothed_labels, data_loader)):
+    for iter, (batch_graphs, batch_labels , batch_snorm_n, batch_snorm_e) in enumerate(data_loader):
         batch_x = batch_graphs.ndata['feat'].to(device)  # num x feat
         batch_e = batch_graphs.edata['feat'].to(device)
         batch_snorm_e = batch_snorm_e.to(device)
         original_labels.append(batch_labels)
-        batch_labels = prev_smoothed_label.to(device)
+        batch_labels = prev_smoothed_labels[iter].to(device)
         batch_snorm_n = batch_snorm_n.to(device)  # num x 1
         batch_scores, smoothed_label = model.forward(g=batch_graphs, h=batch_x, e=batch_e, label=batch_labels,
                                                      delta=delta, snorm_e=batch_snorm_e, snorm_n=batch_snorm_n,
