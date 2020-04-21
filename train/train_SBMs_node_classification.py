@@ -80,7 +80,6 @@ def smooth_train_epoch(model, optimizer, device, data_loader, epoch, prev_smooth
         for origin, smooth, predict in zip(original_labels, smoothed_labels, predicts):
             f.write(str(origin) + "," + str(smooth) + "," + str(predict) + "\n")
     return epoch_loss, epoch_train_acc, optimizer, smoothed_labels
-    return epoch_loss, epoch_train_acc, optimizer, smoothed_labels
 
 
 def smooth_evaluate_network(model, device, data_loader, epoch,  delta=1.0, onehot=False):

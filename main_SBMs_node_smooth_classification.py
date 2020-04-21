@@ -149,8 +149,8 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, onehot=Fal
                                                      factor=params['lr_reduce_factor'],
                                                      patience=params['lr_schedule_patience'],
                                                      verbose=True)
-
-    train_loader = DataLoader(trainset, batch_size=params['batch_size'], shuffle=True, collate_fn=dataset.collate)
+    #TODO suffle is false for test, change later 'shuffle is true'
+    train_loader = DataLoader(trainset, batch_size=params['batch_size'], shuffle=False, collate_fn=dataset.collate)
     val_loader = DataLoader(valset, batch_size=params['batch_size'], shuffle=False, collate_fn=dataset.collate)
     test_loader = DataLoader(testset, batch_size=params['batch_size'], shuffle=False, collate_fn=dataset.collate)
         
@@ -174,7 +174,6 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, onehot=Fal
                 t.set_description('Epoch %d' % epoch)
 
                 start = time.time()
-
                 epoch_train_loss, epoch_train_acc, optimizer, smoothed_labels = smooth_train_epoch(model, optimizer, device, train_loader, epoch, smoothed_labels, delta, onehot=onehot)
                 epoch_val_loss, epoch_val_acc = smooth_evaluate_network(model, device, val_loader, epoch, delta, onehot=onehot)
                 epoch_test_loss, epoch_test_acc = smooth_evaluate_network(model, device, test_loader, epoch, delta, onehot=onehot)
