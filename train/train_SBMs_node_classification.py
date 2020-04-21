@@ -46,7 +46,7 @@ def smooth_train_epoch(model, optimizer, device, data_loader, epoch, prev_smooth
         #     f.write("GT,smoothed Label,predict\n")
         #     for origin, smooth, predict in zip(original_labels, smoothed_labels, predicts):
         #         f.write(str(origin) + "," + str(smooth) + "," + str(predict) + "\n")
-        # return epoch_loss, epoch_train_acc, optimizer, smoothed_labels
+        return epoch_loss, epoch_train_acc, optimizer, smoothed_labels
         # test code to debug
         # return 0, 0, optimizer, test_data # for test
 
