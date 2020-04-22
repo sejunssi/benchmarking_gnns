@@ -48,8 +48,6 @@ class Smooth_GCNNet(nn.Module):
             GCNLayer(hidden_dim+n_classes, out_dim, F.relu, dropout, self.graph_norm, self.batch_norm, self.residual))
         self.MLP_layer = MLPReadout(out_dim, n_classes)
         self.MLP_layer2 = MLPReadout(out_dim, 1)
-        self.softmax = nn.Softmax(dim=1)
-        self.logSoftmax = nn.LogSoftmax(dim=1)
 
     def forward(self, *args, **kwargs):
         g = kwargs['g']
@@ -82,10 +80,12 @@ class Smooth_GCNNet(nn.Module):
         w = self.MLP_layer2(h2)
         w = w.repeat(1, self.n_classes)
         w = torch.clamp(w, min=-delta, max=delta)
-        ones = torch.ones(label.shape[0], label.shape[1]).to(device=self.device)
+        ones = torch.ones(label.shape[0]).to(device=self.device)
         max_entropy = torch.Tensor([1/ label.shape[1]]).repeat(label.shape[0], label.shape[1]).to(device=self.device)
-        g_hat = (ones-w) * label + w * max_entropy
-        g_hat = self.softmax(g_hat)
+        g_hat = (ones-w).T * label + w.T * max_entropy
+        mean = g_hat.mean(dim=1)
+        std = g_hat.std(dim=1)
+        g_hat = (g_hat-mean)/std
         return p, g_hat
 
     def loss(self, pred, label, onehot=False):
