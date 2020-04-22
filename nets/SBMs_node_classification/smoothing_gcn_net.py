@@ -82,7 +82,7 @@ class Smooth_GCNNet(nn.Module):
         w = torch.clamp(w, min=-delta, max=delta)
         ones = torch.ones(label.shape[0], label.shape[1]).to(device=self.device)
         max_entropy = torch.Tensor([1/ label.shape[1]]).repeat(label.shape[0], label.shape[1]).to(device=self.device)
-        g_hat = (ones-w).expands_as(label) * label + w * max_entropy
+        g_hat = (ones-w) * label + w * max_entropy
         mean = g_hat.mean(dim=1)
         std = g_hat.std(dim=1)
         g_hat = (g_hat-mean)/std
