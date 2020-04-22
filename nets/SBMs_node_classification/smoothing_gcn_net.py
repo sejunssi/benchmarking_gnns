@@ -78,6 +78,7 @@ class Smooth_GCNNet(nn.Module):
         # output
         p = self.MLP_layer(h1)
         w = self.MLP_layer2(h2)
+        w = w.data
         w = w.repeat(1, self.n_classes)
         w = torch.clamp(w, min=-delta, max=delta)
         ones = torch.ones(label.shape[0], label.shape[1]).to(device=self.device)
