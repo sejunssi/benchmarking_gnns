@@ -85,7 +85,7 @@ class Smooth_GCNNet(nn.Module):
         g_hat = (ones-w) * label + w * max_entropy
         mean = g_hat.mean(dim=1)
         std = g_hat.std(dim=1)
-        g_hat = (g_hat-mean)/std
+        g_hat = (g_hat-mean.repeat(1, self.n_classes))*1/std.repeat(1, self.n_classes)
         return p, g_hat
 
     def loss(self, pred, label, onehot=False):
