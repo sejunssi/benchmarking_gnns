@@ -28,7 +28,7 @@ def make_label_smoothing(dataname, w, dataset, n_classes):
     dataset[0].dataset = [classical_smoothing(w, data['node_label'], n_classes) for data in dataset[0].dataset]
     w_str = str(w).split(".")[1]
     print(f"writing {dataname} w {w_str}")
-    with open(f'{dataname}'+'_'+f'w{w_str}.pkl', 'wb') as f:
+    with open(f'data/SBMs/{dataname}'+'_'+f'w{w_str}.pkl', 'wb') as f:
         pickle.dump(dataset, f)
     print("Done")
 
