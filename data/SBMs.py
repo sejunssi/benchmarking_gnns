@@ -146,7 +146,7 @@ class SBMsSampleDataset(torch.utils.data.Dataset):
         start = time.time()
         print("[I] Loading dataset %s..." % (name))
         self.name = name
-        data_dir = 'data/SBMs'
+        data_dir = './'
         with open(data_dir + name + '.pkl', "rb") as f:
             f = pickle.load(f)
             self.train = f[0]
@@ -190,7 +190,7 @@ class SBMsDataset(torch.utils.data.Dataset):
         start = time.time()
         print("[I] Loading dataset %s..." % (name))
         self.name = name
-        data_dir = 'data/SBMs/'
+        data_dir = './'
         with open(data_dir+name+'.pkl',"rb") as f:
             f = pickle.load(f)
             self.train = f[0]
@@ -236,7 +236,7 @@ class SmoothedSBMsDataset(torch.utils.data.Dataset):
         print("[I] Loading dataset %s..." % (name))
         print(os.getcwd())
         self.name = name
-        data_dir = 'data/SBMs'
+        data_dir = './'
         with open(data_dir + name + '.pkl', "rb") as f:
             self.train = f[0]
             self.val = f[1]
