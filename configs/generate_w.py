@@ -5,7 +5,7 @@ for model_name in Model_Name:
     CONFIG_NAME.append((f'SBMs_node_clustering_{model_name}_CLUSTER', 'SBM_CLUSTER'))
     CONFIG_NAME.append((f'SBMs_node_clustering_{model_name}_PATTERN', 'SBM_PATTERN'))
 
-w_list = [0.9]
+w_list = [0.1, 0.05]
 for name in CONFIG_NAME:
     filename, data_name = name
     for w in w_list:
