@@ -5,13 +5,14 @@ for model_name in Model_Name:
     CONFIG_NAME.append((f'SBMs_node_clustering_{model_name}_CLUSTER', 'SBM_CLUSTER'))
     CONFIG_NAME.append((f'SBMs_node_clustering_{model_name}_PATTERN', 'SBM_PATTERN'))
 
-a_list = [6, 7, 10, 12, 13, 9]
+w_list = [0.9]
 for name in CONFIG_NAME:
     filename, data_name = name
-    for a in a_list:
-        print(f"writing [a]: {a}", filename)
-        smoothing_fname = f'{filename}_a{a}'
-        smoothing_data_name = f'{data_name}_a{a}'
+    for w in w_list:
+        w_str = str(w).split(".")[1]
+        print(f"writing [w]: {w_str}", filename)
+        smoothing_fname = f'{filename}_w{w_str}'
+        smoothing_data_name = f'{data_name}_w{w_str}'
         with open(f'{filename}.json', 'r') as f:
             print("reading")
             data = f.read()

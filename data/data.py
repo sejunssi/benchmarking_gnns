@@ -44,6 +44,9 @@ def LoadData(DATASET_NAME):
     if re.match('(SBM_CLUSTER_a\d)', DATASET_NAME) or re.match('(SBM_PATTERN_a\d)', DATASET_NAME):
         return SmoothedSBMsDataset(DATASET_NAME)
 
+    if re.match('(SBM_CLUSTER_w\d)', DATASET_NAME) or re.match('(SBM_PATTERN_w\d)', DATASET_NAME):
+        return SmoothedSBMsDataset(DATASET_NAME)
+
     # handling for TSP dataset
     if DATASET_NAME == 'TSP':
         return TSPDataset(DATASET_NAME)
