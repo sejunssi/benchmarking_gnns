@@ -25,7 +25,10 @@ def classical_smoothing(w, data, n_classes):
 
 
 def make_label_smoothing(dataname, w, dataset, n_classes):
-    dataset[0].dataset = [classical_smoothing(w, data['node_label'], n_classes) for data in dataset[0].dataset]
+    dataset[0].node_labels = []
+    for i, data in enumerate(dataset[0].dataset):
+        dataset[0].dataset[i]['node_label'] = classical_smoothing(w, data['node_label'], n_classes)
+        dataset[0].node_labels.append(torch.Tensor(classical_smoothing(w, data['node_label'], n_classes)))
     w_str = str(w).split(".")[1]
     print(f"writing {dataname} w {w_str}")
     with open(f'data/SBMs/{dataname}'+'_'+f'w{w_str}.pkl', 'wb') as f:
