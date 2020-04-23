@@ -7,9 +7,6 @@ class DotDict(dict):
         self.update(kwds)
         self.__dict__ = self
 
-DATASET_NAME = 'SBM_CLUSTER_SAMPLE'
-dataset = LoadData(DATASET_NAME)
-w_list = [0.9]
 
 def make_onehot_data(data):
     onehot_data_list = []
@@ -44,4 +41,7 @@ def classical_label_smoothing(w_lsit, dataset):
                 n_classes = make_onehot_data(dataset)
                 make_label_smoothing(dataname, w, dataset, n_classes)
 
+DATASET_NAME = 'SBM_CLUSTER'
+dataset = LoadData(DATASET_NAME)
+w_list = [0.1, 0.05]
 classical_label_smoothing(w_list, dataset)
