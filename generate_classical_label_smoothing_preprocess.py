@@ -44,5 +44,5 @@ def classical_label_smoothing(DataSetName, w_list):
                 make_label_smoothing(dataname, w, dataset, n_classes)
 
 DataSetName = ['SBM_CLUSTER', 'SBM_PATTERN']
-w_list = [0.05, 1, 0.15, 0.2, 0.25]
+w_list = [0.05, 0.1, 0.15, 0.2, 0.25]
 classical_label_smoothing(DataSetName, w_list)

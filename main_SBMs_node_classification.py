@@ -211,7 +211,6 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, onehot=Fal
                 scheduler.step(epoch_val_loss)
 
                 # Saving checkpoint best validation
-                ckpt_dir = os.path.join(root_ckpt_dir, "VALID_")
                 if best_val_loss > epoch_val_loss:
                     best_val_loss = epoch_val_loss
                     best_model_dict = model.state_dict()
@@ -233,7 +232,8 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, onehot=Fal
                              epoch_test_loss_list, epoch_test_acc_list)):
                 csvwriter.writerow(data)
             csv_file.close()
-            torch.save(best_model_dict, '{}.pkl'.format(ckpt_dir + "/epoch_" + str(best_val_epoch)))
+            ckpt_dir = os.path.join(root_ckpt_dir, "RUN_")
+            torch.save(best_model_dict, '{}.pkl'.format(ckpt_dir + "/epoch_" + str(best_val_epoch)+"_"+"BEST_VAL"))
     
     except KeyboardInterrupt:
         print('-' * 89)
