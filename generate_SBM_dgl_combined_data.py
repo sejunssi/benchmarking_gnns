@@ -7,7 +7,7 @@ class DotDict(dict):
         self.__dict__ = self
 
 def read_pickle(dataname, split):
-    with open(dataname+f"_{split}.pkl", 'rb') as f:
+    with open(f'data/SBMs/'+dataname+f"_{split}.pkl", 'rb') as f:
         data = pickle.load(f)
         return data
 
