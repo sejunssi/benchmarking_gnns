@@ -22,6 +22,7 @@ def smooth_train_epoch(model, optimizer, device, data_loader, epoch, delta=1.0, 
         batch_snorm_e = batch_snorm_e.to(device)
         batch_labels = batch_labels.to(device)
         batch_snorm_n = batch_snorm_n.to(device)  # num x 1
+        optimizer.zero_grad()
         batch_scores, smoothed_label = model.forward(g=batch_graphs, h=batch_x, e=batch_e, label=batch_labels,
                                                      delta=delta, snorm_e=batch_snorm_e, snorm_n=batch_snorm_n,
                                                      onehot=onehot)
@@ -59,7 +60,6 @@ def smooth_evaluate_network(model, device, data_loader, epoch,  delta=1.0, oneho
     return epoch_test_loss, epoch_test_acc
 
 def train_epoch(model, optimizer, device, data_loader, epoch, onehot=False):
-
     model.train()
     epoch_loss = 0
     epoch_train_acc = 0
@@ -70,9 +70,10 @@ def train_epoch(model, optimizer, device, data_loader, epoch, onehot=False):
         batch_e = batch_graphs.edata['feat'].to(device)
         batch_snorm_e = batch_snorm_e.to(device)
         batch_labels = batch_labels.to(device)
-        batch_snorm_n = batch_snorm_n.to(device)         # num x 1
+        batch_snorm_n = batch_snorm_n.to(device)  # num x 1
+        optimizer.zero_grad()
         batch_scores = model.forward(batch_graphs, batch_x, batch_e, batch_snorm_n, batch_snorm_e)
-        loss = model.loss(batch_scores, batch_labels, onehot)
+        loss = model.loss(batch_scores, batch_labels, smooth)
         loss.backward()
         optimizer.step()
         epoch_loss += loss.detach().item()
@@ -82,12 +83,11 @@ def train_epoch(model, optimizer, device, data_loader, epoch, onehot=False):
             epoch_train_acc += accuracy(batch_scores, batch_labels)
     epoch_loss /= (iter + 1)
     epoch_train_acc /= (iter + 1)
-    
+
     return epoch_loss, epoch_train_acc, optimizer
 
 
 def evaluate_network(model, device, data_loader, epoch, onehot=False):
-    
     model.eval()
     epoch_test_loss = 0
     epoch_test_acc = 0
@@ -108,7 +108,7 @@ def evaluate_network(model, device, data_loader, epoch, onehot=False):
                 epoch_test_acc += accuracy(batch_scores, batch_labels)
         epoch_test_loss /= (iter + 1)
         epoch_test_acc /= (iter + 1)
-        
+
     return epoch_test_loss, epoch_test_acc
 
 
