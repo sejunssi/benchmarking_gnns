@@ -159,6 +159,9 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, onehot=Fal
             epoch_test_loss_list = []
             epoch_test_acc_list = []
 
+            best_val_loss = np.inf
+            best_model_dict = {}
+            best_val_epoch = 0
 
             for epoch in t:
                 t.set_description('Epoch %d' % epoch)
@@ -207,6 +210,13 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, onehot=Fal
 
                 scheduler.step(epoch_val_loss)
 
+                # Saving checkpoint best validation
+                ckpt_dir = os.path.join(root_ckpt_dir, "VALID_")
+                if best_val_loss > epoch_val_loss:
+                    best_val_loss = epoch_val_loss
+                    best_model_dict = model.state_dict()
+                    best_val_epoch = epoch
+
                 if optimizer.param_groups[0]['lr'] < params['min_lr']:
                     print("\n!! LR SMALLER OR EQUAL TO MIN LR THRESHOLD.")
                     break
@@ -224,6 +234,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, onehot=Fal
                              epoch_test_loss_list, epoch_test_acc_list)):
                 csvwriter.writerow(data)
             csv_file.close()
+            torch.save(best_model_dict, '{}.pkl'.format(ckpt_dir + "/epoch_" + str(best_val_epoch)))
     
     except KeyboardInterrupt:
         print('-' * 89)
