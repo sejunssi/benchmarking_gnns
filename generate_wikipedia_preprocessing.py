@@ -28,29 +28,39 @@ import torch
 import os
 from gensim.models.doc2vec import TaggedDocument, Doc2Vec
 
-
-def read_edges(data_dir, fname, G, g_nx):
-    with open(os.path.join(data_dir, fname), 'r') as f:
-        reader = csv.reader(f, delimiter=',')
-        for row in reader:
-            G.add_edge(row[0], row[1])
-        return nx.to_numpy_matrix(G)
-
-# def read_json(data_dir, fname):
-#     with open(fname, 'r') as f:
-#         data = json.load(dat)
+from sklearn.model_selection import train_test_split
+import pandas as pd
 
 
-def read_target(data_dir, fname, graph):
+def read_edges(data_dir, fname, g_nx):
     with open(os.path.join(data_dir, fname), 'r') as f:
         reader = csv.reader(f, delimiter=',')
         next(reader)
         for row in reader:
-            id, target = row[0], row[1]
-            graph['node_label'][int(id)] = float(row[1])
+            g_nx.add_edge(row[0], row[1])
+        return nx.to_numpy_matrix(g_nx)
+
+# def read_target(data_dir, fname, graph):
+#     with open(os.path.join(data_dir, fname), 'r') as f:
+#         reader = csv.reader(f, delimiter=',')
+#         next(reader)
+#         for row in reader:
+#             id, target = row[0], row[1]
+#             graph['node_label'][int(id)] = float(row[1])
+#         if not isinstance(graph['node_label'], torch.Tensor):
+#             graph['node_label'] = torch.Tensor(graph['node_label'])
+
+def read_target(data_dir, fname):
+    with open(os.path.join(data_dir, fname), 'r') as f:
+        reader = csv.reader(f, delimiter=',')
+        next(reader)
+        return [(row[0], row[1]) for row in reader]
+
+def set_graph_label(graph, labels):
+    for id, label in labels:
+        graph['node_label'][int(id)] = float(label)
         if not isinstance(graph['node_label'], torch.Tensor):
             graph['node_label'] = torch.Tensor(graph['node_label'])
-
 
 def load_features(features_path):
     """
@@ -68,98 +78,80 @@ def build_vocab(features):
         for vocab in v:
             wordset.add(int(vocab))
     vocab = {word: i+2 for i, word in enumerate(wordset)}
+    vocab['<unk>'] = 0
+    vocab['<pad>'] = 1
     return vocab
 
 
 def reconstruct_feature(features, vocab, graph):
     for k, v in features.items():
         k = int(k)
-        graph['node_feat'][k] = torch.Tensor([vocab[int(t)] for t in v])
+        for i, t in enumerate(v):
+            graph['node_feat'][k][vocab[int(t)]] = 1
+        # graph['node_feat'][k] = torch.Tensor(graph['node_feat'][k]).to(torch.long)
+        # graph['node_feat'][k] = torch.Tensor([vocab[int(t)] for t in v])
+    graph['node_feat'] = torch.Tensor(graph['node_feat']).to(torch.long)
 
-def main():
-    DATA_DIR = 'data/wikipedia/chameleon/'
-    fname1 = 'musae_chameleon_edges.csv'
-    fname2 = 'musae_chameleon_features.json'
-    fname3 = 'musae_chameleon_target.csv'
-    G = nx.MultiGraph()
+
+def load_graph(graph_path):
+    """
+    Reading a NetworkX graph.
+    :param graph_path: Path to the edge list.
+    :return graph: NetworkX object.
+    """
+    data = pd.read_csv(graph_path)
+    edges = data.values.tolist()
+    edges = [[int(edge[0]), int(edge[1])] for edge in edges]
+    graph = nx.from_edgelist(edges)
+    graph.remove_edges_from(nx.selfloop_edges(graph))
+    return graph
+
+def set_graph(adj, labels, vocab):
+    graph = {}
+    graph['W'] = adj
+    number_of_nodes = len(labels)
+    graph['nb_nodes'] = number_of_nodes
+    graph['rand_idx'] = ''
+    graph['node_feat'] = [[0 for _ in range(len(vocab))] for i in range(number_of_nodes)]
+    graph['node_label'] = [0 for i in range(number_of_nodes)]
+    set_graph_label(graph, labels)
+    return graph
+
+def main(data_name):
+    DATA_DIR = f'data/wikipedia/{data_name}/'
+    fname1 = f'musae_{data_name}_edges.csv'
+    fname2 = f'musae_{data_name}_features.json'
+    fname3 = f'musae_{data_name}_target.csv'
     g_nx = nx.Graph()
 
     graph_datas = []
-    graph = {}
-    adj = torch.Tensor(read_edges(DATA_DIR, fname1, G, g_nx))
-    number_of_nodes = len(G)
-    graph['W'] = adj
-    graph['nb_nodes'] = len(G)
-    graph['rand_idx'] = ''
-    graph['node_feat'] = [[] for i in range(len(G))]
-    graph['node_label'] = [0 for i in range(len(G))]
-    read_target(DATA_DIR, fname3, graph)
-    print(graph)
 
-    # def reconstruct_vocab(graph):
-    #     word_set = set()
-    #     graph['node_feat']
-    #     word_set.add()
+    adj = torch.Tensor(read_edges(DATA_DIR, fname1, g_nx))
+    nodes = g_nx.nodes
 
-
+    # graph = load_graph(os.path.join(DATA_DIR, fname1))
+    # print(graph)
+    labels = read_target(DATA_DIR, fname3)
     features = load_features(os.path.join(DATA_DIR, fname2))
     print(features)
 
-
     vocab = build_vocab(features)
-    vocab['<unk>'] = 0
-    vocab['<pad>'] = 1
+    graph = set_graph(adj, labels, vocab)
     reconstruct_feature(features, vocab, graph)
-
+    graph_datas.append(graph)
     print(graph)
+    features = graph['node_feat']
+
+
+    emb = embedding(vocab, output_dim=146)
+    h = torch.mm(features.to(torch.float), emb.weight)
+    print(h)
 
 from torch import nn
-def embedding(features, vocab, output_dim):
+def embedding(vocab, output_dim):
     emb = nn.Embedding(len(vocab), output_dim)
     return emb
 
-#
-#
-# document_collections = create_documents(features)
-#
-#         model = Doc2Vec(document_collections,
-#                         vector_size=self.args.dimensions,
-#                         window=0,
-#                         min_count=self.args.min_count,
-#                         alpha=self.args.alpha,
-#                         dm=0,
-#                         negative=self.args.negative_samples,
-#                         ns_exponent=self.args.exponent,
-#                         min_alpha=self.args.min_alpha,
-#                         sample=self.args.down_sampling,
-#                         workers=self.args.workers,
-#                         epochs=self.args.epochs)
-
-
-# import pandas as pd
-# def load_graph(graph_path):
-#     """
-#     Reading a NetworkX graph.
-#     :param graph_path: Path to the edge list.
-#     :return graph: NetworkX object.
-#     """
-#     data = pd.read_csv(graph_path)
-#     edges = data.values.tolist()
-#     edges = [[int(edge[0]), int(edge[1])] for edge in edges]
-#     graph = nx.from_edgelist(edges)
-#     graph.remove_edges_from(nx.selfloop_edges(graph))
-#     return graph
-# graph2 = load_graph(os.path.join(DATA_DIR, fname1))
-
-# def create_documents(features):
-#     """
-#     From a feature hash create a list of TaggedDocuments.
-#     :param features: Feature hash table - keys are nodes, values are feature lists.
-#     :return docs: Tagged Documents list.
-#     """
-#     docs = [TaggedDocument(words=v, tags=[str(k)]) for k, v in features.items()]
-#     return docs
-
-# docs = create_documents(features)
-# model = Doc2Vec(docs, vector_size=142, window=0)
-# print(model)
+datas = ['chameleon', 'crocodile', 'squirrel']
+for data_name in datas:
+    main(data_name)
