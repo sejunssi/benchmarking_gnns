@@ -6,7 +6,7 @@ class DotDict(dict):
         self.update(kwds)
         self.__dict__ = self
 
-DATASET_NAME = 'SBM_CLUSTER_w05'
+DATASET_NAME = 'chameleon'
 dataset = LoadData(DATASET_NAME)
 
 train, test, val = dataset.train, dataset.test, dataset.val

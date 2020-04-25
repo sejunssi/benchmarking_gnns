@@ -5,6 +5,7 @@
 #from data.molecules import MoleculeDataset
 #from data.TUs import TUsDataset
 from data.SBMs import SBMsDataset, SmoothedSBMsDataset, SBMsSampleDataset
+from data.wiki import WikiDataset
 #from data.TSP import TSPDataset
 #from data.CitationGraphs import CitationGraphsDataset
 import re
@@ -55,3 +56,6 @@ def LoadData(DATASET_NAME):
     CITATIONGRAPHS_DATASETS = ['CORA', 'CITESEER', 'PUBMED']
     if DATASET_NAME in CITATIONGRAPHS_DATASETS: 
         return CitationGraphsDataset(DATASET_NAME)
+
+    if DATASET_NAME in ['chameleon', 'crocodile', 'squirrel']:
+        return WikiDataset(DATASET_NAME)
