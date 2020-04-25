@@ -183,8 +183,6 @@ def main(data_name):
     target_fname = f'musae_{data_name}_target.csv'
     g_nx = nx.Graph()
 
-    # adj = torch.Tensor(read_edges(DATA_DIR, fname1, g_nx))
-
     #create graph
     read_edges(DATA_DIR, edges_fname, g_nx)
     g_nx.remove_edges_from(nx.selfloop_edges(g_nx))
@@ -199,9 +197,9 @@ def main(data_name):
     total_test_SG = g_nx.subgraph(testset)
     total_val_SG = g_nx.subgraph(valset)
 
-    train_graphs = sampling(trainset, 10)
-    val_graphs = sampling(valset, 3)
-    test_graphs = sampling(testset, 3)
+    train_graphs = sampling(trainset, len(trainset)//50)
+    val_graphs = sampling(valset, len(valset)//50)
+    test_graphs = sampling(testset, len(testset)//50)
 
     train_SG = [total_train_SG.subgraph(sg) for sg in train_graphs]
     val_SG = [total_val_SG.subgraph(sg) for sg in val_graphs]
