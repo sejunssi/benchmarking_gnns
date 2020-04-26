@@ -197,7 +197,7 @@ def main(data_name):
     total_test_SG = g_nx.subgraph(testset)
     total_val_SG = g_nx.subgraph(valset)
 
-    train_graphs = sampling(trainset, len(trainset)//50)
+    train_graphs = sampling(trainset, len(trainset)//100)
     val_graphs = sampling(valset, len(valset)//50)
     test_graphs = sampling(testset, len(testset)//50)
 
