@@ -12,10 +12,10 @@ import numpy as np
     http://arxiv.org/abs/1609.02907
 """
 from layers.gcn_layer import GCNLayer
-from layers.mlp_readout_layer import MLPReadout
+from layers.mlp_readout_layer import MLPReadout, ResnetMLPReadout
 
 
-class Smooth_GCNNet(nn.Module):
+class SmoothGCNNet(nn.Module):
 
     def __init__(self, net_params):
         super().__init__()
@@ -41,55 +41,38 @@ class Smooth_GCNNet(nn.Module):
                                      range(n_layers - 1)])
         self.layers.append(
             GCNLayer(hidden_dim, out_dim, F.relu, dropout, self.graph_norm, self.batch_norm, self.residual))
-        self.layers2 = nn.ModuleList([GCNLayer(hidden_dim+n_classes, hidden_dim+n_classes, F.relu, dropout,
-                                              self.graph_norm, self.batch_norm, self.residual) for _ in
-                                     range(n_layers - 1)])
-        self.layers2.append(
-            GCNLayer(hidden_dim+n_classes, out_dim, F.relu, dropout, self.graph_norm, self.batch_norm, self.residual))
         self.MLP_layer = MLPReadout(out_dim, n_classes)
-        self.MLP_layer2 = MLPReadout(out_dim, 1)
+        self.MLP_layer2 = ResnetMLPReadout(out_dim+n_classes, 1)
+        self.sigmoid = nn.Sigmoid()
 
     def forward(self, *args, **kwargs):
         g = kwargs['g']
         h = kwargs['h']
-        # e = kwargs['e']
+        e = kwargs['e']
         delta = kwargs['delta']
         snorm_n = kwargs['snorm_n']
-        # snorm_e = kwargs['snorm_e']
+        snorm_e = kwargs['snorm_e']
         label = kwargs['label']
 
-        h1 = self.embedding_h(h)
-        h1 = self.in_feat_dropout(h1)
-
-        # h2 = torch.cat((h.reshape(len(h), -1), label), dim=1)
+        h = self.embedding_h(h)
+        h = self.in_feat_dropout(h)
         # input embedding
-        h2 = self.embedding_h(h)
-        h2 = self.in_feat_dropout(h2)
-        h2 = torch.cat((h2, label.to(torch.float)), dim=1)
 
-        # GCN1
+        # GCN
         for conv in self.layers:
-            h1 = conv(g, h1, snorm_n)
-
-        #GCN2
-        for conv in self.layers2:
-            h2 = conv(g, h2, snorm_n)
-
+            h = conv(g, h, snorm_n)
         # output
-        p = self.MLP_layer(h1)
-        w = self.MLP_layer2(h2)
+        p = self.MLP_layer(h)
+
+        h = torch.cat((h, label.to(torch.float)), dim=1)
+        w = self.MLP_layer2(h)
+        w = self.sigmoid(w)
         w = w.data
         w = w.repeat(1, self.n_classes)
         w = torch.clamp(w, min=-delta, max=delta)
         ones = torch.ones(label.shape[0], label.shape[1]).to(device=self.device)
         max_entropy = torch.Tensor([1/ label.shape[1]]).repeat(label.shape[0], label.shape[1]).to(device=self.device)
         g_hat = (ones-w) * label + w * max_entropy
-        mean = g_hat.mean(dim=1)
-        mean = mean.reshape(len(mean), 1).repeat(1, self.n_classes)
-        std = g_hat.std(dim=1)
-        std = std.reshape(len(std), 1)
-        std = std.repeat(1, self.n_classes)
-        g_hat = (g_hat-mean)/std
         return p, g_hat
 
     def loss(self, pred, label, onehot=False):

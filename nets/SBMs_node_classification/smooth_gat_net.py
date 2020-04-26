@@ -11,9 +11,10 @@ import dgl
     https://arxiv.org/abs/1710.10903
 """
 from layers.gat_layer import GATLayer
-from layers.mlp_readout_layer import MLPReadout
+from layers.mlp_readout_layer import MLPReadout, ResnetMLPReadout
 
-class GATNet(nn.Module):
+
+class SmoothGATNet(nn.Module):
 
     def __init__(self, net_params):
         super().__init__()
@@ -43,22 +44,41 @@ class GATNet(nn.Module):
                                               dropout, self.graph_norm, self.batch_norm, self.residual) for _ in range(n_layers-1)])
         self.layers.append(GATLayer(hidden_dim * num_heads, out_dim, 1, dropout, self.graph_norm, self.batch_norm, self.residual))
         self.MLP_layer = MLPReadout(out_dim, n_classes)
+        self.MLP_layer2 = ResnetMLPReadout(out_dim + n_classes, 1)
+        self.sigmoid = nn.Sigmoid()
+        self.MLP_layer2 = ResnetMLPReadout(out_dim + n_classes, 1)
+        self.sigmoid = nn.Sigmoid()
 
-
-    def forward(self, g, h, e, snorm_n, snorm_e):
+    def forward(self, *args, **kwargs):
+        g = kwargs['g']
+        h = kwargs['h']
+        e = kwargs['e']
+        delta = kwargs['delta']
+        snorm_n = kwargs['snorm_n']
+        snorm_e = kwargs['snorm_e']
+        label = kwargs['label']
 
         # input embedding
         h = self.embedding_h(h)
         h = self.in_feat_dropout(h)
 
-        # GAT
+
+        # GCN
         for conv in self.layers:
             h = conv(g, h, snorm_n)
-            
-        # output
-        h_out = self.MLP_layer(h)
 
-        return h_out
+        # output
+        p = self.MLP_layer(h)
+        h = torch.cat((h, label.to(torch.float)), dim=1)
+        w = self.MLP_layer2(h)
+        w = self.sigmoid(w)
+        w = w.data
+        w = w.repeat(1, self.n_classes)
+        w = torch.clamp(w, min=-delta, max=delta)
+        ones = torch.ones(label.shape[0], label.shape[1]).to(device=self.device)
+        max_entropy = torch.Tensor([1 / label.shape[1]]).repeat(label.shape[0], label.shape[1]).to(device=self.device)
+        g_hat = (ones - w) * label + w * max_entropy
+        return p, g_hat
     
     
     def loss(self, pred, label, onehot=False):

@@ -10,7 +10,14 @@ from nets.SBMs_node_classification.graphsage_net import GraphSageNet
 from nets.SBMs_node_classification.mlp_net import MLPNet
 from nets.SBMs_node_classification.gin_net import GINNet
 from nets.SBMs_node_classification.mo_net import MoNet as MoNet_
-from nets.SBMs_node_classification.smoothing_gcn_net import Smooth_GCNNet
+
+from nets.SBMs_node_classification.smooth_gcn_net import SmoothGCNNet
+from nets.SBMs_node_classification.smooth_gat_net import SmoothGATNet
+from nets.SBMs_node_classification.smooth_gated_gcn_net import SmoothGatedGCNNet
+from nets.SBMs_node_classification.smooth_graphsage_net import SmoothGraphSageNet
+from nets.SBMs_node_classification.smooth_mo_net import SmoothMoNet
+from nets.SBMs_node_classification.smooth_mlp_net import SmoothMLPNet
+from nets.SBMs_node_classification.smooth_gin_net import SmoothGINNet
 
 
 def GatedGCN(net_params):
@@ -43,7 +50,14 @@ def gnn_model(MODEL_NAME, net_params):
         'MLP': MLP,
         'GIN': GIN,
         'MoNet': MoNet,
-        'SMOOTH_GCN': Smooth_GCNNet
+
+        'SMOOTH_GatedGCN': SmoothGatedGCNNet,
+        'SMOOTH_GCN': SmoothGCNNet,
+        'SMOOTH_GAT': SmoothGATNet,
+        'SMOOTH_GraphSage': SmoothGraphSageNet,
+        'SMOOTH_MLP': SmoothMLPNet,
+        'SMOOTH_GIN': SmoothGINNet,
+        'SMOOTH_Monet': SmoothMoNet,
     }
         
     return models[MODEL_NAME](net_params)
