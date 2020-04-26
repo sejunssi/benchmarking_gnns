@@ -155,7 +155,6 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, onehot=Fal
     test_loader = DataLoader(testset, batch_size=params['batch_size'], shuffle=False, collate_fn=dataset.collate)
         
     # At any point you can hit Ctrl + C to break out of training early.
-    smoothed_labels = []
     try:
         with tqdm(range(params['epochs'])) as t:
 
@@ -172,6 +171,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, onehot=Fal
             best_val_loss = np.inf
             best_model_dict = {}
             best_val_epoch = 0
+            best_acc = []
 
             for epoch in t:
                 t.set_description('Epoch %d' % epoch)
@@ -222,6 +222,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, onehot=Fal
                     best_val_loss = epoch_val_loss
                     best_model_dict = model.state_dict()
                     best_val_epoch = epoch
+                    best_acc = [epoch_train_acc, epoch_val_acc, epoch_test_acc]
 
                 scheduler.step(epoch_val_loss)
 
@@ -245,6 +246,17 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, onehot=Fal
 
             ckpt_dir = os.path.join(root_ckpt_dir, "RUN_")
             torch.save(best_model_dict, '{}.pkl'.format(ckpt_dir + "/epoch_" + str(best_val_epoch) + "_" + "BEST_VAL"))
+            with open(f"{DATASET_NAME}_ep{best_val_epoch}_acc_best_val.csv",'wb') as f:
+                if len(best_acc) == 3:
+                    f.write("train acc, val acc, test acc")
+                    f.write("\n")
+                    f.write(best_acc[0])
+                    f.write(",")
+                    f.write(best_acc[1])
+                    f.write(",")
+                    f.write(best_acc[2])
+                else:
+                    f.write("Error")
 
     except KeyboardInterrupt:
         print('-' * 89)
