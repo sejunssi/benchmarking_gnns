@@ -3,7 +3,7 @@ import torch
 import numpy as np
 import pickle
 import os
-from data.SBMs import SBMsSampleDatasetDGL
+from data.SBMs import SBMsDatasetDGL
 
 
 class DotDict(dict):
@@ -148,7 +148,7 @@ print('Time (sec):', time.time() - start)
 
 
 def load_sample_data(data_name):
-    dataset = SBMsSampleDatasetDGL('data/SBMs/', data_name)
+    dataset = SBMsDatasetDGL(data_name)
     with open('data/SBMs/SBM_CLUSTER_SAMPLE.pkl', 'wb') as f:
         pickle.dump([dataset.train, dataset.val, dataset.test], f)
 
