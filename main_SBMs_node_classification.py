@@ -233,6 +233,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, onehot=Fal
                              epoch_test_loss_list, epoch_test_acc_list)):
                 csvwriter.writerow(data)
             csv_file.close()
+
             ckpt_dir = os.path.join(root_ckpt_dir, "RUN_")
             torch.save(best_model_dict, '{}.pkl'.format(ckpt_dir + "/epoch_" + str(best_val_epoch)+"_"+"BEST_VAL"))
     

@@ -169,6 +169,9 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, onehot=Fal
             epoch_test_loss_list = []
             epoch_test_acc_list = []
 
+            best_val_loss = np.inf
+            best_model_dict = {}
+            best_val_epoch = 0
 
             for epoch in t:
                 t.set_description('Epoch %d' % epoch)
@@ -214,6 +217,12 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, onehot=Fal
                     if epoch_nb < epoch-1:
                         os.remove(file)
 
+                # Saving checkpoint best validation
+                if best_val_loss > epoch_val_loss:
+                    best_val_loss = epoch_val_loss
+                    best_model_dict = model.state_dict()
+                    best_val_epoch = epoch
+
                 scheduler.step(epoch_val_loss)
 
                 if optimizer.param_groups[0]['lr'] < params['min_lr']:
@@ -233,7 +242,10 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, onehot=Fal
                              epoch_test_loss_list, epoch_test_acc_list)):
                 csvwriter.writerow(data)
             csv_file.close()
-    
+
+            ckpt_dir = os.path.join(root_ckpt_dir, "RUN_")
+            torch.save(best_model_dict, '{}.pkl'.format(ckpt_dir + "/epoch_" + str(best_val_epoch) + "_" + "BEST_VAL"))
+
     except KeyboardInterrupt:
         print('-' * 89)
         print('Exiting from training early because of KeyboardInterrupt')
