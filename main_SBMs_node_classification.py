@@ -28,6 +28,7 @@ from torch.utils.data import DataLoader
 from tensorboardX import SummaryWriter
 from tqdm import tqdm
 import csv
+import re
 
 class DotDict(dict):
     def __init__(self, **kwds):
@@ -422,10 +423,14 @@ def main():
         net_params['cat'] = True if args.cat=='True' else False
     if args.self_loop is not None:
         net_params['self_loop'] = True if args.self_loop=='True' else False
-    onehot = False
     if args.onehot is not None:
         net_params['onehot'] = True if args.onehot=='True' else False
         onehot = net_params['onehot']
+    else:
+        onehot = False
+        if DATASET_NAME.split("_")[-1][0] in ['w', 'a']:
+            print('onehot parameter is missing. onehot = True')
+            onehot = True
         
     # SBM
     net_params['in_dim'] = torch.unique(dataset.train[0][0].ndata['feat'],dim=0).size(0) # node_dim (feat is an integer)

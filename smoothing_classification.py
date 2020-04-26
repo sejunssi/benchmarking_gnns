@@ -59,7 +59,7 @@ class ProgressSmoothing:
             self.get_neigh_smooth_weight(v, a, smoothed_labels)
         return smoothed_labels
 
-def generate_smoothing_file(dataname, W_lists, node_label_list, a):
+def generate_smoothing_file(DATA_DIR, dataname, W_lists, node_label_list, a):
     print(f"Smoothing {dataname} [a]", a)
     train_label = []
     for W, labels in zip(W_lists, node_label_list):
@@ -73,7 +73,7 @@ def generate_smoothing_file(dataname, W_lists, node_label_list, a):
         node_label_list_data.append(torch.Tensor([list(labels) for labels in smoothed_label]))
     data[0].node_labels = node_label_list_data
     print("Write")
-    with open(f'{dataname}_a{a}.pkl', 'wb') as f:
+    with open(f'{DATA_DIR}/{dataname}_a{a}.pkl', 'wb') as f:
         pickle.dump(data, f)
 
 
@@ -91,12 +91,13 @@ def make_onehot_data(data):
     data[0].node_labels = onehot_data_list
 
 
-DataSetName = ['SBM_CLUSTER', 'SBM_PATTERN']
-for a in [5]:
+DATA_DIR = 'data/SBMs'
+DataSetName = ['SBM_CLUSTER_SAMPLE']
+for a in [8]:
     for dataname in DataSetName:
-        with open(f'{dataname}.pkl', 'rb') as f:
+        with open(f'{DATA_DIR}/{dataname}.pkl', 'rb') as f:
             data = pickle.load(f)
         make_onehot_data(data)
         W_lists = list(map(lambda d: d['W'].numpy(), data[0].dataset))
         node_label_list = list(map(lambda d: d['node_label'].numpy(), data[0].dataset))
-        generate_smoothing_file(dataname, W_lists, node_label_list, a)
+        generate_smoothing_file(DATA_DIR, dataname, W_lists, node_label_list, a)
