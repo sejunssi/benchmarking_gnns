@@ -425,10 +425,14 @@ def main():
         net_params['cat'] = True if args.cat=='True' else False
     if args.self_loop is not None:
         net_params['self_loop'] = True if args.self_loop=='True' else False
-    onehot = False
     if args.onehot is not None:
-        net_params['onehot'] = True if args.onehot=='True' else False
+        net_params['onehot'] = True if args.onehot == 'True' else False
         onehot = net_params['onehot']
+    else:
+        onehot = False
+        if DATASET_NAME.split("_")[-1][0] in ['w', 'a']:
+            print('onehot parameter is missing. onehot = True')
+            onehot = True
 
     if args.delta is not None:
         net_params['delta'] = float(args.delta)

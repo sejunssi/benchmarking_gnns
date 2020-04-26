@@ -90,22 +90,6 @@ class SBMsDatasetDGL(torch.utils.data.Dataset):
         print("[I] Data load time: {:.4f}s".format(time.time()-start))
 
 
-class SBMsSampleDatasetDGL(torch.utils.data.Dataset):
-
-    def __init__(self, path,  name):
-        """
-            TODO
-        """
-        start = time.time()
-        print("[I] Loading data ...")
-        self.name = name
-        data_dir = path
-
-        self.train = load_SBMsDataSetDGL(data_dir, name, split='train')
-        self.test = load_SBMsDataSetDGL(data_dir, name, split='test')
-        self.val = load_SBMsDataSetDGL(data_dir, name, split='val')
-        print("[I] Finished loading.")
-        print("[I] Data load time: {:.4f}s".format(time.time()-start))
 
 
 
@@ -137,47 +121,6 @@ def self_loop(g):
     return new_g
 
 
-class SBMsSampleDataset(torch.utils.data.Dataset):
-
-    def __init__(self, name):
-        """
-            Loading SBM datasets
-        """
-        start = time.time()
-        print("[I] Loading dataset %s..." % (name))
-        self.name = name
-        data_dir = 'data/SBMs/'
-        with open(data_dir + name + '.pkl', "rb") as f:
-            f = pickle.load(f)
-            self.train = f[0]
-            self.val = f[1]
-            self.test = f[2]
-        print('train, test, val sizes :', len(self.train), len(self.test), len(self.val))
-        print("[I] Finished loading.")
-        print("[I] Data load time: {:.4f}s".format(time.time() - start))
-
-    # form a mini batch from a given list of samples = [(graph, label) pairs]
-    def collate(self, samples):
-        # The input samples is a list of pairs (graph, label).
-        graphs, labels = map(list, zip(*samples))
-        labels = torch.cat(labels)
-        tab_sizes_n = [graphs[i].number_of_nodes() for i in range(len(graphs))]
-        tab_snorm_n = [torch.FloatTensor(size, 1).fill_(1. / float(size)) for size in tab_sizes_n]
-        snorm_n = torch.cat(tab_snorm_n).sqrt()
-        tab_sizes_e = [graphs[i].number_of_edges() for i in range(len(graphs))]
-        tab_snorm_e = [torch.FloatTensor(size, 1).fill_(1. / float(size)) for size in tab_sizes_e]
-        snorm_e = torch.cat(tab_snorm_e).sqrt()
-        batched_graph = dgl.batch(graphs)
-
-        return batched_graph, labels, snorm_n, snorm_e
-
-    def _add_self_loops(self):
-        # function for adding self loops
-        # this function will be called only if self_loop flag is True
-
-        self.train.graph_lists = [self_loop(g) for g in self.train.graph_lists]
-        self.val.graph_lists = [self_loop(g) for g in self.val.graph_lists]
-        self.test.graph_lists = [self_loop(g) for g in self.test.graph_lists]
 
 
 

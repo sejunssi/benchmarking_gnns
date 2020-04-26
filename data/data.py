@@ -4,8 +4,8 @@
 #from data.superpixels import SuperPixDataset
 #from data.molecules import MoleculeDataset
 #from data.TUs import TUsDataset
-from data.SBMs import SBMsDataset, SmoothedSBMsDataset, SBMsSampleDataset
 from data.wiki import WikiDataset
+from data.SBMs import SBMsDataset, SmoothedSBMsDataset
 #from data.TSP import TSPDataset
 #from data.CitationGraphs import CitationGraphsDataset
 import re
@@ -36,10 +36,12 @@ def LoadData(DATASET_NAME):
 
     SAMPLE_SBMDATASET = ['SBM_CLUSTER_SAMPLE', 'SBM_CLUSTER_SAMPLE']
     if DATASET_NAME in SAMPLE_SBMDATASET:
-        return SBMsSampleDataset(DATASET_NAME)
 
-    SAMPLE_SBMDATASET = ['SBM_CLUSTER_SAMPLE_SMOOTH', 'SBM_CLUSTER_SAMPLE_SMOOTH']
-    if DATASET_NAME in SAMPLE_SBMDATASET:
+        return SBM_DATASETS(DATASET_NAME)
+    if re.match('(SBM_CLUSTER_[a-zA-Z]+_a\d)', DATASET_NAME) or re.match('(SBM_PATTERN_[a-zA-Z]+_a\d)', DATASET_NAME):
+        return SmoothedSBMsDataset(DATASET_NAME)
+
+    if re.match('(SBM_CLUSTER_[a-zA-Z]+_w\d)', DATASET_NAME) or re.match('(SBM_PATTERN_[a-zA-Z]+_w\d)', DATASET_NAME):
         return SmoothedSBMsDataset(DATASET_NAME)
 
     if re.match('(SBM_CLUSTER_a\d)', DATASET_NAME) or re.match('(SBM_PATTERN_a\d)', DATASET_NAME):
