@@ -36,7 +36,7 @@ def LoadData(DATASET_NAME):
     SAMPLE_SBMDATASET = ['SBM_CLUSTER_SAMPLE', 'SBM_CLUSTER_SAMPLE']
     if DATASET_NAME in SAMPLE_SBMDATASET:
 
-        return SBM_DATASETS(DATASET_NAME)
+        return SBMsDataset(DATASET_NAME)
     if re.match('(SBM_CLUSTER_[a-zA-Z]+_a\d)', DATASET_NAME) or re.match('(SBM_PATTERN_[a-zA-Z]+_a\d)', DATASET_NAME):
         return SmoothedSBMsDataset(DATASET_NAME)
 
