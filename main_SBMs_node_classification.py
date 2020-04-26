@@ -238,7 +238,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, onehot=Fal
 
             ckpt_dir = os.path.join(root_ckpt_dir, "RUN_")
             torch.save(best_model_dict, '{}.pkl'.format(ckpt_dir + "/epoch_" + str(best_val_epoch)+"_"+"BEST_VAL"))
-            with open(f"{DATASET_NAME}_ep{best_val_epoch}_acc_best_val.csv",'wb') as f:
+            with open(f"{DATASET_NAME}_ep{best_val_epoch}_acc_best_val.csv",'w') as f:
                 if len(best_acc) == 3:
                     f.write("train acc, val acc, test acc")
                     f.write("\n")
