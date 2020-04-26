@@ -122,8 +122,6 @@ python $code --dataset $dataset --gpu_id 2 --seed $seed2 --config 'configs/SBMs_
 python $code --dataset $dataset --gpu_id 3 --seed $seed3 --config 'configs/SBMs_node_clustering_MoNet_PATTERN_SMOOTH.json' &
 wait" C-m
 
-tmux send-keys "tmux kill-session -t benchmark_SBMs_node_classification_smooth" C-m
-
 
 # No residual
 
