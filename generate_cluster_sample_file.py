@@ -2,6 +2,8 @@ import time
 import torch
 import numpy as np
 import pickle
+import os
+from data.SBMs import SBMsSampleDatasetDGL
 
 
 class DotDict(dict):
@@ -116,30 +118,39 @@ def generate_semisuperclust_dataset(nb_graphs):
         dataset.append(graph)
     return dataset
 
-def SBMs_CLUSTER(nb_graphs, name):
+def SBMs_CLUSTER(nb_graphs, data_dir, name):
     dataset = generate_semisuperclust_dataset(nb_graphs)
     print(len(dataset))
-    with open(name + '.pkl', "wb") as f:
+    with open(os.path.join(data_dir, name) + '.pkl', "wb") as f:
         pickle.dump(dataset, f)
 
 start = time.time()
-
-nb_graphs = 1001  # train
+DATA_DIR = 'data/SBMs/'
+nb_graphs = 100  # train
 # nb_graphs = 3333 # train
 # nb_graphs = 500 # train
 # nb_graphs = 20 # train
-SBMs_CLUSTER(nb_graphs, 'SBM_CLUSTER_SAMPLE_train')
+SBMs_CLUSTER(nb_graphs, DATA_DIR, 'SBM_CLUSTER_SAMPLE_train')
 
-nb_graphs = 100  # val
+nb_graphs = 10  # val
 # nb_graphs = 333 # val
 # nb_graphs = 100 # val
 # nb_graphs = 5 # val
-SBMs_CLUSTER(nb_graphs, 'SBM_CLUSTER_SAMPLE_val')
+SBMs_CLUSTER(nb_graphs, DATA_DIR, 'SBM_CLUSTER_SAMPLE_val')
 
-nb_graphs = 100  # test
+nb_graphs = 10  # test
 # nb_graphs = 333 # test
 # nb_graphs = 100 # test
 # nb_graphs = 5 # test
-SBMs_CLUSTER(nb_graphs, 'SBM_CLUSTER_SAMPLE_test')
+SBMs_CLUSTER(nb_graphs, DATA_DIR, 'SBM_CLUSTER_SAMPLE_test')
 
 print('Time (sec):', time.time() - start)
+
+
+def load_sample_data(data_name):
+    dataset = SBMsSampleDatasetDGL('data/SBMs/', data_name)
+    with open('data/SBMs/SBM_CLUSTER_SAMPLE.pkl', 'wb') as f:
+        pickle.dump([dataset.train, dataset.val, dataset.test], f)
+
+data_name = "SBM_CLUSTER_SAMPLE"
+load_sample_data(data_name)

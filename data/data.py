@@ -48,6 +48,9 @@ def LoadData(DATASET_NAME):
     if re.match('(SBM_CLUSTER_w\d)', DATASET_NAME) or re.match('(SBM_PATTERN_w\d)', DATASET_NAME):
         return SmoothedSBMsDataset(DATASET_NAME)
 
+    if DATASET_NAME in ['chameleon', 'crocodile', 'squirrel']:
+        return WikiDataset(DATASET_NAME)
+
     # handling for TSP dataset
     if DATASET_NAME == 'TSP':
         return TSPDataset(DATASET_NAME)
@@ -57,5 +60,4 @@ def LoadData(DATASET_NAME):
     if DATASET_NAME in CITATIONGRAPHS_DATASETS: 
         return CitationGraphsDataset(DATASET_NAME)
 
-    if DATASET_NAME in ['chameleon', 'crocodile', 'squirrel']:
-        return WikiDataset(DATASET_NAME)
+
