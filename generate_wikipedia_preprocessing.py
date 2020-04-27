@@ -23,20 +23,16 @@
 import csv
 import json
 import networkx as nx
+import nxmetis as metis
 
 import torch
 import os
 
-from sklearn.model_selection import train_test_split
-from torch import nn
 import numpy as np
 import pickle
 from data.wiki import WikiDatasetDGL
+from utils.data_struct import build_vocab, DotDict, feature_embedding
 
-class DotDict(dict):
-    def __init__(self, **kwds):
-        self.update(kwds)
-        self.__dict__ = self
 
 def read_edges(data_dir, fname, g_nx):
     with open(os.path.join(data_dir, fname), 'r') as f:
@@ -46,15 +42,6 @@ def read_edges(data_dir, fname, g_nx):
             g_nx.add_edge(int(row[0]), int(row[1]))
         return nx.to_numpy_matrix(g_nx)
 
-# def read_target(data_dir, fname, graph):
-#     with open(os.path.join(data_dir, fname), 'r') as f:
-#         reader = csv.reader(f, delimiter=',')
-#         next(reader)
-#         for row in reader:
-#             id, target = row[0], row[1]
-#             graph['node_label'][int(id)] = float(row[1])
-#         if not isinstance(graph['node_label'], torch.Tensor):
-#             graph['node_label'] = torch.Tensor(graph['node_label'])
 
 def read_target(data_dir, fname, type='int'):
     with open(os.path.join(data_dir, fname), 'r') as f:
@@ -75,15 +62,6 @@ def load_features(features_path, type='str'):
         features = {str(k): [str(val) for val in v] for k, v in features.items()}
     return features
 
-def build_vocab(features):
-    wordset = set()
-    for k, v in features.items():
-        for vocab in v:
-            wordset.add(int(vocab))
-    vocab = {word: i+2 for i, word in enumerate(wordset)}
-    vocab['<unk>'] = 0
-    vocab['<pad>'] = 1
-    return vocab
 
 
 def reconstruct_feature(features, labels, vocab, graph):
@@ -101,25 +79,13 @@ def reconstruct_feature(features, labels, vocab, graph):
 
 
 
-# def load_graph(graph_path):
-#     """
-#     Reading a NetworkX graph.
-#     :param graph_path: Path to the edge list.
-#     :return graph: NetworkX object.
-#     """
-#     data = pd.read_csv(graph_path)
-#     edges = data.values.tolist()
-#     edges = [[int(edge[0]), int(edge[1])] for edge in edges]
-#     graph = nx.from_edgelist(edges)
-#     graph.remove_edges_from(nx.selfloop_edges(graph))
-#     return graph
 
 def get_troch_data_graph(adj, features, labels, vocab):
     graph = DotDict()
     graph.W = torch.Tensor(adj)
     number_of_nodes = len(labels)
     graph.nb_nodes = number_of_nodes
-    graph.rand_idx = ''
+    # graph.rand_idx = ''
     graph.node_feat = [[0 for _ in range(len(vocab))] for i in range(number_of_nodes)]
     graph.node_label = [0 for i in range(number_of_nodes)]
     reconstruct_feature(features, labels, vocab, graph)
@@ -134,14 +100,6 @@ def generate_subgraph_data(G, features, labels):
     return adj, sub_features, sub_labels
 
 
-
-def feature_embedding(graph, vocab, output_dim):
-    reconsted_features = graph['node_feat']
-    emb = nn.Embedding(len(vocab), output_dim)
-    embedded_feature = torch.mm(reconsted_features.to(torch.float), emb.weight)
-    graph['node_feat'] = embedded_feature
-
-
 def random_split(g_nx, train_test_val_ratio):
     rand_idx = np.random.permutation(len(g_nx.nodes))
     print(f"random shuffle: {len(g_nx)}")
@@ -150,7 +108,7 @@ def random_split(g_nx, train_test_val_ratio):
         rand_idx[divided_ratio[1] + divided_ratio[2]:], \
         rand_idx[:divided_ratio[1]], \
         rand_idx[divided_ratio[1]:divided_ratio[1] + divided_ratio[2]]
-    return trainset,valset, testset
+    return trainset, valset, testset
 
 
 
@@ -190,20 +148,35 @@ def main(data_name):
     total_labels = read_target(DATA_DIR, target_fname)
     total_features = load_features(os.path.join(DATA_DIR, features_fname), 'int')
 
-    train_test_val_ratio = [10/12, 1/12, 1/12]
-    trainset, valset, testset = random_split(g_nx, train_test_val_ratio)
+    split_num = len(g_nx.nodes)//50
+    split_idx = split_num//10
 
-    total_train_SG = g_nx.subgraph(trainset)
-    total_test_SG = g_nx.subgraph(testset)
-    total_val_SG = g_nx.subgraph(valset)
+    (edgecuts, parts) = metis.partition(g_nx, split_num)
+    testset = parts[:split_idx]
+    valset = parts[split_idx:2*split_idx]
+    trainset = parts[2*split_idx:]
 
-    train_graphs = sampling(trainset, len(trainset)//100)
-    val_graphs = sampling(valset, len(valset)//50)
-    test_graphs = sampling(testset, len(testset)//50)
+    train_SG = [g_nx.subgraph(sg) for sg in trainset if len(sg) is not 0]
+    val_SG = [g_nx.subgraph(sg) for sg in valset if len(sg) is not 0]
+    test_SG= [g_nx.subgraph(sg) for sg in testset if len(sg) is not 0]
 
-    train_SG = [total_train_SG.subgraph(sg) for sg in train_graphs]
-    val_SG = [total_val_SG.subgraph(sg) for sg in val_graphs]
-    test_SG= [total_test_SG.subgraph(sg) for sg in test_graphs]
+    ######## old version ######
+
+    # train_test_val_ratio = [10/12, 1/12, 1/12]
+    # trainset, valset, testset = random_split(g_nx, train_test_val_ratio)
+
+    # total_train_SG = g_nx.subgraph(trainset)
+    # total_test_SG = g_nx.subgraph(testset)
+    # total_val_SG = g_nx.subgraph(valset)
+
+    # train_graphs = sampling(trainset, len(trainset)//50)
+    # val_graphs = sampling(valset, len(valset)//50)
+    # test_graphs = sampling(testset, len(testset)//50)
+
+    # train_SG = [total_train_SG.subgraph(sg) for sg in train_graphs]
+    # val_SG = [total_val_SG.subgraph(sg) for sg in val_graphs]
+    # test_SG= [total_test_SG.subgraph(sg) for sg in test_graphs]
+    ######## old version #######
 
 
     train_torch_graphs = get_torch_graphs(total_features, total_labels, train_SG)
@@ -213,10 +186,10 @@ def main(data_name):
         print("writing", f'{DATA_DIR}{data_name}_train.pkl')
         pickle.dump(train_torch_graphs, f)
     with open(f'{DATA_DIR}/{data_name}_val.pkl', 'wb') as f:
-        print("writing", f'{DATA_DIR}{data_name}_train.pkl')
+        print("writing", f'{DATA_DIR}{data_name}_val.pkl')
         pickle.dump(val_torch_graphs, f)
     with open(f'{DATA_DIR}/{data_name}_test.pkl', 'wb') as f:
-        print("writing", f'{DATA_DIR}{data_name}_train.pkl')
+        print("writing", f'{DATA_DIR}{data_name}_test.pkl')
         pickle.dump(test_torch_graphs, f)
     print("writing", data_name)
     dataset = WikiDatasetDGL(f'data/wikipedia/{data_name}', data_name)
@@ -229,7 +202,10 @@ def get_torch_graphs(total_features, total_labels, sg):
         adj, feat, label = generate_subgraph_data(g, total_features, total_labels)
         vocab = build_vocab(feat)
         graph = get_troch_data_graph(adj, feat, label, vocab)
-        feature_embedding(graph, vocab, 146)
+        # hidden_dim = 146
+        # features = graph['node_feat']
+        # embedded_features = feature_embedding(features, vocab, hidden_dim)
+        # graph['node_feat'] = embedded_features.squeeze().data
         torch_graphs.append(graph)
     return torch_graphs
 
