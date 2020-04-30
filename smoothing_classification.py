@@ -92,7 +92,7 @@ def make_onehot_data(data):
 
 
 DATA_DIR = 'data/SBMs'
-DataSetName = ['SBM_CLUSTER_SAMPLE']
+DataSetName = ['SBM_CLUSTER']
 for a in [8]:
     for dataname in DataSetName:
         with open(f'{DATA_DIR}/{dataname}.pkl', 'rb') as f:

@@ -159,7 +159,6 @@ do
 done
 
 
-w_list=1 05
 # residual w
 # shellcheck disable=SC2068
 for w in ${a_list[@]}
