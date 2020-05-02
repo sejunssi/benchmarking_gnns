@@ -11,7 +11,7 @@ code=main_SBMs_node_classification.py
 tmux new -s benchmark_SBMs_node_classification -d
 tmux send-keys "source activate benchmark_gnn" C-m
 
-a_list=(8 7 9)
+a_list=(7 8 9)
 w_list=(05 1 15)
 # residual a
 
@@ -36,9 +36,9 @@ do
   wait" C-m
 
   tmux send-keys "
-  python $code --dataset $dataset   --gpu_id 0 --onehot True--seed $seed0 --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_a${a}.json' &
-  python $code --dataset $dataset   --gpu_id 1 --onehot True--seed $seed1 --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_a${a}.json' &
-  python $code --dataset $dataset   --gpu_id 2 --onehot True--seed $seed2 --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_a${a}.json' &
+  python $code --dataset $dataset   --gpu_id 0 --onehot True --seed $seed0 --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_a${a}.json' &
+  python $code --dataset $dataset   --gpu_id 1 --onehot True --seed $seed1 --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_a${a}.json' &
+  python $code --dataset $dataset   --gpu_id 2 --onehot True --seed $seed2 --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_a${a}.json' &
 
   wait" C-m
 
@@ -82,9 +82,9 @@ do
   wait" C-m
 
   tmux send-keys "
-  python $code --dataset $dataset   --gpu_id 0 --onehot True--seed $seed0 --config 'configs/SBMs_node_clustering_GatedGCN_PATTERN_a${a}.json' &
-  python $code --dataset $dataset   --gpu_id 1 --onehot True--seed $seed1 --config 'configs/SBMs_node_clustering_GatedGCN_PATTERN_a${a}.json' &
-  python $code --dataset $dataset   --gpu_id 2 --onehot True--seed $seed2 --config 'configs/SBMs_node_clustering_GatedGCN_PATTERN_a${a}.json' &
+  python $code --dataset $dataset   --gpu_id 0 --onehot True --seed $seed0 --config 'configs/SBMs_node_clustering_GatedGCN_PATTERN_a${a}.json' &
+  python $code --dataset $dataset   --gpu_id 1 --onehot True --seed $seed1 --config 'configs/SBMs_node_clustering_GatedGCN_PATTERN_a${a}.json' &
+  python $code --dataset $dataset   --gpu_id 2 --onehot True --seed $seed2 --config 'configs/SBMs_node_clustering_GatedGCN_PATTERN_a${a}.json' &
   wait" C-m
 
   tmux send-keys "
@@ -141,9 +141,9 @@ do
   wait" C-m
 
   tmux send-keys "
-  python $code --dataset $dataset --residual=False   --gpu_id 0 --onehot True--seed $seed0 --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_a${a}.json' &
-  python $code --dataset $dataset --residual=False   --gpu_id 1 --onehot True--seed $seed1 --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_a${a}.json' &
-  python $code --dataset $dataset --residual=False   --gpu_id 2 --onehot True--seed $seed2 --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_a${a}.json' &
+  python $code --dataset $dataset --residual=False   --gpu_id 0 --onehot True --seed $seed0 --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_a${a}.json' &
+  python $code --dataset $dataset --residual=False   --gpu_id 1 --onehot True --seed $seed1 --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_a${a}.json' &
+  python $code --dataset $dataset --residual=False   --gpu_id 2 --onehot True --seed $seed2 --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_a${a}.json' &
 
   wait" C-m
 
@@ -205,9 +205,9 @@ do
   wait" C-m
 
   tmux send-keys "
-  python $code --dataset $dataset --residual=False   --gpu_id 0 --onehot True--seed $seed0 --config 'configs/SBMs_node_clustering_GatedGCN_PATTERN_a${a}.json' &
-  python $code --dataset $dataset --residual=False   --gpu_id 1 --onehot True--seed $seed1 --config 'configs/SBMs_node_clustering_GatedGCN_PATTERN_a${a}.json' &
-  python $code --dataset $dataset --residual=False   --gpu_id 2 --onehot True--seed $seed2 --config 'configs/SBMs_node_clustering_GatedGCN_PATTERN_a${a}.json' &
+  python $code --dataset $dataset --residual=False   --gpu_id 0 --onehot True --seed $seed0 --config 'configs/SBMs_node_clustering_GatedGCN_PATTERN_a${a}.json' &
+  python $code --dataset $dataset --residual=False   --gpu_id 1 --onehot True --seed $seed1 --config 'configs/SBMs_node_clustering_GatedGCN_PATTERN_a${a}.json' &
+  python $code --dataset $dataset --residual=False   --gpu_id 2 --onehot True --seed $seed2 --config 'configs/SBMs_node_clustering_GatedGCN_PATTERN_a${a}.json' &
 
   wait" C-m
 
@@ -256,9 +256,9 @@ do
   wait" C-m
 
   tmux send-keys "
-  python $code --dataset $dataset   --gpu_id 0 --onehot True--seed $seed0 --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_w${w}.json' &
-  python $code --dataset $dataset   --gpu_id 1 --onehot True--seed $seed1 --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_w${w}.json' &
-  python $code --dataset $dataset   --gpu_id 2 --onehot True--seed $seed2 --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_w${w}.json' &
+  python $code --dataset $dataset   --gpu_id 0 --onehot True --seed $seed0 --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_w${w}.json' &
+  python $code --dataset $dataset   --gpu_id 1 --onehot True --seed $seed1 --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_w${w}.json' &
+  python $code --dataset $dataset   --gpu_id 2 --onehot True --seed $seed2 --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_w${w}.json' &
 
   wait" C-m
 
@@ -306,9 +306,9 @@ do
   wait" C-m
 
   tmux send-keys "
-  python $code --dataset $dataset   --gpu_id 0 --onehot True--seed $seed0 --config 'configs/SBMs_node_clustering_GatedGCN_PATTERN_w${w}.json' &
-  python $code --dataset $dataset   --gpu_id 1 --onehot True--seed $seed1 --config 'configs/SBMs_node_clustering_GatedGCN_PATTERN_w${w}.json' &
-  python $code --dataset $dataset   --gpu_id 2 --onehot True--seed $seed2 --config 'configs/SBMs_node_clustering_GatedGCN_PATTERN_w${w}.json' &
+  python $code --dataset $dataset   --gpu_id 0 --onehot True --seed $seed0 --config 'configs/SBMs_node_clustering_GatedGCN_PATTERN_w${w}.json' &
+  python $code --dataset $dataset   --gpu_id 1 --onehot True --seed $seed1 --config 'configs/SBMs_node_clustering_GatedGCN_PATTERN_w${w}.json' &
+  python $code --dataset $dataset   --gpu_id 2 --onehot True --seed $seed2 --config 'configs/SBMs_node_clustering_GatedGCN_PATTERN_w${w}.json' &
 
   wait" C-m
 
@@ -375,9 +375,9 @@ do
   wait" C-m
 
   tmux send-keys "
-  python $code --dataset $dataset --residual=False   --gpu_id 0 --onehot True--seed $seed0 --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_w${w}.json' &
-  python $code --dataset $dataset --residual=False   --gpu_id 1 --onehot True--seed $seed1 --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_w${w}.json' &
-  python $code --dataset $dataset --residual=False   --gpu_id 2 --onehot True--seed $seed2 --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_w${w}.json' &
+  python $code --dataset $dataset --residual=False   --gpu_id 0 --onehot True --seed $seed0 --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_w${w}.json' &
+  python $code --dataset $dataset --residual=False   --gpu_id 1 --onehot True --seed $seed1 --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_w${w}.json' &
+  python $code --dataset $dataset --residual=False   --gpu_id 2 --onehot True --seed $seed2 --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_w${w}.json' &
 
   wait" C-m
 
@@ -438,9 +438,9 @@ do
   wait" C-m
 
   tmux send-keys "
-  python $code --dataset $dataset --residual=False   --gpu_id 0 --onehot True--seed $seed0 --config 'configs/SBMs_node_clustering_GatedGCN_PATTERN_w${w}.json' &
-  python $code --dataset $dataset --residual=False   --gpu_id 1 --onehot True--seed $seed1 --config 'configs/SBMs_node_clustering_GatedGCN_PATTERN_w${w}.json' &
-  python $code --dataset $dataset --residual=False   --gpu_id 2 --onehot True--seed $seed2 --config 'configs/SBMs_node_clustering_GatedGCN_PATTERN_w${w}.json' &
+  python $code --dataset $dataset --residual=False   --gpu_id 0 --onehot True --seed $seed0 --config 'configs/SBMs_node_clustering_GatedGCN_PATTERN_w${w}.json' &
+  python $code --dataset $dataset --residual=False   --gpu_id 1 --onehot True --seed $seed1 --config 'configs/SBMs_node_clustering_GatedGCN_PATTERN_w${w}.json' &
+  python $code --dataset $dataset --residual=False   --gpu_id 2 --onehot True --seed $seed2 --config 'configs/SBMs_node_clustering_GatedGCN_PATTERN_w${w}.json' &
 
   wait" C-m
 
