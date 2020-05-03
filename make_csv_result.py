@@ -46,7 +46,7 @@ cur_dir = os.getcwd()
 file_name = []
 
 with open("SBM_test_result.csv", 'w', newline='') as f2:
-    header = ["dataset", "model name", "seed", "residual",  "paper accuracy", "test_accuracy"]
+    header = ["dataset", "model name", "seed", "residual",  "paper accuracy", "test_accuracy", 'smooth']
     csvwriter = csv.writer(f2, delimiter=',')
     csvwriter.writerow(header)
 
@@ -71,7 +71,7 @@ for name in glob.glob('*.csv'):
                     paper_acc[''.join(name_list[:6])] = test_acc
                 with open("SBM_test_result.csv", 'a', newline='') as f2:
                     csvwriter = csv.writer(f2, delimiter=',')
-                    csvwriter.writerow([dataset, model_name, seed, residual, paper_acc[paper_dict_name], test_acc])
+                    csvwriter.writerow([dataset, model_name, seed, residual, paper_acc[paper_dict_name], test_acc, smoothing_name])
 
 
 
