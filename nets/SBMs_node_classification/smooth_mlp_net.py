@@ -62,7 +62,7 @@ class SmoothMLPNet(nn.Module):
             h = torch.sigmoid(self.gates(h)) * h
 
         # output
-        p = self.MLP_layer(h)
+        p = self.readout_mlp(h)
 
         h = torch.cat((h, label.to(torch.float)), dim=1)
         w = self.MLP_layer2(h)
