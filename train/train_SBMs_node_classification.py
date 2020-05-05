@@ -49,7 +49,7 @@ def smooth_evaluate_network(model, device, data_loader, epoch,  delta=1.0, oneho
             batch_labels = batch_labels.to(device)
             batch_snorm_n = batch_snorm_n.to(device)
             batch_scores, smoothed_label = model.forward(g=batch_graphs, h=batch_x, e=batch_e, label=batch_labels, delta=delta, snorm_e=batch_snorm_e, snorm_n=batch_snorm_n, onehot=onehot)
-            loss = model.loss(batch_scores, batch_labels, onehot)
+            loss = model.loss(batch_scores, batch_labels.to(torch.float), onehot=True)
             epoch_test_loss += loss.detach().item()
             if onehot:
                 epoch_test_acc += accuracy_smoothing(batch_scores, batch_labels)

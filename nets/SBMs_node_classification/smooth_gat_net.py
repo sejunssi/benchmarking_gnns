@@ -70,14 +70,14 @@ class SmoothGATNet(nn.Module):
         # output
         p = self.MLP_layer(h)
         h = torch.cat((h, label.to(torch.float)), dim=1)
-        w = self.MLP_layer2(h)
+        w = self.MLP_layer2(h).to(torch.float)
         w = self.sigmoid(w)
         w = w.data
         w = w.repeat(1, self.n_classes)
         w = torch.clamp(w, min=0, max=delta).to(device=self.device)
-        ones = torch.ones(label.shape[0], label.shape[1]).to(float).to(device=self.device)
-        max_entropy = torch.Tensor([1 / label.shape[1]]).repeat(label.shape[0], label.shape[1]).to(device=self.device)
-        g_hat = (ones - w) * label.to(device=self.device) + w * max_entropy
+        ones = torch.ones(label.shape[0], label.shape[1]).to(torch.float).to(device=self.device)
+        max_entropy = torch.Tensor([1 / label.shape[1]]).repeat(label.shape[0], label.shape[1]).to(torch.float).to(device=self.device)
+        g_hat = (ones - w) * label.to(torch.float) + w * max_entropy
         return p, g_hat
     
     
