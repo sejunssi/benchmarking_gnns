@@ -62,11 +62,11 @@ class SmoothGatedGCNNet(nn.Module):
         w = self.MLP_layer2(h)
         w = self.sigmoid(w)
         w = w.data
-        w = w.repeat(1, self.n_classes)
-        w = torch.clamp(w, min=0, max=delta)
+        w = w.repeat(1, self.n_classes).to(device=self.device)
+        w = torch.clamp(w, min=0, max=delta).to(device=self.device)
         ones = torch.ones(label.shape[0], label.shape[1]).to(device=self.device)
         max_entropy = torch.Tensor([1 / label.shape[1]]).repeat(label.shape[0], label.shape[1]).to(device=self.device)
-        g_hat = (ones - w) * label + w * max_entropy
+        g_hat = (ones - w) * label.to(device=self.device) + w * max_entropy
         return p, g_hat
         
 
