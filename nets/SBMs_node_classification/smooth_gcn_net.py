@@ -75,8 +75,8 @@ class SmoothGCNNet(nn.Module):
         g_hat = (ones-w) * label.to(torch.float) + w * max_entropy
         return p, g_hat
 
-    def loss(self, pred, label, onehot=False):
-        if onehot == True:
+    def loss(self, pred, label, train_soft_target=False):
+        if train_soft_target == True:
             criterion = LabelSmoothingLoss()
             loss = criterion(pred, label)
             return loss

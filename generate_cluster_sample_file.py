@@ -124,33 +124,34 @@ def SBMs_CLUSTER(nb_graphs, data_dir, name):
     with open(os.path.join(data_dir, name) + '.pkl', "wb") as f:
         pickle.dump(dataset, f)
 
+data_name = "SBM_CLUSTER_SAMPLE"
 start = time.time()
 DATA_DIR = 'data/SBMs/'
 nb_graphs = 100  # train
 # nb_graphs = 3333 # train
 # nb_graphs = 500 # train
 # nb_graphs = 20 # train
-SBMs_CLUSTER(nb_graphs, DATA_DIR, 'SBM_CLUSTER_SAMPLE_train')
+SBMs_CLUSTER(nb_graphs, DATA_DIR, f'{data_name}_train')
 
 nb_graphs = 10  # val
 # nb_graphs = 333 # val
 # nb_graphs = 100 # val
 # nb_graphs = 5 # val
-SBMs_CLUSTER(nb_graphs, DATA_DIR, 'SBM_CLUSTER_SAMPLE_val')
+SBMs_CLUSTER(nb_graphs, DATA_DIR, f'{data_name}_val')
 
 nb_graphs = 10  # test
 # nb_graphs = 333 # test
 # nb_graphs = 100 # test
 # nb_graphs = 5 # test
-SBMs_CLUSTER(nb_graphs, DATA_DIR, 'SBM_CLUSTER_SAMPLE_test')
+SBMs_CLUSTER(nb_graphs, DATA_DIR, f'{data_name}_test')
 
 print('Time (sec):', time.time() - start)
 
 
 def load_sample_data(data_name):
     dataset = SBMsDatasetDGL(data_name)
-    with open('data/SBMs/SBM_CLUSTER_SAMPLE.pkl', 'wb') as f:
+    with open(f'data/SBMs/{data_name}.pkl', 'wb') as f:
         pickle.dump([dataset.train, dataset.val, dataset.test], f)
 
-data_name = "SBM_CLUSTER_SAMPLE"
+
 load_sample_data(data_name)

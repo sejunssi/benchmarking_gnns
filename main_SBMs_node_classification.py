@@ -94,7 +94,7 @@ def view_model_param(MODEL_NAME, net_params):
     TRAINING CODE
 """
 
-def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, onehot=False):
+def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, train_soft_target=False):
     
     start0 = time.time()
     per_epoch_time = []
@@ -107,7 +107,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, onehot=Fal
             dataset._add_self_loops()
     
     trainset, valset, testset = dataset.train, dataset.val, dataset.test
-    if onehot:
+    if train_soft_target:
         valset.node_labels = [x.long() for x in valset.node_labels]
         testset.node_labels = [x.long() for x in testset.node_labels]
         
@@ -170,7 +170,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, onehot=Fal
 
                 start = time.time()
 
-                epoch_train_loss, epoch_train_acc, optimizer = train_epoch(model, optimizer, device, train_loader, epoch, onehot)
+                epoch_train_loss, epoch_train_acc, optimizer = train_epoch(model, optimizer, device, train_loader, epoch, train_soft_target)
                 epoch_val_loss, epoch_val_acc = evaluate_network(model, device, val_loader, epoch)
                 epoch_test_loss, epoch_test_acc = evaluate_network(model, device, test_loader, epoch)
 
@@ -255,7 +255,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, onehot=Fal
     
     
     _, test_acc = evaluate_network(model, device, test_loader, epoch)
-    _, train_acc = evaluate_network(model, device, train_loader, epoch, onehot=onehot)
+    _, train_acc = evaluate_network(model, device, train_loader, epoch, train_soft_target=train_soft_target)
     print("Test Accuracy: {:.4f}".format(test_acc))
     print("Train Accuracy: {:.4f}".format(train_acc))
     print("TOTAL TIME TAKEN: {:.4f}s".format(time.time()-start0))
@@ -340,7 +340,7 @@ def main():
     parser.add_argument('--cat', help="Please give a value for cat")
     parser.add_argument('--self_loop', help="Please give a value for self_loop")
     parser.add_argument('--max_time', help="Please give a value for max_time")
-    parser.add_argument('--onehot', help="Please give a value for onehot")
+    parser.add_argument('--train_soft_target', help="Please give a value for train_soft_target")
     args = parser.parse_args()
 #    pdb.set_trace()
     with open(args.config) as f:
@@ -436,20 +436,20 @@ def main():
         net_params['cat'] = True if args.cat=='True' else False
     if args.self_loop is not None:
         net_params['self_loop'] = True if args.self_loop=='True' else False
-    if args.onehot is not None:
-        net_params['onehot'] = True if args.onehot=='True' else False
-        onehot = net_params['onehot']
+    if args.train_soft_target is not None:
+        net_params['train_soft_target'] = True if args.train_soft_target=='True' else False
+        train_soft_target = net_params['train_soft_target']
     else:
-        onehot = False
+        train_soft_target = False
         if DATASET_NAME.split("_")[-1][0] in ['w', 'a']:
-            print('onehot parameter is missing. onehot = True')
-            onehot = True
+            print('train_soft_target parameter is missing. train_soft_target = True')
+            train_soft_target = True
         
     # SBM
     net_params['in_dim'] = torch.unique(dataset.train[0][0].ndata['feat'],dim=0).size(0) # node_dim (feat is an integer)
 
     net_params['n_classes'] = torch.unique(dataset.train[0][1],dim=0).size(0)
-    if onehot:
+    if train_soft_target:
         net_params['n_classes'] = len(dataset.train.dataset[0]['node_label'][0])
 
     root_log_dir = out_dir + 'logs/' + MODEL_NAME + "_" + DATASET_NAME + "_GPU" + str(config['gpu']['id']) + "_" + time.strftime('%Hh%Mm%Ss_on_%b_%d_%Y')
@@ -465,7 +465,7 @@ def main():
         os.makedirs(out_dir + 'configs')
 
     net_params['total_param'] = view_model_param(MODEL_NAME, net_params)
-    train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, onehot)
+    train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, train_soft_target)
 
     
     
