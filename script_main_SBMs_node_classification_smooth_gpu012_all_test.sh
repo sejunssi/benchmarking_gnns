@@ -22,12 +22,19 @@ seed_list=(41 95 12 35)
 
 for seed in ${seed_list[@]}
 do
+
     tmux send-keys "
-    python $code1 --dataset SBM_CLUSTER --how_residual=resnet  --gpu_id 0 --seed 41 --config 'configs/SBMs_node_clustering_GIN_PATTERN_SMOOTH.json' &
-    python $code1 --dataset SBM_CLUSTER --how_residual=rk2  --gpu_id 1 --seed 41 --config 'configs/SBMs_node_clustering_GIN_PATTERN_SMOOTH.json' &
-    python $code1 --dataset SBM_CLUSTER --how_residual=rk3  --gpu_id 2 --seed 41 --config 'configs/SBMs_node_clustering_GIN_PATTERN_SMOOTH.json' &
+    python main_SBMs_node_classification_smooth --dataset SBM_CLUSTER --delta=0.1 --how_residual=rk2  --gpu_id 0 --seed 41 --config 'configs/SBMs_node_clustering_GIN_CLUSTER_SMOOTH.json'
+    python main_SBMs_node_classification_smooth --dataset SBM_CLUSTER --delta=0.1 --how_residual=rk3  --gpu_id 1 --seed 41 --config 'configs/SBMs_node_clustering_GIN_CLUSTER_SMOOTH.json'
+    python main_SBMs_node_classification_smooth --dataset SBM_CLUSTER --delta=0.2 --how_residual=rk2  --gpu_id 2 --seed 41 --config 'configs/SBMs_node_clustering_GIN_CLUSTER_SMOOTH.json'
+    wait" C-m
+
+    tmux send-keys "
+    python main_SBMs_node_classification_smooth --dataset SBM_CLUSTER --delta=0.2 --how_residual=rk2  --gpu_id 1 --seed 41 --config 'configs/SBMs_node_clustering_GIN_CLUSTER_SMOOTH.json'
     wait" C-m
 done
+
+
 
 
 
