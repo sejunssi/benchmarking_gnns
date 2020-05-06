@@ -39,7 +39,6 @@ class SmoothGINNet(nn.Module):
             self.middle_dim = net_params['middle_dim']
             middle_dim = self.middle_dim
             self.new_fc_layer = nn.Linear(hidden_dim + n_classes, middle_dim)
-            self.new_fc_layer2 = nn.Linear(middle_dim, hidden_dim + n_classes)
             if self.how_residual == 'rk2':
                self.w_layer = RK2netMLPReadout(middle_dim, 1)
         else:
@@ -101,7 +100,6 @@ class SmoothGINNet(nn.Module):
             score_over_layer_p += self.linears_prediction1[i](h)
             if self.middle_dim != 'None':
                 h = self.new_fc_layer(torch.cat((h, label.to(torch.float)), dim=1))
-                h = self.new_fc_layer2(h)
             score_over_layer_w += self.w_layer(h)
 
         w = self.sigmoid(score_over_layer_w).to(torch.float)

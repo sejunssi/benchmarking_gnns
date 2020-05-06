@@ -149,7 +149,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, train_soft
                                                      factor=params['lr_reduce_factor'],
                                                      patience=params['lr_schedule_patience'],
                                                      verbose=True)
-    #TODO suffle is false for test, change later 'shuffle is true'
+
     train_loader = DataLoader(trainset, batch_size=params['batch_size'], shuffle=True, collate_fn=dataset.collate)
     val_loader = DataLoader(valset, batch_size=params['batch_size'], shuffle=False, collate_fn=dataset.collate)
     test_loader = DataLoader(testset, batch_size=params['batch_size'], shuffle=False, collate_fn=dataset.collate)
@@ -236,7 +236,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, train_soft
                     print("Max_time for training elapsed {:.2f} hours, so stopping".format(params['max_time']))
                     break
 
-            csv_file = open(f'./{params["seed"]}_{str(net_params["residual"])}_{DATASET_NAME}_{MODEL_NAME}_{net_params["how_residual"]}_{delta}_{net_params["middle_dim"]}_epoch_files.csv', 'w')
+            csv_file = open(f'./{params["seed"]}_{str(net_params["residual"])}_{DATASET_NAME}_{MODEL_NAME}_{net_params["how_residual"]}_{delta}_{net_params["middle_dim"]}_v2_epoch_files.csv', 'w')
             csvwriter = csv.writer(csv_file)
             csvwriter.writerow(header)
             for data in (zip(epochs, epoch_train_loss_list, epoch_train_acc_list, epoch_val_loss_list, epoch_val_acc_list,
@@ -247,7 +247,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, train_soft
             ckpt_dir = os.path.join(root_ckpt_dir, "RUN_")
             torch.save(best_model_dict, '{}.pkl'.format(ckpt_dir + "/epoch_" + str(best_val_epoch) + "_" + "BEST_VAL"))
             with open(
-                    f"{params['seed']}_{str(net_params['residual'])}_{DATASET_NAME}_{MODEL_NAME}_{net_params['how_residual']}_{delta}_{net_params['middle_dim']}_ep{best_val_epoch}_acc_best_val.csv",
+                    f"{params['seed']}_{str(net_params['residual'])}_{DATASET_NAME}_{MODEL_NAME}_{net_params['how_residual']}_{delta}_{net_params['middle_dim']}_v2_ep{best_val_epoch}_acc_best_val.csv",
                     'w') as f:
                 if len(best_acc) == 3:
                     f.write("train acc, val acc, test acc")
@@ -263,7 +263,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, train_soft
         print('-' * 89)
         print('Exiting from training early because of KeyboardInterrupt')
 
-    with open(f'./out/{params["seed"]}_{str(net_params["residual"])}_{DATASET_NAME}_{MODEL_NAME}_{net_params["how_residual"]}_{delta}_{net_params["middle_dim"]}.pkl', 'wb') as f:
+    with open(f'./out/{params["seed"]}_{str(net_params["residual"])}_{DATASET_NAME}_{MODEL_NAME}_{net_params["how_residual"]}_{delta}_{net_params["middle_dim"]}_v2_.pkl', 'wb') as f:
         print("writing pickle file")
         graph_dict = {
             'g': batch_graph_list,
@@ -283,7 +283,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, train_soft
     # trained_w = model.w.squeeze().data.numpy().tolist()
     # with open(f'./{params["seed"]}_{str(net_params["residual"])}_{DATASET_NAME}_{MODEL_NAME}_W.csv', 'w') as f:
     #     f.write(",".join(map(str, trained_w)))
-    with open(f'./{params["seed"]}_{str(net_params["residual"])}_{DATASET_NAME}_{MODEL_NAME}_{net_params["how_residual"]}_{delta}_{net_params["middle_dim"]}_test_result.csv', 'wt',
+    with open(f'./{params["seed"]}_{str(net_params["residual"])}_{DATASET_NAME}_{MODEL_NAME}_{net_params["how_residual"]}_{delta}_{net_params["middle_dim"]}_v2_test_result.csv', 'wt',
               newline='') as f:
         f.write("Test_Accuracy" + "," + "Train_Accuracy" + "," + "Total_Time_Taken" + "," + "AVG_Time_Per_Epoch")
         f.write("\n")
