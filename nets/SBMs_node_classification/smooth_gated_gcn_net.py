@@ -12,7 +12,8 @@ import numpy as np
     https://arxiv.org/pdf/1711.07553v2.pdf
 """
 from layers.gated_gcn_layer import GatedGCNLayer
-from layers.mlp_readout_layer import MLPReadout, ResnetMLPReadout, RK2netMLPReadout, RK3netMLPReadout, RK2M1netMLPReadout, RKinetMLPReadout
+from layers.mlp_readout_layer \
+    import MLPReadout, ResnetMLPReadout, RK2netMLPReadout, RK3netMLPReadout, RK2M1netMLPReadout, RKinetMLPReadout, BaseLineMLPReadout
 
 class SmoothGatedGCNNet(nn.Module):
     
@@ -46,7 +47,6 @@ class SmoothGatedGCNNet(nn.Module):
         self.MLP_layer = MLPReadout(hidden_dim, n_classes)
         self.rk_middle_layer(bottleneck, hidden_dim, n_classes, net_params)
         self.sigmoid = nn.Sigmoid()
-    
 
     def rk_middle_layer(self, bottleneck, hidden_dim, n_classes, net_params):
         if self.middle_dim != 'None':
@@ -65,6 +65,8 @@ class SmoothGatedGCNNet(nn.Module):
                     self.w_layer = ResnetMLPReadout(hidden_dim + n_classes, 1)
                 elif self.how_residual == 'rk3':
                     self.w_layer = RK3netMLPReadout(hidden_dim + n_classes, 1)
+                else:
+                    self.w_layer = BaseLineMLPReadout(hidden_dim + n_classes, 1)
             else:
                 if self.how_residual == 'rki':
                     self.w_layer = RKinetMLPReadout(hidden_dim + n_classes, 1, self.rki)
@@ -76,6 +78,8 @@ class SmoothGatedGCNNet(nn.Module):
                     self.w_layer = ResnetMLPReadout(middle_dim + n_classes, 1)
                 elif self.how_residual == 'rk3':
                     self.w_layer = RK3netMLPReadout(middle_dim + n_classes, 1)
+                else:
+                    self.w_layer = BaseLineMLPReadout(hidden_dim + n_classes, 1)
         else:
             if self.how_residual == 'rki':
                 self.w_layer = RKinetMLPReadout(hidden_dim + n_classes, 1, self.rki)
@@ -87,6 +91,8 @@ class SmoothGatedGCNNet(nn.Module):
                 self.w_layer = ResnetMLPReadout(hidden_dim + n_classes, 1)
             elif self.how_residual == 'rk3':
                 self.w_layer = RK3netMLPReadout(hidden_dim + n_classes, 1)
+            else:
+                self.w_layer = BaseLineMLPReadout(hidden_dim + n_classes, 1)
 
     def forward(self, *args, **kwargs):
         g = kwargs['g']

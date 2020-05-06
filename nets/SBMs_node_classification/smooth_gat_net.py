@@ -12,8 +12,8 @@ import dgl
     https://arxiv.org/abs/1710.10903
 """
 from layers.gat_layer import GATLayer
-from layers.mlp_readout_layer import MLPReadout, ResnetMLPReadout, RK2netMLPReadout, RK3netMLPReadout
-from layers.mlp_readout_layer import MLPReadout, ResnetMLPReadout, RK2netMLPReadout, RK3netMLPReadout, RK2M1netMLPReadout, RKinetMLPReadout
+from layers.mlp_readout_layer import MLPReadout, ResnetMLPReadout, RK2netMLPReadout,\
+    RK3netMLPReadout, RK2M1netMLPReadout, RKinetMLPReadout, BaseLineMLPReadout
 
 
 class SmoothGATNet(nn.Module):
@@ -73,6 +73,8 @@ class SmoothGATNet(nn.Module):
                     self.w_layer = ResnetMLPReadout(hidden_dim + n_classes, 1)
                 elif self.how_residual == 'rk3':
                     self.w_layer = RK3netMLPReadout(hidden_dim + n_classes, 1)
+                else:
+                    self.w_layer = BaseLineMLPReadout(hidden_dim + n_classes, 1)
             else:
                 if self.how_residual == 'rki':
                     self.w_layer = RKinetMLPReadout(hidden_dim + n_classes, 1, self.rki)
@@ -84,6 +86,8 @@ class SmoothGATNet(nn.Module):
                     self.w_layer = ResnetMLPReadout(middle_dim + n_classes, 1)
                 elif self.how_residual == 'rk3':
                     self.w_layer = RK3netMLPReadout(middle_dim + n_classes, 1)
+                else:
+                    self.w_layer = BaseLineMLPReadout(hidden_dim + n_classes, 1)
         else:
             if self.how_residual == 'rki':
                 self.w_layer = RKinetMLPReadout(hidden_dim + n_classes, 1, self.rki)
@@ -95,6 +99,8 @@ class SmoothGATNet(nn.Module):
                 self.w_layer = ResnetMLPReadout(hidden_dim + n_classes, 1)
             elif self.how_residual == 'rk3':
                 self.w_layer = RK3netMLPReadout(hidden_dim + n_classes, 1)
+            else:
+                self.w_layer = BaseLineMLPReadout(hidden_dim + n_classes, 1)
 
     def forward(self, *args, **kwargs):
         g = kwargs['g']
