@@ -1,7 +1,8 @@
 #!/bin/bash
 
 
-code=main_SBMs_node_classification_smooth.py
+code1=main_SBMs_node_classification_smooth.py
+code2=main_SBMs_node_classification.py
 tmux new -s benchmark_SBMs_node_classification_smooth -d
 tmux send-keys "source activate benchmark_gnn" C-m
 
