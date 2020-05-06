@@ -156,7 +156,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, train_soft
         
     # At any point you can hit Ctrl + C to break out of training early.
     try:
-        with tqdm(range(net_params['epochs'])) as t:
+        with tqdm(range(params['epochs'])) as t:
 
             header = ['epoch', 'epoch_train_losses', 'epoch_train_acc', 'epoch_val_losses', 'epoch_val_acc',
                       'epoch_test_losses', 'epoch_test_acc']
