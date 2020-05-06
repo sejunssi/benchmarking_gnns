@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from utils.loss import LabelSmoothingLoss
+import pickle
 
 import dgl
 
@@ -77,12 +78,13 @@ class SmoothGATNet(nn.Module):
         w = self.w_layer(h).to(torch.float)
         w = self.sigmoid(w)
         w = w.data
+        saved_w = w
         w = w.repeat(1, self.n_classes)
         w = torch.clamp(w, min=0, max=delta).to(device=self.device)
         ones = torch.ones(label.shape[0], label.shape[1]).to(torch.float).to(device=self.device)
         max_entropy = torch.Tensor([1 / label.shape[1]]).repeat(label.shape[0], label.shape[1]).to(torch.float).to(device=self.device)
         g_hat = (ones - w) * label.to(torch.float) + w * max_entropy
-        return p, g_hat
+        return p, g_hat, g, saved_w
     
     
     def loss(self, pred, label, train_soft_target=False):

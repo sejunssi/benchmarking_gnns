@@ -95,12 +95,13 @@ class SmoothGINNet(nn.Module):
 
         w = self.sigmoid(score_over_layer_w).to(torch.float)
         w = w.data
+        saved_w = w
         w = w.repeat(1, self.n_classes)
         w = torch.clamp(w, min=0, max=delta).to(device=self.device)
         ones = torch.ones(label.shape[0], label.shape[1]).to(torch.float).to(device=self.device)
         max_entropy = torch.Tensor([1 / label.shape[1]]).repeat(label.shape[0], label.shape[1]).to(torch.float).to(device=self.device)
         g_hat = (ones - w) * label.to(torch.float) + w * max_entropy
-        return score_over_layer_p, g_hat
+        return score_over_layer_p, g_hat, g, saved_w
         
     def loss(self, pred, label, train_soft_target=False):
         if train_soft_target == True:

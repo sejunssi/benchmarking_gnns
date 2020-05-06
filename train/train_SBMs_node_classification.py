@@ -9,6 +9,7 @@ import dgl
 
 from train.metrics import accuracy_SBM as accuracy
 from train.metrics import accuracy_smoothing
+import pickle
 
 
 def smooth_train_epoch(model, optimizer, device, data_loader, epoch, delta=1.0, train_soft_target=False):
@@ -16,6 +17,11 @@ def smooth_train_epoch(model, optimizer, device, data_loader, epoch, delta=1.0, 
     model.train()
     epoch_loss = 0
     epoch_train_acc = 0
+    batch_graph_list = []
+    batch_label_list = []
+    smoothed_label_list = []
+    batch_scores_list = []
+    weights = []
     for iter, (batch_graphs, batch_labels, batch_snorm_n, batch_snorm_e) in enumerate(data_loader):
         batch_x = batch_graphs.ndata['feat'].to(device)  # num x feat
         batch_e = batch_graphs.edata['feat'].to(device)
@@ -23,9 +29,15 @@ def smooth_train_epoch(model, optimizer, device, data_loader, epoch, delta=1.0, 
         batch_labels = batch_labels.to(device)
         batch_snorm_n = batch_snorm_n.to(device)  # num x 1
         optimizer.zero_grad()
-        batch_scores, smoothed_label = model.forward(g=batch_graphs, h=batch_x, e=batch_e, label=batch_labels,
+        batch_scores, smoothed_label, g, saved_w = model.forward(g=batch_graphs, h=batch_x, e=batch_e, label=batch_labels,
                                                      delta=delta, snorm_e=batch_snorm_e, snorm_n=batch_snorm_n,
                                                      train_soft_target=train_soft_target)
+
+        batch_label_list.append(batch_labels)
+        smoothed_label_list.append(smoothed_label)
+        batch_scores_list.append(batch_scores)
+        batch_graph_list.append(g)
+        weights.append(saved_w)
         loss = model.loss(batch_scores, smoothed_label, train_soft_target=train_soft_target)
         loss.backward()
         optimizer.step()
@@ -33,7 +45,7 @@ def smooth_train_epoch(model, optimizer, device, data_loader, epoch, delta=1.0, 
         epoch_train_acc += accuracy_smoothing(batch_scores, batch_labels)
     epoch_loss /= (iter + 1)
     epoch_train_acc /= (iter + 1)
-    return epoch_loss, epoch_train_acc, optimizer
+    return epoch_loss, epoch_train_acc, optimizer, batch_graph_list, batch_label_list, smoothed_label_list, weights, batch_scores_list
 
 
 def smooth_evaluate_network(model, device, data_loader, epoch,  delta=1.0, train_soft_target=False):
@@ -48,7 +60,7 @@ def smooth_evaluate_network(model, device, data_loader, epoch,  delta=1.0, train
             batch_snorm_e = batch_snorm_e.to(device)
             batch_labels = batch_labels.to(device)
             batch_snorm_n = batch_snorm_n.to(device)
-            batch_scores, smoothed_label = model.forward(g=batch_graphs, h=batch_x, e=batch_e, label=batch_labels, delta=delta, snorm_e=batch_snorm_e, snorm_n=batch_snorm_n, train_soft_target=train_soft_target)
+            batch_scores, smoothed_label, g,  saved_w = model.forward(g=batch_graphs, h=batch_x, e=batch_e, label=batch_labels, delta=delta, snorm_e=batch_snorm_e, snorm_n=batch_snorm_n, train_soft_target=train_soft_target)
             loss = model.loss(batch_scores, batch_labels.to(torch.float), train_soft_target=True)
             epoch_test_loss += loss.detach().item()
             if train_soft_target:

@@ -177,7 +177,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, train_soft
                 t.set_description('Epoch %d' % epoch)
 
                 start = time.time()
-                epoch_train_loss, epoch_train_acc, optimizer = smooth_train_epoch(model, optimizer, device, train_loader, epoch, delta, train_soft_target=train_soft_target)
+                epoch_train_loss, epoch_train_acc, optimizer, batch_graph_list, batch_label_list, smoothed_label_list, weights, batch_scores_list = smooth_train_epoch(model, optimizer, device, train_loader, epoch, delta, train_soft_target=train_soft_target)
                 epoch_val_loss, epoch_val_acc = smooth_evaluate_network(model, device, val_loader, epoch, delta, train_soft_target=train_soft_target)
                 epoch_test_loss, epoch_test_acc = smooth_evaluate_network(model, device, test_loader, epoch, delta, train_soft_target=train_soft_target)
 
@@ -236,7 +236,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, train_soft
                     print("Max_time for training elapsed {:.2f} hours, so stopping".format(params['max_time']))
                     break
 
-            csv_file = open(f'./{params["seed"]}_{DATASET_NAME}_{MODEL_NAME}_epoch_files.csv', 'w')
+            csv_file = open(f'./{params["seed"]}_{str(net_params["residual"])}_{DATASET_NAME}_{MODEL_NAME}_{net_params["how_residual"]}_epoch_files.csv', 'w')
             csvwriter = csv.writer(csv_file)
             csvwriter.writerow(header)
             for data in (zip(epochs, epoch_train_loss_list, epoch_train_acc_list, epoch_val_loss_list, epoch_val_acc_list,
@@ -247,7 +247,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, train_soft
             ckpt_dir = os.path.join(root_ckpt_dir, "RUN_")
             torch.save(best_model_dict, '{}.pkl'.format(ckpt_dir + "/epoch_" + str(best_val_epoch) + "_" + "BEST_VAL"))
             with open(
-                    f"{params['seed']}_{str(net_params['residual'])}_{DATASET_NAME}_ep{best_val_epoch}_acc_best_val.csv",
+                    f"{params['seed']}_{str(net_params['residual'])}_{DATASET_NAME}_{MODEL_NAME}_{net_params['how_residual']}_ep{best_val_epoch}_acc_best_val.csv",
                     'w') as f:
                 if len(best_acc) == 3:
                     f.write("train acc, val acc, test acc")
@@ -263,6 +263,15 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, train_soft
         print('-' * 89)
         print('Exiting from training early because of KeyboardInterrupt')
 
+    with open(f'./out/{params["seed"]}_{str(net_params["residual"])}_{DATASET_NAME}_{MODEL_NAME}_{net_params["how_residual"]}.pkl', 'wb') as f:
+        print("writing pickle file")
+        graph_dict = {
+            'g': batch_graph_list,
+            'label': batch_label_list,
+            'smoothed_label': smoothed_label_list,
+            'predicted_label': batch_scores_list
+        }
+        pickle.dump(graph_dict, f)
     _, test_acc = smooth_evaluate_network(model, device, test_loader, epoch, train_soft_target=train_soft_target)
     _, train_acc = smooth_evaluate_network(model, device, train_loader, epoch, train_soft_target=train_soft_target)
     print("Test Accuracy: {:.4f}".format(test_acc))
@@ -274,7 +283,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, train_soft
     # trained_w = model.w.squeeze().data.numpy().tolist()
     # with open(f'./{params["seed"]}_{str(net_params["residual"])}_{DATASET_NAME}_{MODEL_NAME}_W.csv', 'w') as f:
     #     f.write(",".join(map(str, trained_w)))
-    with open(f'./{params["seed"]}_{str(net_params["residual"])}_{DATASET_NAME}_{MODEL_NAME}_test_result.csv', 'wt',
+    with open(f'./{params["seed"]}_{str(net_params["residual"])}_{DATASET_NAME}_{MODEL_NAME}_{net_params["how_residual"]}_test_result.csv', 'wt',
               newline='') as f:
         f.write("Test_Accuracy" + "," + "Train_Accuracy" + "," + "Total_Time_Taken" + "," + "AVG_Time_Per_Epoch")
         f.write("\n")
