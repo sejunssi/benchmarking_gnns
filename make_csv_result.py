@@ -72,17 +72,17 @@ for name in glob.glob('*.csv'):
                 with open("SBM_test_result.csv", 'a', newline='') as f2:
                     csvwriter = csv.writer(f2, delimiter=',')
                     csvwriter.writerow([dataset, model_name, seed, residual, paper_acc[paper_dict_name], test_acc, smoothing_name])
-        elif re.match('(\d+)_(True|False)_SBM_(CLUSTER|PATTERN)_(\w+)_(\w+)_(\d+)*', name):
+        elif re.match('(\w+)_test_result.csv', name):
             file_name.append(name)
-            if re.match('(\d+)_(True|False)_SBM_(CLUSTER|PATTERN)_(a\d+|w\d+)_*', name):
+            if re.match('(\d+)_(True|False)_SBM_(CLUSTER|PATTERN)_(SMOOTH)_(\w+)_(\w+)_(\d+)*', name):
                 name_list = name.split("_")
                 seed = name_list[0]
                 residual = name_list[1]
                 dataset = name_list[3]
 
-                model_name = name_list[4]
-                how_residual = name_list[5]
-                delta = name_list[6]
+                model_name = name_list[5]
+                how_residual = name_list[6]
+                delta = name_list[7]
 
                 paper_dict_name = residual + '_SBM_' + dataset + "_" + model_name
 

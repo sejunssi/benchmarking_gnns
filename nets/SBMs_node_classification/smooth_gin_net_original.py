@@ -34,22 +34,18 @@ class SmoothGINNet(nn.Module):
         self.n_classes = n_classes
         self.device = net_params['device']
         self.how_residual = net_params['how_residual']
-        # self.middle_dim = net_params['middle_dim']
-        middle_dim = 64
-        self.new_fc_layer = nn.Linear(hidden_dim+n_classes, middle_dim)
-        self.middle_dim = middle_dim
         if self.how_residual == 'resnet':
             self.w_layer = ResnetMLPReadout(hidden_dim+n_classes, 1)
         elif self.how_residual == 'rk2':
-            self.w_layer = RK2netMLPReadout(middle_dim, 1)
+            self.w_layer = RK2netMLPReadout(hidden_dim+n_classes, 1)
         elif self.how_residual == 'rk3':
             self.w_layer = RK3netMLPReadout(hidden_dim+n_classes, 1)
         
         # List of MLPs
         self.ginlayers = torch.nn.ModuleList()
-
+        
         self.embedding_h = nn.Embedding(in_dim, hidden_dim)
-
+        
         for layer in range(self.n_layers):
             mlp = MLP(n_mlp_layers, hidden_dim, hidden_dim, hidden_dim)
             
@@ -63,6 +59,8 @@ class SmoothGINNet(nn.Module):
 
         for layer in range(self.n_layers+1):
             self.linears_prediction1.append(nn.Linear(hidden_dim, n_classes))
+
+
             self.linears_prediction2.append(nn.Linear(hidden_dim, 1))
 
         self.sigmoid = nn.Sigmoid()
@@ -93,8 +91,7 @@ class SmoothGINNet(nn.Module):
 
         for i, h in enumerate(hidden_rep):
             score_over_layer_p += self.linears_prediction1[i](h)
-            h2 = self.new_fc_layer(torch.cat((h, label.to(torch.float)), dim=1))
-            score_over_layer_w += self.w_layer(h2)
+            score_over_layer_w += self.w_layer(torch.cat((h, label.to(torch.float)), dim=1))
 
         w = self.sigmoid(score_over_layer_w).to(torch.float)
         w = w.data

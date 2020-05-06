@@ -4,14 +4,7 @@
 
 # %%
 
-import numpy as np
-import torch
-import pickle
-import time
 
-
-import matplotlib.pyplot as plt
-import scipy.sparse
 #from data.superpixels import SuperPixDataset
 # from data.molecules import MoleculeDataset
 # from data.TUs import TUsDataset
@@ -23,8 +16,6 @@ import scipy.sparse
 
 
 import time
-import os
-import pickle
 import numpy as np
 
 import dgl
@@ -423,11 +414,11 @@ import pickle
 # % autoreload
 
 
-from data.SBMs_smoothing import SBMsDatasetDGL
+from script_old.SBMs_smoothing import SBMsDatasetDGL
 
 from data.data import LoadData
 from torch.utils.data import DataLoader
-from data.SBMs_smoothing import SBMsDataset
+from script_old.SBMs_smoothing import SBMsDataset
 
 # %%
 
