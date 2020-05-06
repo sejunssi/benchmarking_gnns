@@ -8,7 +8,8 @@ tmux send-keys "source activate benchmark_gnn" C-m
 
 seed_list=(41 95 12 35)
 
-for seed in ${seed_list[@}
+# shellcheck disable=SC2068
+for seed in ${seed_list[@]}
 do
     tmux send-keys "
     python $code --dataset SBM_CLUSTER_w05   --gpu_id 0 --train_soft_target True --seed $seed --config 'configs/SBMs_node_clustering_GIN_CLUSTER_w05.json' &
@@ -54,7 +55,8 @@ done
 
 
 #P
-for seed in ${seed_list[@}
+# shellcheck disable=SC2068
+for seed in ${seed_list[@]}
 do
 
     tmux send-keys "
