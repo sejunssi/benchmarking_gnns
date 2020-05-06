@@ -88,7 +88,8 @@ class SmoothGINNet(nn.Module):
         g = kwargs['g']
         h = kwargs['h']
         e = kwargs['e']
-        delta = kwargs['delta']
+        lb_delta = kwargs['lb_delta']
+        ub_delta = kwargs['ub_delta']
         snorm_n = kwargs['snorm_n']
         snorm_e = kwargs['snorm_e']
         label = kwargs['label']
@@ -115,7 +116,7 @@ class SmoothGINNet(nn.Module):
         w = w.data
         saved_w = w
         w = w.repeat(1, self.n_classes)
-        w = torch.clamp(w, min=0, max=delta).to(device=self.device)
+        w = torch.clamp(w, min=lb_delta, max=ub_delta).to(device=self.device)
         ones = torch.ones(label.shape[0], label.shape[1]).to(torch.float).to(device=self.device)
         max_entropy = torch.Tensor([1 / label.shape[1]]).repeat(label.shape[0], label.shape[1]).to(torch.float).to(device=self.device)
         g_hat = (ones - w) * label.to(torch.float) + w * max_entropy
