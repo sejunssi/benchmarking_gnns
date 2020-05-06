@@ -34,7 +34,7 @@ class SmoothGINNet(nn.Module):
         self.n_classes = n_classes
         self.device = net_params['device']
         self.how_residual = net_params['how_residual']
-        if net_params['middle_dim'] is not None:
+        if net_params['middle_dim'] != 'None':
             self.middle_dim = net_params['middle_dim']
             middle_dim = self.middle_dim
             self.new_fc_layer = nn.Linear(hidden_dim + n_classes, middle_dim)
