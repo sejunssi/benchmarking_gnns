@@ -41,7 +41,7 @@ class SmoothGINNet(nn.Module):
             self.new_fc_layer = nn.Linear(hidden_dim + n_classes, middle_dim)
             self.new_fc_layer2 = nn.Linear(middle_dim, hidden_dim + n_classes)
             if self.how_residual == 'rk2':
-               self.w_layer = RK2netMLPReadout(middle_dim, 1)
+               self.w_layer = RK2netMLPReadout(hidden_dim + n_classes, 1)
         else:
             if self.how_residual == 'rk2':
                 self.w_layer = RK2netMLPReadout(hidden_dim+n_classes, 1)
