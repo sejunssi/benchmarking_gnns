@@ -13,7 +13,8 @@ from dgl.nn.pytorch.glob import SumPooling, AvgPooling, MaxPooling
 """
 
 from layers.gin_layer import GINLayer, ApplyNodeFunc, MLP
-from layers.mlp_readout_layer import MLPReadout, ResnetMLPReadout, RK2netMLPReadout, RK3netMLPReadout, RK2M1netMLPReadout, RKinetMLPReadout
+from layers.mlp_readout_layer import MLPReadout, ResnetMLPReadout, RK2netMLPReadout, RK3netMLPReadout, \
+    RK2M1netMLPReadout, RKinetMLPReadout, BaseLineMLPReadout
 
 class SmoothGINNet(nn.Module):
     
@@ -38,44 +39,7 @@ class SmoothGINNet(nn.Module):
         self.how_residual = net_params['how_residual']
         self.middle_dim = net_params['middle_dim']
         self.rki = net_params['rki']
-        if self.middle_dim != 'None':
-            self.middle_dim = net_params['middle_dim']
-            middle_dim = self.middle_dim
-            self.new_fc_layer = nn.Linear(hidden_dim + n_classes, middle_dim)
-            if bottleneck == True:
-                self.bottleneck_layer = nn.Linear(middle_dim, hidden_dim + n_classes)
-                if self.how_residual == 'rki':
-                    self.w_layer = RKinetMLPReadout(hidden_dim + n_classes, 1, self.rki)
-                elif self.how_residual == 'rk2_m1':
-                    self.w_layer = RK2M1netMLPReadout(hidden_dim + n_classes, 1)
-                elif self.how_residual == 'rk2':
-                   self.w_layer = RK2netMLPReadout(hidden_dim + n_classes, 1)
-                elif self.how_residual == 'resnet':
-                   self.w_layer = ResnetMLPReadout(hidden_dim + n_classes, 1)
-                elif self.how_residual == 'rk3':
-                   self.w_layer = RK3netMLPReadout(hidden_dim + n_classes, 1)
-            else:
-                if self.how_residual == 'rki':
-                    self.w_layer = RKinetMLPReadout(hidden_dim + n_classes, 1, self.rki)
-                elif self.how_residual == 'rk2_m1':
-                    self.w_layer = RK2M1netMLPReadout(middle_dim, 1)
-                elif self.how_residual == 'rk2':
-                   self.w_layer = RK2netMLPReadout(middle_dim, 1)
-                elif self.how_residual == 'resnet':
-                   self.w_layer = ResnetMLPReadout(middle_dim + n_classes, 1)
-                elif self.how_residual == 'rk3':
-                   self.w_layer = RK3netMLPReadout(middle_dim + n_classes, 1)
-        else:
-            if self.how_residual == 'rki':
-                self.w_layer = RKinetMLPReadout(hidden_dim + n_classes, 1, self.rki)
-            elif self.how_residual == 'rk2_m1':
-                self.w_layer = RK2M1netMLPReadout(hidden_dim + n_classes, 1)
-            elif self.how_residual == 'rk2':
-                self.w_layer = RK2netMLPReadout(hidden_dim+n_classes, 1)
-            elif self.how_residual == 'resnet':
-                self.w_layer = ResnetMLPReadout(hidden_dim+n_classes, 1)
-            elif self.how_residual == 'rk3':
-                self.w_layer = RK3netMLPReadout(hidden_dim+n_classes, 1)
+
         
         # List of MLPs
         self.ginlayers = torch.nn.ModuleList()
@@ -88,16 +52,61 @@ class SmoothGINNet(nn.Module):
             self.ginlayers.append(GINLayer(ApplyNodeFunc(mlp), neighbor_aggr_type,
                                            dropout, graph_norm, batch_norm, residual, 0, learn_eps))
 
+        self.rk_middle_layer(bottleneck, hidden_dim, n_classes, net_params)
         # Linear function for output of each layer
         # which maps the output of different layers into a prediction score
         self.linears_prediction1 = torch.nn.ModuleList()
-        self.linears_prediction2 = torch.nn.ModuleList()
 
         for layer in range(self.n_layers+1):
             self.linears_prediction1.append(nn.Linear(hidden_dim, n_classes))
-            self.linears_prediction2.append(nn.Linear(hidden_dim, 1))
 
         self.sigmoid = nn.Sigmoid()
+
+    def rk_middle_layer(self, bottleneck, hidden_dim, n_classes, net_params):
+        if self.middle_dim != 'None':
+            self.middle_dim = net_params['middle_dim']
+            middle_dim = self.middle_dim
+            self.dense_layer = nn.Linear(hidden_dim + n_classes, middle_dim)
+            if bottleneck == True:
+                self.widen_layer = nn.Linear(middle_dim, hidden_dim + n_classes)
+                if self.how_residual == 'rki':
+                    self.w_layer = RKinetMLPReadout(hidden_dim + n_classes, 1, self.rki)
+                elif self.how_residual == 'rk2_m1':
+                    self.w_layer = RK2M1netMLPReadout(hidden_dim + n_classes, 1)
+                elif self.how_residual == 'rk2':
+                    self.w_layer = RK2netMLPReadout(hidden_dim + n_classes, 1)
+                elif self.how_residual == 'resnet':
+                    self.w_layer = ResnetMLPReadout(hidden_dim + n_classes, 1)
+                elif self.how_residual == 'rk3':
+                    self.w_layer = RK3netMLPReadout(hidden_dim + n_classes, 1)
+                else:
+                    self.w_layer = BaseLineMLPReadout(hidden_dim + n_classes, 1)
+            else:
+                if self.how_residual == 'rki':
+                    self.w_layer = RKinetMLPReadout(hidden_dim + n_classes, 1, self.rki)
+                elif self.how_residual == 'rk2_m1':
+                    self.w_layer = RK2M1netMLPReadout(middle_dim + n_classes, 1)
+                elif self.how_residual == 'rk2':
+                    self.w_layer = RK2netMLPReadout(middle_dim + n_classes, 1)
+                elif self.how_residual == 'resnet':
+                    self.w_layer = ResnetMLPReadout(middle_dim + n_classes, 1)
+                elif self.how_residual == 'rk3':
+                    self.w_layer = RK3netMLPReadout(middle_dim + n_classes, 1)
+                else:
+                    self.w_layer = BaseLineMLPReadout(hidden_dim + n_classes, 1)
+        else:
+            if self.how_residual == 'rki':
+                self.w_layer = RKinetMLPReadout(hidden_dim + n_classes, 1, self.rki)
+            elif self.how_residual == 'rk2_m1':
+                self.w_layer = RK2M1netMLPReadout(hidden_dim + n_classes, 1)
+            elif self.how_residual == 'rk2':
+                self.w_layer = RK2netMLPReadout(hidden_dim + n_classes, 1)
+            elif self.how_residual == 'resnet':
+                self.w_layer = ResnetMLPReadout(hidden_dim + n_classes, 1)
+            elif self.how_residual == 'rk3':
+                self.w_layer = RK3netMLPReadout(hidden_dim + n_classes, 1)
+            else:
+                self.w_layer = BaseLineMLPReadout(hidden_dim + n_classes, 1)
 
     def conv1x1(self, in_planes, out_planes, stride=1):
         """1x1 convolution"""
@@ -127,9 +136,9 @@ class SmoothGINNet(nn.Module):
         for i, h in enumerate(hidden_rep):
             score_over_layer_p += self.linears_prediction1[i](h)
             if self.middle_dim != 'None':
-                h = self.new_fc_layer(torch.cat((h, label.to(torch.float)), dim=1))
+                h = self.dense_layer(torch.cat((h, label.to(torch.float)), dim=1))
                 if self.bottleneck == True:
-                    h = self.bottleneck_layer(h)
+                    h = self.widen_layer(h)
             else:
                 h = torch.cat((h, label.to(torch.float)), dim=1)
             score_over_layer_w += self.w_layer(h)
