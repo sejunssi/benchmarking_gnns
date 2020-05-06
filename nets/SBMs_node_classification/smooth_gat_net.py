@@ -13,6 +13,7 @@ import dgl
 """
 from layers.gat_layer import GATLayer
 from layers.mlp_readout_layer import MLPReadout, ResnetMLPReadout, RK2netMLPReadout, RK3netMLPReadout
+from layers.mlp_readout_layer import MLPReadout, ResnetMLPReadout, RK2netMLPReadout, RK3netMLPReadout, RK2M1netMLPReadout, RKinetMLPReadout
 
 
 class SmoothGATNet(nn.Module):
@@ -36,13 +37,50 @@ class SmoothGATNet(nn.Module):
         self.dropout = dropout
         self.n_classes = n_classes
         self.device = net_params['device']
+
+        bottleneck = net_params['bottleneck']
+        self.bottleneck = bottleneck
         self.how_residual = net_params['how_residual']
-        if self.how_residual == 'resnet':
-            self.w_layer = ResnetMLPReadout(out_dim+n_classes, 1)
-        elif self.how_residual == 'rk2':
-            self.w_layer = RK2netMLPReadout(out_dim+n_classes, 1)
-        elif self.how_residual == 'rk3':
-            self.w_layer = RK3netMLPReadout(out_dim+n_classes, 1)
+        self.middle_dim = net_params['middle_dim']
+        self.rki = net_params['rki']
+        if self.middle_dim != 'None':
+            self.middle_dim = net_params['middle_dim']
+            middle_dim = self.middle_dim
+            self.new_fc_layer = nn.Linear(hidden_dim + n_classes, middle_dim)
+            if bottleneck == True:
+                self.bottleneck_layer = nn.Linear(middle_dim, hidden_dim + n_classes)
+                if self.how_residual == 'rki':
+                    self.w_layer = RKinetMLPReadout(hidden_dim + n_classes, 1, self.rki)
+                elif self.how_residual == 'rk2_m1':
+                    self.w_layer = RK2M1netMLPReadout(hidden_dim + n_classes, 1)
+                elif self.how_residual == 'rk2':
+                    self.w_layer = RK2netMLPReadout(hidden_dim + n_classes, 1)
+                elif self.how_residual == 'resnet':
+                    self.w_layer = ResnetMLPReadout(hidden_dim + n_classes, 1)
+                elif self.how_residual == 'rk3':
+                    self.w_layer = RK3netMLPReadout(hidden_dim + n_classes, 1)
+            else:
+                if self.how_residual == 'rki':
+                    self.w_layer = RKinetMLPReadout(hidden_dim + n_classes, 1, self.rki)
+                elif self.how_residual == 'rk2_m1':
+                    self.w_layer = RK2M1netMLPReadout(middle_dim, 1)
+                elif self.how_residual == 'rk2':
+                    self.w_layer = RK2netMLPReadout(middle_dim, 1)
+                elif self.how_residual == 'resnet':
+                    self.w_layer = ResnetMLPReadout(middle_dim + n_classes, 1)
+                elif self.how_residual == 'rk3':
+                    self.w_layer = RK3netMLPReadout(middle_dim + n_classes, 1)
+        else:
+            if self.how_residual == 'rki':
+                self.w_layer = RKinetMLPReadout(hidden_dim + n_classes, 1, self.rki)
+            elif self.how_residual == 'rk2_m1':
+                self.w_layer = RK2M1netMLPReadout(hidden_dim + n_classes, 1)
+            elif self.how_residual == 'rk2':
+                self.w_layer = RK2netMLPReadout(hidden_dim + n_classes, 1)
+            elif self.how_residual == 'resnet':
+                self.w_layer = ResnetMLPReadout(hidden_dim + n_classes, 1)
+            elif self.how_residual == 'rk3':
+                self.w_layer = RK3netMLPReadout(hidden_dim + n_classes, 1)
         
         self.embedding_h = nn.Embedding(in_dim_node, hidden_dim * num_heads) # node feat is an integer
         
