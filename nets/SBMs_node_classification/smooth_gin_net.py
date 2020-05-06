@@ -34,14 +34,19 @@ class SmoothGINNet(nn.Module):
         self.n_classes = n_classes
         self.device = net_params['device']
         self.how_residual = net_params['how_residual']
-        # self.middle_dim = net_params['middle_dim']
-        middle_dim = 64
-        self.new_fc_layer = nn.Linear(hidden_dim+n_classes, middle_dim)
+        if net_params['middle_dim'] is not None:
+            self.middle_dim = net_params['middle_dim']
+            middle_dim = self.middle_dim
+            self.new_fc_layer = nn.Linear(hidden_dim + n_classes, middle_dim)
+            if self.how_residual == 'rk2':
+               self.w_layer = RK2netMLPReadout(middle_dim, 1)
+        else:
+            if self.how_residual == 'rk2':
+                self.w_layer = RK2netMLPReadout(hidden_dim+n_classes, 1)
+
         self.middle_dim = middle_dim
         if self.how_residual == 'resnet':
             self.w_layer = ResnetMLPReadout(hidden_dim+n_classes, 1)
-        elif self.how_residual == 'rk2':
-            self.w_layer = RK2netMLPReadout(middle_dim, 1)
         elif self.how_residual == 'rk3':
             self.w_layer = RK3netMLPReadout(hidden_dim+n_classes, 1)
         

@@ -363,7 +363,8 @@ def main():
     parser.add_argument('--max_time', help="Please give a value for max_time")
     parser.add_argument('--train_soft_target', help="Please give a value for train_soft_target")
     parser.add_argument('--delta', help="Please give a value for delta")
-    parser.add_argument('--how_residual', help="Please give a value for delta")
+    parser.add_argument('--how_residual', help="Please give a value for how_residual")
+    parser.add_argument('--middle_dim', help="Please give a value for middle_dim")
     args = parser.parse_args()
 #    pdb.set_trace()
     with open(args.config) as f:
@@ -481,6 +482,10 @@ def main():
     else:
         net_params['how_residual'] = 'resnet'
 
+    if args.middle_dim is not None:
+        net_params['middle_dim'] = int(args.middle_dim)
+    else:
+        net_params['middle_dim'] = None
         
     # SBM
     net_params['in_dim'] = torch.unique(dataset.train[0][0].ndata['feat'],dim=0).size(0) # node_dim (feat is an integer)
