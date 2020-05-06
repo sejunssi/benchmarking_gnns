@@ -11,6 +11,43 @@ seed_list=(41 95 12 35)
 for seed in ${seed_list[@}
 do
     tmux send-keys "
+    python $code --dataset SBM_CLUSTER --how_residual=resnet  --gpu_id 0 --seed $seed --config 'configs/SBMs_node_clustering_GIN_CLUSTER_SMOOTH.json' &
+    python $code --dataset SBM_CLUSTER --how_residual=resnet  --gpu_id 1 --seed $seed --config 'configs/SBMs_node_clustering_GAT_CLUSTER_SMOOTH.json' &
+    python $code --dataset SBM_CLUSTER  --how_residual=resnet  --gpu_id 2 --seed $seed --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_SMOOTH.json' &
+    wait" C-m
+
+    tmux send-keys "
+    python $code --dataset SBM_CLUSTER --how_residual=rk2  --gpu_id 0 --seed $seed --config 'configs/SBMs_node_clustering_GIN_CLUSTER_SMOOTH.json' &
+    python $code --dataset SBM_CLUSTER --how_residual=rk2  --gpu_id 1 --seed $seed --config 'configs/SBMs_node_clustering_GAT_CLUSTER_SMOOTH.json' &
+    python $code --dataset SBM_CLUSTER --how_residual=rk2  --gpu_id 2 --seed $seed --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_SMOOTH.json' &
+    wait" C-m
+
+    tmux send-keys "
+    python $code --dataset SBM_CLUSTER --how_residual=rk3  --gpu_id 0 --seed $seed --config 'configs/SBMs_node_clustering_GIN_CLUSTER_SMOOTH.json' &
+    python $code --dataset SBM_CLUSTER --how_residual=rk3  --gpu_id 1 --seed $seed --config 'configs/SBMs_node_clustering_GAT_CLUSTER_SMOOTH.json' &
+    python $code --dataset SBM_CLUSTER --how_residual=rk3  --gpu_id 2 --seed $seed --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_SMOOTH.json' &
+    wait" C-m
+
+    tmux send-keys "
+    python $code --dataset SBM_CLUSTER --residual=False --how_residual=resnet  --gpu_id 0 --seed $seed --config 'configs/SBMs_node_clustering_GIN_CLUSTER_SMOOTH.json' &
+    python $code --dataset SBM_CLUSTER --residual=False --how_residual=resnet  --gpu_id 1 --seed $seed --config 'configs/SBMs_node_clustering_GAT_CLUSTER_SMOOTH.json' &
+    python $code --dataset SBM_CLUSTER --residual=False --how_residual=resnet  --gpu_id 2 --seed $seed --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_SMOOTH.json' &
+    wait" C-m
+
+    tmux send-keys "
+    python $code --dataset SBM_CLUSTER --residual=False --how_residual=rk2  --gpu_id 0 --seed $seed --config 'configs/SBMs_node_clustering_GIN_CLUSTER_SMOOTH.json' &
+    python $code --dataset SBM_CLUSTER --residual=False --how_residual=rk2  --gpu_id 1 --seed $seed --config 'configs/SBMs_node_clustering_GAT_CLUSTER_SMOOTH.json' &
+    python $code --dataset SBM_CLUSTER --residual=False --how_residual=rk2  --gpu_id 2 --seed $seed --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_SMOOTH.json' &
+    wait" C-m
+
+    tmux send-keys "
+    python $code --dataset SBM_CLUSTER --residual=False --how_residual=rk3  --gpu_id 0 --seed $seed --config 'configs/SBMs_node_clustering_GIN_CLUSTER_SMOOTH.json' &
+    python $code --dataset SBM_CLUSTER --residual=False --how_residual=rk3  --gpu_id 1 --seed $seed --config 'configs/SBMs_node_clustering_GAT_CLUSTER_SMOOTH.json' &
+    python $code --dataset SBM_CLUSTER --residual=False --how_residual=rk3  --gpu_id 2 --seed $seed --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_SMOOTH.json' &
+    wait" C-m
+
+
+    tmux send-keys "
     python $code --dataset SBM_CLUSTER_w05   --gpu_id 0 --train_soft_target True --seed $seed --config 'configs/SBMs_node_clustering_GIN_CLUSTER_w05.json' &
     python $code --dataset SBM_CLUSTER_w05   --gpu_id 1 --train_soft_target True --seed $seed --config 'configs/SBMs_node_clustering_GAT_CLUSTER_w05.json' &
     python $code --dataset SBM_CLUSTER_w05   --gpu_id 2 --train_soft_target True --seed $seed --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_w05.json' &
@@ -56,6 +93,42 @@ done
 #P
 for seed in ${seed_list[@}
 do
+    tmux send-keys "
+    python $code --dataset SBM_PATTERN --how_residual=resnet  --gpu_id 0 --seed $seed --config 'configs/SBMs_node_clustering_GIN_PATTERN_SMOOTH.json' &
+    python $code --dataset SBM_PATTERN --how_residual=resnet  --gpu_id 1 --seed $seed --config 'configs/SBMs_node_clustering_GAT_PATTERN_SMOOTH.json' &
+    python $code --dataset SBM_PATTERN  --how_residual=resnet  --gpu_id 2 --seed $seed --config 'configs/SBMs_node_clustering_GatedGCN_PATTERN_SMOOTH.json' &
+    wait" C-m
+
+    tmux send-keys "
+    python $code --dataset SBM_PATTERN --how_residual=rk2  --gpu_id 0 --seed $seed --config 'configs/SBMs_node_clustering_GIN_PATTERN_SMOOTH.json' &
+    python $code --dataset SBM_PATTERN --how_residual=rk2  --gpu_id 1 --seed $seed --config 'configs/SBMs_node_clustering_GAT_PATTERN_SMOOTH.json' &
+    python $code --dataset SBM_PATTERN --how_residual=rk2  --gpu_id 2 --seed $seed --config 'configs/SBMs_node_clustering_GatedGCN_PATTERN_SMOOTH.json' &
+    wait" C-m
+
+    tmux send-keys "
+    python $code --dataset SBM_PATTERN --how_residual=rk3  --gpu_id 0 --seed $seed --config 'configs/SBMs_node_clustering_GIN_PATTERN_SMOOTH.json' &
+    python $code --dataset SBM_PATTERN --how_residual=rk3  --gpu_id 1 --seed $seed --config 'configs/SBMs_node_clustering_GAT_PATTERN_SMOOTH.json' &
+    python $code --dataset SBM_PATTERN --how_residual=rk3  --gpu_id 2 --seed $seed --config 'configs/SBMs_node_clustering_GatedGCN_PATTERN_SMOOTH.json' &
+    wait" C-m
+
+    tmux send-keys "
+    python $code --dataset SBM_PATTERN --residual=False --how_residual=resnet  --gpu_id 0 --seed $seed --config 'configs/SBMs_node_clustering_GIN_PATTERN_SMOOTH.json' &
+    python $code --dataset SBM_PATTERN --residual=False --how_residual=resnet  --gpu_id 1 --seed $seed --config 'configs/SBMs_node_clustering_GAT_PATTERN_SMOOTH.json' &
+    python $code --dataset SBM_PATTERN --residual=False --how_residual=resnet  --gpu_id 2 --seed $seed --config 'configs/SBMs_node_clustering_GatedGCN_PATTERN_SMOOTH.json' &
+    wait" C-m
+
+    tmux send-keys "
+    python $code --dataset SBM_PATTERN --residual=False --how_residual=rk2  --gpu_id 0 --seed $seed --config 'configs/SBMs_node_clustering_GIN_PATTERN_SMOOTH.json' &
+    python $code --dataset SBM_PATTERN --residual=False --how_residual=rk2  --gpu_id 1 --seed $seed --config 'configs/SBMs_node_clustering_GAT_PATTERN_SMOOTH.json' &
+    python $code --dataset SBM_PATTERN --residual=False --how_residual=rk2  --gpu_id 2 --seed $seed --config 'configs/SBMs_node_clustering_GatedGCN_PATTERN_SMOOTH.json' &
+    wait" C-m
+
+    tmux send-keys "
+    python $code --dataset SBM_PATTERN --residual=False --how_residual=rk3  --gpu_id 0 --seed $seed --config 'configs/SBMs_node_clustering_GIN_PATTERN_SMOOTH.json' &
+    python $code --dataset SBM_PATTERN --residual=False --how_residual=rk3  --gpu_id 1 --seed $seed --config 'configs/SBMs_node_clustering_GAT_PATTERN_SMOOTH.json' &
+    python $code --dataset SBM_PATTERN --residual=False --how_residual=rk3  --gpu_id 2 --seed $seed --config 'configs/SBMs_node_clustering_GatedGCN_PATTERN_SMOOTH.json' &
+    wait" C-m
+
 
     tmux send-keys "
     python $code --dataset SBM_PATTERN_w05   --gpu_id 0 --train_soft_target True --seed $seed --config 'configs/SBMs_node_clustering_GIN_PATTERN_w05.json' &
