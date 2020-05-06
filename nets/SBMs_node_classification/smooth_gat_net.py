@@ -127,7 +127,7 @@ class SmoothGATNet(nn.Module):
         if self.middle_dim != 'None':
             h = self.dense_layer(h)
             if self.bottleneck:
-                h = self.wi(h)
+                h = self.widen_layer(h)
 
         w = self.w_layer(h).to(torch.float)
         w = self.sigmoid(w)
