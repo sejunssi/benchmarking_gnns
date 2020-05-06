@@ -67,6 +67,31 @@ class RK2netMLPReadout(nn.Module):
         y = self.FC_layers[self.L](y)
         return y
 
+class RK2M1netMLPReadout(nn.Module):
+
+    def __init__(self, input_dim, output_dim, L=2):  # L=nb_hidden_layers
+        super().__init__()
+        list_FC_layers = [nn.Linear(input_dim , input_dim, bias=True) for _ in range(L)]
+        list_FC_layers.append(nn.Linear(input_dim, output_dim, bias=True))
+        self.FC_layers = nn.ModuleList(list_FC_layers)
+
+        list_FC_layers2 = [nn.Linear(input_dim, input_dim, bias=True) for _ in range(L)]
+        self.FC_layers2 = nn.ModuleList(list_FC_layers2)
+
+        self.L = L
+
+    def forward(self, x):
+        y = x
+        identity = y
+        for l in range(self.L-1):
+            y1 = self.FC_layers[l](y)
+            y1 = y1 + identity
+            y2 = self.FC_layers2[l](y1)
+            y = F.relu(y1 + y2)
+            identity = y
+        y = self.FC_layers[self.L](y)
+        return y
+
 class RK3netMLPReadout(nn.Module):
 
     def __init__(self, input_dim, output_dim, L=2):  # L=nb_hidden_layers
