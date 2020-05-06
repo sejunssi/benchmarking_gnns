@@ -11,7 +11,7 @@ import dgl
     https://arxiv.org/abs/1710.10903
 """
 from layers.gat_layer import GATLayer
-from layers.mlp_readout_layer import MLPReadout, ResnetMLPReadout
+from layers.mlp_readout_layer import MLPReadout, ResnetMLPReadout, RK2netMLPReadout, RK3netMLPReadout
 
 
 class SmoothGATNet(nn.Module):
@@ -35,6 +35,13 @@ class SmoothGATNet(nn.Module):
         self.dropout = dropout
         self.n_classes = n_classes
         self.device = net_params['device']
+        self.how_residual = net_params['how_residual']
+        if self.how_residual == 'resnet':
+            self.w_layer = ResnetMLPReadout(out_dim+n_classes, 1)
+        elif self.how_residual == 'rk2':
+            self.w_layer = RK2netMLPReadout(out_dim+n_classes, 1)
+        elif self.how_residual == 'rk3':
+            self.w_layer = RK3netMLPReadout(out_dim+n_classes, 1)
         
         self.embedding_h = nn.Embedding(in_dim_node, hidden_dim * num_heads) # node feat is an integer
         
@@ -44,9 +51,6 @@ class SmoothGATNet(nn.Module):
                                               dropout, self.graph_norm, self.batch_norm, self.residual) for _ in range(n_layers-1)])
         self.layers.append(GATLayer(hidden_dim * num_heads, out_dim, 1, dropout, self.graph_norm, self.batch_norm, self.residual))
         self.MLP_layer = MLPReadout(out_dim, n_classes)
-        self.MLP_layer2 = ResnetMLPReadout(out_dim + n_classes, 1)
-        self.sigmoid = nn.Sigmoid()
-        self.MLP_layer2 = ResnetMLPReadout(out_dim + n_classes, 1)
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, *args, **kwargs):
@@ -70,19 +74,19 @@ class SmoothGATNet(nn.Module):
         # output
         p = self.MLP_layer(h)
         h = torch.cat((h, label.to(torch.float)), dim=1)
-        w = self.MLP_layer2(h)
+        w = self.w_layer(h).to(torch.float)
         w = self.sigmoid(w)
         w = w.data
         w = w.repeat(1, self.n_classes)
-        w = torch.clamp(w, min=0, max=delta)
-        ones = torch.ones(label.shape[0], label.shape[1]).to(device=self.device)
-        max_entropy = torch.Tensor([1 / label.shape[1]]).repeat(label.shape[0], label.shape[1]).to(device=self.device)
-        g_hat = (ones - w) * label + w * max_entropy
+        w = torch.clamp(w, min=0, max=delta).to(device=self.device)
+        ones = torch.ones(label.shape[0], label.shape[1]).to(torch.float).to(device=self.device)
+        max_entropy = torch.Tensor([1 / label.shape[1]]).repeat(label.shape[0], label.shape[1]).to(torch.float).to(device=self.device)
+        g_hat = (ones - w) * label.to(torch.float) + w * max_entropy
         return p, g_hat
     
     
-    def loss(self, pred, label, onehot=False):
-        if onehot == True:
+    def loss(self, pred, label, train_soft_target=False):
+        if train_soft_target == True:
             criterion = LabelSmoothingLoss()
             loss = criterion(pred, label)
             return loss

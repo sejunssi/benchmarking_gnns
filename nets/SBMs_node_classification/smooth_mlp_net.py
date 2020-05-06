@@ -5,7 +5,7 @@ from utils.loss import LabelSmoothingLoss
 import dgl
 
 from layers.mlp_readout_layer import MLPReadout, ResnetMLPReadout
-
+from layers.mlp_readout_layer import MLPReadout, ResnetMLPReadout, RK2netMLPReadout, RK3netMLPReadout
 
 class SmoothMLPNet(nn.Module):
 
@@ -21,6 +21,13 @@ class SmoothMLPNet(nn.Module):
         self.gated = net_params['gated']
         self.n_classes = n_classes
         self.device = net_params['device']
+        self.how_residual = net_params['how_residual']
+        if self.how_residual == 'resnet':
+            self.w_layer = ResnetMLPReadout(hidden_dim + n_classes, 1)
+        elif self.how_residual == 'rk2':
+            self.w_layer = RK2netMLPReadout(hidden_dim + n_classes, 1)
+        elif self.how_residual == 'rk3':
+            self.w_layer = RK3netMLPReadout(hidden_dim + n_classes, 1)
         
         self.embedding_h = nn.Embedding(in_dim_node, hidden_dim) # node feat is an integer
         self.in_feat_dropout = nn.Dropout(in_feat_dropout)
@@ -62,22 +69,22 @@ class SmoothMLPNet(nn.Module):
             h = torch.sigmoid(self.gates(h)) * h
 
         # output
-        p = self.MLP_layer(h)
+        p = self.readout_mlp(h)
 
         h = torch.cat((h, label.to(torch.float)), dim=1)
-        w = self.MLP_layer2(h)
-        w = self.sigmoid(w)
+        w = self.w_layer(h)
+        w = self.sigmoid(w).to(torch.float)
         w = w.data
         w = w.repeat(1, self.n_classes)
-        w = torch.clamp(w, min=0, max=delta)
-        ones = torch.ones(label.shape[0], label.shape[1]).to(device=self.device)
-        max_entropy = torch.Tensor([1 / label.shape[1]]).repeat(label.shape[0], label.shape[1]).to(device=self.device)
-        g_hat = (ones - w) * label + w * max_entropy
+        w = torch.clamp(w, min=0, max=delta).to(device=self.device)
+        ones = torch.ones(label.shape[0], label.shape[1]).to(torch.float).to(device=self.device)
+        max_entropy = torch.Tensor([1 / label.shape[1]]).repeat(label.shape[0], label.shape[1]).to(torch.float).to(device=self.device)
+        g_hat = (ones - w) * label.to(torch.float)+ w * max_entropy
         return p, g_hat
 
         
-    def loss(self, pred, label, onehot=False):
-        if onehot == True:
+    def loss(self, pred, label, train_soft_target=False):
+        if train_soft_target == True:
             criterion = LabelSmoothingLoss()
             loss = criterion(pred, label)
             return loss

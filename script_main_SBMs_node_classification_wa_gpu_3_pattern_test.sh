@@ -12,39 +12,8 @@ tmux new -s benchmark_SBMs_node_classification -d
 tmux send-keys "source activate benchmark_gnn" C-m
 
 a_list=(8 7 9)
-w_list=(05 1 15)
 # residual a
 
-
-# shellcheck disable=SC2068
-for a in ${a_list[@]}
-do
-  dataset=SBM_CLUSTER_a${a}
-
-  tmux send-keys "
-  python $code --dataset $dataset   --gpu_id 3 --train_soft_target True --seed $seed3 --config 'configs/SBMs_node_clustering_GCN_CLUSTER_a${a}.json' &
-  wait" C-m
-
-  tmux send-keys "
-  python $code --dataset $dataset   --gpu_id 3 --train_soft_target True --seed $seed3 --config 'configs/SBMs_node_clustering_GraphSage_CLUSTER_a${a}.json' &
-  wait" C-m
-
-  tmux send-keys "
-  python $code --dataset $dataset   --gpu_id 3 --train_soft_target True --seed $seed3 --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_a${a}.json' &
-  wait" C-m
-
-  tmux send-keys "
-  python $code --dataset $dataset  --gpu_id 3 --train_soft_target True --seed $seed3 --config 'configs/SBMs_node_clustering_GAT_CLUSTER_a${a}.json' &
-  wait" C-m
-
-  tmux send-keys "
-  python $code --dataset $dataset  --gpu_id 3 --train_soft_target True --seed $seed3 --config 'configs/SBMs_node_clustering_MoNet_CLUSTER_a${a}.json' &
-  wait" C-m
-
-  tmux send-keys "
-  python $code --dataset $dataset  --gpu_id 3 --train_soft_target True --seed $seed3 --config 'configs/SBMs_node_clustering_GIN_CLUSTER_a${a}.json' &
-  wait" C-m
-done
 
 # shellcheck disable=SC2068
 for a in ${a_list[@]}
@@ -76,45 +45,6 @@ do
   wait" C-m
 
 done
-
-# Non residual
-# shellcheck disable=SC2068
-for a in ${a_list[@]}
-do
-  dataset=SBM_CLUSTER_a${a}
-
-  tmux send-keys "
-  python $code --dataset $dataset --residual=False --gpu_id 3 --train_soft_target True --seed $seed3 --config 'configs/SBMs_node_clustering_MLP_CLUSTER_a${a}.json' &
-  wait" C-m
-  tmux send-keys "
-  python $code --dataset $dataset --residual=False --gpu_id 3 --train_soft_target True --seed $seed3 --config 'configs/SBMs_node_clustering_MLP_GATED_CLUSTER_a${a}.json' &
-  wait" C-m
-
-  tmux send-keys "
-  python $code --dataset $dataset --residual=False   --gpu_id 3 --train_soft_target True --seed $seed3 --config 'configs/SBMs_node_clustering_GCN_CLUSTER_a${a}.json' &
-  wait" C-m
-
-  tmux send-keys "
-  python $code --dataset $dataset --residual=False   --gpu_id 3 --train_soft_target True --seed $seed3 --config 'configs/SBMs_node_clustering_GraphSage_CLUSTER_a${a}.json' &
-  wait" C-m
-
-  tmux send-keys "
-  python $code --dataset $dataset --residual=False   --gpu_id 3 --train_soft_target True --seed $seed3 --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_a${a}.json' &
-  wait" C-m
-
-  tmux send-keys "
-  python $code --dataset $dataset --residual=False  --gpu_id 3 --train_soft_target True --seed $seed3 --config 'configs/SBMs_node_clustering_GAT_CLUSTER_a${a}.json' &
-  wait" C-m
-
-  tmux send-keys "
-  python $code --dataset $dataset --residual=False  --gpu_id 3 --train_soft_target True --seed $seed3 --config 'configs/SBMs_node_clustering_MoNet_CLUSTER_a${a}.json' &
-  wait" C-m
-
-  tmux send-keys "
-  python $code --dataset $dataset --residual=False  --gpu_id 3 --train_soft_target True --seed $seed3 --config 'configs/SBMs_node_clustering_GIN_CLUSTER_a${a}.json' &
-  wait" C-m
-done
-
 
 # shellcheck disable=SC2068
 for a in ${a_list[@]}

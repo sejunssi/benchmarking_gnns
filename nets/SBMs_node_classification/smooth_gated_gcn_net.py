@@ -12,7 +12,7 @@ import numpy as np
     https://arxiv.org/pdf/1711.07553v2.pdf
 """
 from layers.gated_gcn_layer import GatedGCNLayer
-from layers.mlp_readout_layer import MLPReadout
+from layers.mlp_readout_layer import MLPReadout, ResnetMLPReadout, RK2netMLPReadout, RK3netMLPReadout
 
 class SmoothGatedGCNNet(nn.Module):
     
@@ -31,12 +31,20 @@ class SmoothGatedGCNNet(nn.Module):
         self.residual = net_params['residual']
         self.n_classes = n_classes
         self.device = net_params['device']
+        self.how_residual = net_params['how_residual']
+        if self.how_residual == 'resnet':
+            self.w_layer = ResnetMLPReadout(hidden_dim+n_classes, 1)
+        elif self.how_residual == 'rk2':
+            self.w_layer = RK2netMLPReadout(hidden_dim+n_classes, 1)
+        elif self.how_residual == 'rk3':
+            self.w_layer = RK3netMLPReadout(hidden_dim+n_classes, 1)
         
         self.embedding_h = nn.Embedding(in_dim_node, hidden_dim) # node feat is an integer
         self.embedding_e = nn.Linear(in_dim_edge, hidden_dim) # edge feat is a float
         self.layers = nn.ModuleList([ GatedGCNLayer(hidden_dim, hidden_dim, dropout,
                                                        self.graph_norm, self.batch_norm, self.residual) for _ in range(n_layers) ])
         self.MLP_layer = MLPReadout(hidden_dim, n_classes)
+        self.sigmoid = nn.Sigmoid()
 
     def forward(self, *args, **kwargs):
         g = kwargs['g']
@@ -49,7 +57,7 @@ class SmoothGatedGCNNet(nn.Module):
 
         # input embedding
         h = self.embedding_h(h)
-        h = self.in_feat_dropout(h)
+        e = self.embedding_e(e)
         
         # res gated convnets
         for conv in self.layers:
@@ -59,19 +67,19 @@ class SmoothGatedGCNNet(nn.Module):
         p = self.MLP_layer(h)
         # output
         h = torch.cat((h, label.to(torch.float)), dim=1)
-        w = self.MLP_layer2(h)
+        w = self.w_layer(h).to(torch.float)
         w = self.sigmoid(w)
         w = w.data
-        w = w.repeat(1, self.n_classes)
-        w = torch.clamp(w, min=0, max=delta)
-        ones = torch.ones(label.shape[0], label.shape[1]).to(device=self.device)
-        max_entropy = torch.Tensor([1 / label.shape[1]]).repeat(label.shape[0], label.shape[1]).to(device=self.device)
-        g_hat = (ones - w) * label + w * max_entropy
+        w = w.repeat(1, self.n_classes).to(device=self.device)
+        w = torch.clamp(w, min=0, max=delta).to(device=self.device)
+        ones = torch.ones(label.shape[0], label.shape[1]).to(torch.float).to(device=self.device)
+        max_entropy = torch.Tensor([1 / label.shape[1]]).repeat(label.shape[0], label.shape[1]).to(torch.float).to(device=self.device)
+        g_hat = (ones - w) * label.to(torch.float) + w * max_entropy
         return p, g_hat
         
 
-    def loss(self, pred, label, onehot=False):
-        if onehot == True:
+    def loss(self, pred, label, train_soft_target=False):
+        if train_soft_target == True:
             criterion = LabelSmoothingLoss()
             loss = criterion(pred, label)
             return loss
@@ -83,10 +91,9 @@ class SmoothGatedGCNNet(nn.Module):
             cluster_sizes = torch.zeros(self.n_classes).long().to(self.device)
             cluster_sizes[torch.unique(label)] = label_count
             weight = (V - cluster_sizes).float() / V
-            weight *= (cluster_sizes>0).float()
+            weight *= (cluster_sizes > 0).float()
 
             # weighted cross-entropy for unbalanced classes
             criterion = nn.CrossEntropyLoss(weight=weight)
             loss = criterion(pred, label)
         return loss
-

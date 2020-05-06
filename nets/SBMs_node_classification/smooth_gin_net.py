@@ -13,6 +13,7 @@ from dgl.nn.pytorch.glob import SumPooling, AvgPooling, MaxPooling
 """
 
 from layers.gin_layer import GINLayer, ApplyNodeFunc, MLP
+from layers.mlp_readout_layer import MLPReadout, ResnetMLPReadout, RK2netMLPReadout, RK3netMLPReadout
 
 class SmoothGINNet(nn.Module):
     
@@ -32,6 +33,13 @@ class SmoothGINNet(nn.Module):
         residual = net_params['residual']
         self.n_classes = n_classes
         self.device = net_params['device']
+        self.how_residual = net_params['how_residual']
+        if self.how_residual == 'resnet':
+            self.w_layer = ResnetMLPReadout(hidden_dim+n_classes, 1)
+        elif self.how_residual == 'rk2':
+            self.w_layer = RK2netMLPReadout(hidden_dim+n_classes, 1)
+        elif self.how_residual == 'rk3':
+            self.w_layer = RK3netMLPReadout(hidden_dim+n_classes, 1)
         
         # List of MLPs
         self.ginlayers = torch.nn.ModuleList()
@@ -49,8 +57,6 @@ class SmoothGINNet(nn.Module):
         self.linears_prediction1 = torch.nn.ModuleList()
         self.linears_prediction2 = torch.nn.ModuleList()
 
-        self.conv = self.conv1x1(hidden_dim + n_classes, hidden_dim)
-        self.norm_layer = nn.BatchNorm2d(hidden_dim)
         for layer in range(self.n_layers+1):
             self.linears_prediction1.append(nn.Linear(hidden_dim, n_classes))
 
@@ -85,24 +91,19 @@ class SmoothGINNet(nn.Module):
 
         for i, h in enumerate(hidden_rep):
             score_over_layer_p += self.linears_prediction1[i](h)
-            x = h
-            x = torch.cat((x, label.to(torch.float)), dim=1)
-            y = self.conv(x.reshape(x.shape[0], x.shape[1], 1, 1))
-            y = self.norm_layer(y).squeeze()
-            y = y + h
-            score_over_layer_w += self.linears_prediction2[i](y)
+            score_over_layer_w += self.w_layer(torch.cat((h, label.to(torch.float)), dim=1))
 
-        w = self.sigmoid(score_over_layer_w)
+        w = self.sigmoid(score_over_layer_w).to(torch.float)
         w = w.data
         w = w.repeat(1, self.n_classes)
-        w = torch.clamp(w, min=0, max=delta)
-        ones = torch.ones(label.shape[0], label.shape[1]).to(device=self.device)
-        max_entropy = torch.Tensor([1 / label.shape[1]]).repeat(label.shape[0], label.shape[1]).to(device=self.device)
-        g_hat = (ones - w) * label + w * max_entropy
+        w = torch.clamp(w, min=0, max=delta).to(device=self.device)
+        ones = torch.ones(label.shape[0], label.shape[1]).to(torch.float).to(device=self.device)
+        max_entropy = torch.Tensor([1 / label.shape[1]]).repeat(label.shape[0], label.shape[1]).to(torch.float).to(device=self.device)
+        g_hat = (ones - w) * label.to(torch.float) + w * max_entropy
         return score_over_layer_p, g_hat
         
-    def loss(self, pred, label, onehot=False):
-        if onehot == True:
+    def loss(self, pred, label, train_soft_target=False):
+        if train_soft_target == True:
             criterion = LabelSmoothingLoss()
             loss = criterion(pred, label)
             return loss

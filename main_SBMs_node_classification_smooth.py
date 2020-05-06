@@ -94,7 +94,7 @@ def view_model_param(MODEL_NAME, net_params):
     TRAINING CODE
 """
 
-def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, onehot=False):
+def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, train_soft_target=False):
     
     start0 = time.time()
     per_epoch_time = []
@@ -108,12 +108,12 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, onehot=Fal
     
     trainset, valset, testset = dataset.train, dataset.val, dataset.test
 
-    if onehot:
+    if train_soft_target:
         valset.node_labels = [x.long() for x in valset.node_labels]
         testset.node_labels = [x.long() for x in testset.node_labels]
-    if not onehot:
+    if not train_soft_target:
         make_onehot_node_label(trainset, net_params['n_classes'])
-        onehot=True
+        train_soft_target=True
     make_onehot_node_label(valset, net_params['n_classes'])
     make_onehot_node_label(testset, net_params['n_classes'])
 
@@ -156,7 +156,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, onehot=Fal
         
     # At any point you can hit Ctrl + C to break out of training early.
     try:
-        with tqdm(range(params['epochs'])) as t:
+        with tqdm(range(net_params['epochs'])) as t:
 
             header = ['epoch', 'epoch_train_losses', 'epoch_train_acc', 'epoch_val_losses', 'epoch_val_acc',
                       'epoch_test_losses', 'epoch_test_acc']
@@ -177,9 +177,9 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, onehot=Fal
                 t.set_description('Epoch %d' % epoch)
 
                 start = time.time()
-                epoch_train_loss, epoch_train_acc, optimizer = smooth_train_epoch(model, optimizer, device, train_loader, epoch, delta, onehot=onehot)
-                epoch_val_loss, epoch_val_acc = smooth_evaluate_network(model, device, val_loader, epoch, delta, onehot=onehot)
-                epoch_test_loss, epoch_test_acc = smooth_evaluate_network(model, device, test_loader, epoch, delta, onehot=onehot)
+                epoch_train_loss, epoch_train_acc, optimizer = smooth_train_epoch(model, optimizer, device, train_loader, epoch, delta, train_soft_target=train_soft_target)
+                epoch_val_loss, epoch_val_acc = smooth_evaluate_network(model, device, val_loader, epoch, delta, train_soft_target=train_soft_target)
+                epoch_test_loss, epoch_test_acc = smooth_evaluate_network(model, device, test_loader, epoch, delta, train_soft_target=train_soft_target)
 
                 epoch_train_loss_list.append(epoch_train_loss)
                 epoch_val_loss_list.append(epoch_val_loss)
@@ -196,7 +196,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, onehot=Fal
                 writer.add_scalar('val/_acc', epoch_val_acc, epoch)
                 writer.add_scalar('learning_rate', optimizer.param_groups[0]['lr'], epoch)
 
-                _, epoch_test_acc = smooth_evaluate_network(model, device, test_loader, epoch, delta, onehot=onehot)
+                _, epoch_test_acc = smooth_evaluate_network(model, device, test_loader, epoch, delta, train_soft_target=train_soft_target)
                 t.set_postfix(time=time.time()-start, lr=optimizer.param_groups[0]['lr'],
                               train_loss=epoch_train_loss, val_loss=epoch_val_loss,
                               train_acc=epoch_train_acc, val_acc=epoch_val_acc,
@@ -246,37 +246,40 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, onehot=Fal
 
             ckpt_dir = os.path.join(root_ckpt_dir, "RUN_")
             torch.save(best_model_dict, '{}.pkl'.format(ckpt_dir + "/epoch_" + str(best_val_epoch) + "_" + "BEST_VAL"))
-            with open(f"{DATASET_NAME}_ep{best_val_epoch}_acc_best_val.csv",'w') as f:
+            with open(
+                    f"{params['seed']}_{str(net_params['residual'])}_{DATASET_NAME}_ep{best_val_epoch}_acc_best_val.csv",
+                    'w') as f:
                 if len(best_acc) == 3:
                     f.write("train acc, val acc, test acc")
                     f.write("\n")
-                    f.write(best_acc[0])
+                    f.write(str(best_acc[0]))
                     f.write(",")
-                    f.write(best_acc[1])
+                    f.write(str(best_acc[1]))
                     f.write(",")
-                    f.write(best_acc[2])
+                    f.write(str(best_acc[2]))
                 else:
                     f.write("Error")
-
     except KeyboardInterrupt:
         print('-' * 89)
         print('Exiting from training early because of KeyboardInterrupt')
-    
-    
-    _, test_acc = smooth_evaluate_network(model, device, test_loader, epoch, delta, onehot=onehot)
-    _, train_acc = smooth_evaluate_network(model, device, train_loader, epoch, delta, onehot=onehot)
+
+    _, test_acc = smooth_evaluate_network(model, device, test_loader, epoch, train_soft_target=train_soft_target)
+    _, train_acc = smooth_evaluate_network(model, device, train_loader, epoch, train_soft_target=train_soft_target)
     print("Test Accuracy: {:.4f}".format(test_acc))
     print("Train Accuracy: {:.4f}".format(train_acc))
-    print("TOTAL TIME TAKEN: {:.4f}s".format(time.time()-start0))
+    print("TOTAL TIME TAKEN: {:.4f}s".format(time.time() - start0))
     print("AVG TIME PER EPOCH: {:.4f}s".format(np.mean(per_epoch_time)))
 
     writer.close()
-
-
-    with open(f'./smooth_{params["seed"]}_{DATASET_NAME}_{MODEL_NAME}_test_result.csv', 'wt', newline='') as f:
+    # trained_w = model.w.squeeze().data.numpy().tolist()
+    # with open(f'./{params["seed"]}_{str(net_params["residual"])}_{DATASET_NAME}_{MODEL_NAME}_W.csv', 'w') as f:
+    #     f.write(",".join(map(str, trained_w)))
+    with open(f'./{params["seed"]}_{str(net_params["residual"])}_{DATASET_NAME}_{MODEL_NAME}_test_result.csv', 'wt',
+              newline='') as f:
         f.write("Test_Accuracy" + "," + "Train_Accuracy" + "," + "Total_Time_Taken" + "," + "AVG_Time_Per_Epoch")
         f.write("\n")
-        f.write("{:.4f}".format(test_acc) + "," + "{:.4f}".format(train_acc) + "," + "{:.4f}".format(time.time() - start0) + "," + "{:.4f}".format(np.mean(per_epoch_time)))
+        f.write("{:.4f}".format(test_acc) + "," + "{:.4f}".format(train_acc) + "," + "{:.4f}".format(
+            time.time() - start0) + "," + "{:.4f}".format(np.mean(per_epoch_time)))
         """
         Write the results in out_dir/results folder
     """
@@ -349,8 +352,9 @@ def main():
     parser.add_argument('--cat', help="Please give a value for cat")
     parser.add_argument('--self_loop', help="Please give a value for self_loop")
     parser.add_argument('--max_time', help="Please give a value for max_time")
-    parser.add_argument('--onehot', help="Please give a value for onehot")
+    parser.add_argument('--train_soft_target', help="Please give a value for train_soft_target")
     parser.add_argument('--delta', help="Please give a value for delta")
+    parser.add_argument('--how_residual', help="Please give a value for delta")
     args = parser.parse_args()
 #    pdb.set_trace()
     with open(args.config) as f:
@@ -449,26 +453,30 @@ def main():
         net_params['cat'] = True if args.cat=='True' else False
     if args.self_loop is not None:
         net_params['self_loop'] = True if args.self_loop=='True' else False
-    if args.onehot is not None:
-        net_params['onehot'] = True if args.onehot == 'True' else False
-        onehot = net_params['onehot']
+    if args.train_soft_target is not None:
+        net_params['train_soft_target'] = True if args.train_soft_target == 'True' else False
+        train_soft_target = net_params['train_soft_target']
     else:
-        onehot = False
+        train_soft_target = False
         if DATASET_NAME.split("_")[-1][0] in ['w', 'a']:
-            print('onehot parameter is missing. onehot = True')
-            onehot = True
+            print('train_soft_target parameter is missing. train_soft_target = True')
+            train_soft_target = True
 
     if args.delta is not None:
         net_params['delta'] = float(args.delta)
     else:
-        net_params['delta'] = 1.0
+        net_params['delta'] = 0.2
+
+    if args.how_residual is not None:
+        net_params['how_residual'] = str(args.how_residual)
+    else:
+        net_params['how_residual'] = 'resnet'
+
         
     # SBM
     net_params['in_dim'] = torch.unique(dataset.train[0][0].ndata['feat'],dim=0).size(0) # node_dim (feat is an integer)
 
     net_params['n_classes'] = torch.unique(dataset.train[0][1],dim=0).size(0)
-    if onehot:
-        net_params['n_classes'] = len(dataset.train.dataset[0]['node_label'][0])
 
     root_log_dir = out_dir + 'logs/' + MODEL_NAME + "_" + DATASET_NAME + "_GPU" + str(config['gpu']['id']) + "_" + time.strftime('%Hh%Mm%Ss_on_%b_%d_%Y')
     root_ckpt_dir = out_dir + 'checkpoints/' + MODEL_NAME + "_" + DATASET_NAME + "_GPU" + str(config['gpu']['id']) + "_" + time.strftime('%Hh%Mm%Ss_on_%b_%d_%Y')
@@ -483,7 +491,7 @@ def main():
         os.makedirs(out_dir + 'configs')
 
     net_params['total_param'] = view_model_param(MODEL_NAME, net_params)
-    train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, onehot)
+    train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, train_soft_target)
 
     
     
