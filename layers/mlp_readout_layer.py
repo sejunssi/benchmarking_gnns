@@ -67,6 +67,41 @@ class RK2netMLPReadout(nn.Module):
         y = self.FC_layers[self.L](y)
         return y
 
+
+class RKinetMLPReadout(nn.Module):
+
+    def __init__(self, input_dim, output_dim, L=2, i=0):  # L=nb_hidden_layers
+        super().__init__()
+        list_FC_layers = [nn.Linear(input_dim , input_dim, bias=True) for _ in range(L)]
+        list_FC_layers.append(nn.Linear(input_dim, output_dim, bias=True))
+        self.FC_layers = nn.ModuleList(list_FC_layers)
+        if i == 2:
+            list_FC_layers2 = [RK2netMLPReadout(input_dim, input_dim) for _ in range(L)]
+            list_FC_layers2.append(ResnetMLPReadout(input_dim, output_dim))
+        elif i == 3:
+            list_FC_layers2 = [RK3netMLPReadout(input_dim, input_dim) for _ in range(L)]
+            list_FC_layers2.append(ResnetMLPReadout(input_dim, output_dim))
+        else:
+            list_FC_layers2 = [ResnetMLPReadout(input_dim, input_dim) for _ in range(L)]
+            list_FC_layers2.append(ResnetMLPReadout(input_dim, output_dim))
+        self.FC_layers2 = nn.ModuleList(list_FC_layers2)
+        self.L = L
+
+    def forward(self, x):
+        y1 = x
+        y2 = x
+        identity = y1
+        for l in range(self.L):
+            y1 = self.FC_layers[l](y1)
+            F.relu(y1)
+        y1 = self.FC_layers[self.L](y1)
+        for l in range(self.L):
+            y2 = self.FC_layers2[l](y2)
+            y2 = F.relu(identity + y2)
+            identity = y2
+        y2 = self.FC_layers[self.L](y2)
+        return y1+y2
+
 class RK2M1netMLPReadout(nn.Module):
 
     def __init__(self, input_dim, output_dim, L=2):  # L=nb_hidden_layers
