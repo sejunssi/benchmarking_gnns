@@ -12,7 +12,7 @@ import numpy as np
     http://arxiv.org/abs/1609.02907
 """
 from layers.gcn_layer import GCNLayer
-from layers.mlp_readout_layer import MLPReadout, ResnetMLPReadout
+from layers.mlp_readout_layer import MLPReadout, ResnetMLPReadout, RK2netMLPReadout, RK3netMLPReadout
 
 
 class SmoothGCNNet(nn.Module):
@@ -33,6 +33,13 @@ class SmoothGCNNet(nn.Module):
         self.residual = net_params['residual']
         self.n_classes = n_classes
         self.device = net_params['device']
+        self.how_residual = net_params['how_residual']
+        if self.how_residual == 'resnet':
+            self.w_layer = ResnetMLPReadout(out_dim + n_classes, 1)
+        elif self.how_residual == 'rk2':
+            self.w_layer = RK2netMLPReadout(out_dim + n_classes, 1)
+        elif self.how_residual == 'rk3':
+            self.w_layer = RK3netMLPReadout(out_dim + n_classes, 1)
 
         self.embedding_h = nn.Embedding(in_dim_node, hidden_dim)  # node feat is an integer
         self.in_feat_dropout = nn.Dropout(in_feat_dropout)
@@ -42,7 +49,6 @@ class SmoothGCNNet(nn.Module):
         self.layers.append(
             GCNLayer(hidden_dim, out_dim, F.relu, dropout, self.graph_norm, self.batch_norm, self.residual))
         self.MLP_layer = MLPReadout(out_dim, n_classes)
-        self.MLP_layer2 = ResnetMLPReadout(out_dim+n_classes, 1)
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, *args, **kwargs):
@@ -65,14 +71,14 @@ class SmoothGCNNet(nn.Module):
         p = self.MLP_layer(h)
 
         h = torch.cat((h, label.to(torch.float)), dim=1)
-        w = self.MLP_layer2(h).to(torch.float)
+        w = self.w_layer(h).to(torch.float)
         w = self.sigmoid(w)
         w = w.data
         w = w.repeat(1, self.n_classes)
         w = torch.clamp(w, min=0, max=delta).to(device=self.device)
         ones = torch.ones(label.shape[0], label.shape[1]).to(torch.float).to(device=self.device)
         max_entropy = torch.Tensor([1/ label.shape[1]]).repeat(label.shape[0], label.shape[1]).to(torch.float).to(device=self.device)
-        g_hat = (ones-w) * label.to(torch.float) + w * max_entropy
+        g_hat = (ones-w) * label.to(torch.float) + w * max_entropys
         return p, g_hat
 
     def loss(self, pred, label, train_soft_target=False):

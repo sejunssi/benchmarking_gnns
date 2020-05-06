@@ -156,7 +156,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, train_soft
         
     # At any point you can hit Ctrl + C to break out of training early.
     try:
-        with tqdm(range(params['epochs'])) as t:
+        with tqdm(range(net_params['epochs'])) as t:
 
             header = ['epoch', 'epoch_train_losses', 'epoch_train_acc', 'epoch_val_losses', 'epoch_val_acc',
                       'epoch_test_losses', 'epoch_test_acc']
@@ -263,7 +263,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, train_soft
         print('-' * 89)
         print('Exiting from training early because of KeyboardInterrupt')
 
-    _, test_acc = smooth_evaluate_network(model, device, test_loader, epoch)
+    _, test_acc = smooth_evaluate_network(model, device, test_loader, epoch, train_soft_target=train_soft_target)
     _, train_acc = smooth_evaluate_network(model, device, train_loader, epoch, train_soft_target=train_soft_target)
     print("Test Accuracy: {:.4f}".format(test_acc))
     print("Train Accuracy: {:.4f}".format(train_acc))
@@ -271,7 +271,9 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, train_soft
     print("AVG TIME PER EPOCH: {:.4f}s".format(np.mean(per_epoch_time)))
 
     writer.close()
-
+    # trained_w = model.w.squeeze().data.numpy().tolist()
+    # with open(f'./{params["seed"]}_{str(net_params["residual"])}_{DATASET_NAME}_{MODEL_NAME}_W.csv', 'w') as f:
+    #     f.write(",".join(map(str, trained_w)))
     with open(f'./{params["seed"]}_{str(net_params["residual"])}_{DATASET_NAME}_{MODEL_NAME}_test_result.csv', 'wt',
               newline='') as f:
         f.write("Test_Accuracy" + "," + "Train_Accuracy" + "," + "Total_Time_Taken" + "," + "AVG_Time_Per_Epoch")
@@ -352,6 +354,7 @@ def main():
     parser.add_argument('--max_time', help="Please give a value for max_time")
     parser.add_argument('--train_soft_target', help="Please give a value for train_soft_target")
     parser.add_argument('--delta', help="Please give a value for delta")
+    parser.add_argument('--how_residual', help="Please give a value for delta")
     args = parser.parse_args()
 #    pdb.set_trace()
     with open(args.config) as f:
@@ -462,14 +465,18 @@ def main():
     if args.delta is not None:
         net_params['delta'] = float(args.delta)
     else:
-        net_params['delta'] = 1.0
+        net_params['delta'] = 0.2
+
+    if args.how_residual is not None:
+        net_params['how_residual'] = str(args.how_residual)
+    else:
+        net_params['how_residual'] = 'resnet'
+
         
     # SBM
     net_params['in_dim'] = torch.unique(dataset.train[0][0].ndata['feat'],dim=0).size(0) # node_dim (feat is an integer)
 
     net_params['n_classes'] = torch.unique(dataset.train[0][1],dim=0).size(0)
-    if train_soft_target:
-        net_params['n_classes'] = len(dataset.train.dataset[0]['node_label'][0])
 
     root_log_dir = out_dir + 'logs/' + MODEL_NAME + "_" + DATASET_NAME + "_GPU" + str(config['gpu']['id']) + "_" + time.strftime('%Hh%Mm%Ss_on_%b_%d_%Y')
     root_ckpt_dir = out_dir + 'checkpoints/' + MODEL_NAME + "_" + DATASET_NAME + "_GPU" + str(config['gpu']['id']) + "_" + time.strftime('%Hh%Mm%Ss_on_%b_%d_%Y')

@@ -15,7 +15,7 @@ import numpy as np
 
 from layers.gmm_layer import GMMLayer
 from layers.mlp_readout_layer import MLPReadout, ResnetMLPReadout
-
+from layers.mlp_readout_layer import MLPReadout, ResnetMLPReadout, RK2netMLPReadout, RK3netMLPReadout
 
 class SmoothMoNet(nn.Module):
     def __init__(self, net_params):
@@ -35,6 +35,13 @@ class SmoothMoNet(nn.Module):
         residual = net_params['residual']  
         self.device = net_params['device']
         self.n_classes = n_classes
+        self.how_residual = net_params['how_residual']
+        if self.how_residual == 'resnet':
+            self.w_layer = ResnetMLPReadout(hidden_dim + n_classes, 1)
+        elif self.how_residual == 'rk2':
+            self.w_layer = RK2netMLPReadout(hidden_dim + n_classes, 1)
+        elif self.how_residual == 'rk3':
+            self.w_layer = RK3netMLPReadout(hidden_dim + n_classes, 1)
         
         aggr_type = "sum"                                    # default for MoNet
         
@@ -81,7 +88,7 @@ class SmoothMoNet(nn.Module):
         p = self.MLP_layer(h)
 
         h = torch.cat((h, label.to(torch.float)), dim=1)
-        w = self.MLP_layer2(h).to(torch.float)
+        w = self.w_layer(h).to(torch.float)
         w = self.sigmoid(w)
         w = w.data
         w = w.repeat(1, self.n_classes)

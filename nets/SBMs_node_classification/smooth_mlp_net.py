@@ -5,7 +5,7 @@ from utils.loss import LabelSmoothingLoss
 import dgl
 
 from layers.mlp_readout_layer import MLPReadout, ResnetMLPReadout
-
+from layers.mlp_readout_layer import MLPReadout, ResnetMLPReadout, RK2netMLPReadout, RK3netMLPReadout
 
 class SmoothMLPNet(nn.Module):
 
@@ -21,6 +21,13 @@ class SmoothMLPNet(nn.Module):
         self.gated = net_params['gated']
         self.n_classes = n_classes
         self.device = net_params['device']
+        self.how_residual = net_params['how_residual']
+        if self.how_residual == 'resnet':
+            self.w_layer = ResnetMLPReadout(hidden_dim + n_classes, 1)
+        elif self.how_residual == 'rk2':
+            self.w_layer = RK2netMLPReadout(hidden_dim + n_classes, 1)
+        elif self.how_residual == 'rk3':
+            self.w_layer = RK3netMLPReadout(hidden_dim + n_classes, 1)
         
         self.embedding_h = nn.Embedding(in_dim_node, hidden_dim) # node feat is an integer
         self.in_feat_dropout = nn.Dropout(in_feat_dropout)
@@ -65,7 +72,7 @@ class SmoothMLPNet(nn.Module):
         p = self.readout_mlp(h)
 
         h = torch.cat((h, label.to(torch.float)), dim=1)
-        w = self.MLP_layer2(h)
+        w = self.w_layer(h)
         w = self.sigmoid(w).to(torch.float)
         w = w.data
         w = w.repeat(1, self.n_classes)

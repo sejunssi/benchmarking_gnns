@@ -13,7 +13,7 @@ import dgl
 
 from layers.graphsage_layer import GraphSageLayer
 from layers.mlp_readout_layer import MLPReadout, ResnetMLPReadout
-
+from layers.mlp_readout_layer import MLPReadout, ResnetMLPReadout, RK2netMLPReadout, RK3netMLPReadout
 
 class SmoothGraphSageNet(nn.Module):
     """
@@ -35,6 +35,13 @@ class SmoothGraphSageNet(nn.Module):
         self.residual = net_params['residual']
         self.n_classes = n_classes
         self.device = net_params['device']
+        self.how_residual = net_params['how_residual']
+        if self.how_residual == 'resnet':
+            self.w_layer = ResnetMLPReadout(out_dim + n_classes, 1)
+        elif self.how_residual == 'rk2':
+            self.w_layer = RK2netMLPReadout(out_dim + n_classes, 1)
+        elif self.how_residual == 'rk3':
+            self.w_layer = RK3netMLPReadout(out_dim + n_classes, 1)
         
         self.embedding_h = nn.Embedding(in_dim_node, hidden_dim) # node feat is an integer
         self.in_feat_dropout = nn.Dropout(in_feat_dropout)
@@ -69,7 +76,7 @@ class SmoothGraphSageNet(nn.Module):
         p = self.MLP_layer(h)
 
         h = torch.cat((h, label.to(torch.float)), dim=1)
-        w = self.MLP_layer2(h)
+        w = self.w_layer(h)
         w = self.sigmoid(w).to(torch.float)
         w = w.data
         w = w.repeat(1, self.n_classes)
