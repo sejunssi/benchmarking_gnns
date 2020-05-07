@@ -46,16 +46,18 @@ d = '.'
 
 cur_dir = os.getcwd()
 
+data_dir = './result'
 file_name = []
 
-with open(f"SBM_test_result_{timestampStr}.csv", 'w', newline='') as f2:
+with open(f"{data_dir}/SBM_test_result_{timestampStr}.csv", 'w', newline='') as f2:
     header = ["dataset", "model name", "seed", "residual",  "paper accuracy", "test_accuracy", 'how',
               'lb_delta', 'ub_delta', 'middle_dim', 'bottleneck']
     csvwriter = csv.writer(f2, delimiter=',')
     csvwriter.writerow(header)
 
-for name in glob.glob(f'*.csv'):
-    if re.match(f'(\w+)_test_result.csv', name):
+for name in glob.glob(f'{data_dir}/*.csv'):
+    name = str(name.split("\\")[1]).replace("./",'')
+    if re.match('[a-zA-Z0-9_-]+_test_result.csv', name):
         file_name.append(name)
         if re.match('(\d+)_(True|False)_SBM_(CLUSTER|PATTERN)_(a\d+|w\d+)_*', name):
             name_list = name.split("_")
@@ -67,18 +69,16 @@ for name in glob.glob(f'*.csv'):
 
             paper_dict_name = residual+'_SBM_'+dataset+"_"+model_name
 
-            with open(name, 'r') as f:
+            with open(data_dir+"/"+name, 'r') as f:
                 csvreader = csv.reader(f,  delimiter=',')
                 next(csvreader)
                 for x in csvreader:
                     test_acc = float(x[0])
                     paper_acc[''.join(name_list[:6])] = test_acc
-                with open(f"SBM_test_result_{timestampStr}.csv", 'a', newline='') as f2:
+                with open(f"{data_dir}/SBM_test_result_{timestampStr}.csv", 'a', newline='') as f2:
                     csvwriter = csv.writer(f2, delimiter=',')
                     csvwriter.writerow([dataset, model_name, seed, residual, paper_acc[paper_dict_name], test_acc, smoothing_name])
-        elif re.match('(\w+)_test_result.csv', name):
-            file_name.append(name)
-            if re.match('(\d+)_(True|False)_SBM_(CLUSTER|PATTERN)_(SMOOTH)_(\w+)_(\w+)_(\d+)*', name):
+        elif re.match('(\d+)_(True|False)_SBM_(CLUSTER|PATTERN)_(SMOOTH)_(\w+)_(\w+)_(\d+)*', name):
                 name_list = name.split("_")
                 seed = name_list[0]
                 residual = name_list[1]
@@ -88,18 +88,20 @@ for name in glob.glob(f'*.csv'):
                 how_residual = name_list[6]
                 lb_delta = name_list[8]
                 ub_delta = name_list[9]
-                middle_dim = name_list[10]
+                lb_delta = "0."+lb_delta.replace('lb','')
+                ub_delta = "0."+ ub_delta.replace('ub','')
+                middle_dim = name_list[10].replace('md', '')
                 bottleneck = name_list[11]
 
                 paper_dict_name = residual + '_SBM_' + dataset + "_" + model_name
 
-                with open(name, 'r') as f:
+                with open(data_dir+"/"+name, 'r') as f:
                     csvreader = csv.reader(f, delimiter=',')
                     next(csvreader)
                     for x in csvreader:
                         test_acc = float(x[0])
                         paper_acc[''.join(name_list[:6])] = test_acc
-                    with open(f"SBM_test_result_{timestampStr}.csv", 'a', newline='') as f2:
+                    with open(f"{data_dir}/SBM_test_result_{timestampStr}.csv", 'a', newline='') as f2:
                         csvwriter = csv.writer(f2, delimiter=',')
                         csvwriter.writerow(
                             [dataset, model_name, seed, residual, paper_acc[paper_dict_name], test_acc, how_residual, lb_delta, ub_delta, middle_dim, bottleneck])
