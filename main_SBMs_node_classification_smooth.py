@@ -237,7 +237,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, train_soft
                     print("Max_time for training elapsed {:.2f} hours, so stopping".format(params['max_time']))
                     break
 
-            csv_file = open(f'./result/{params["seed"]}_{str(net_params["residual"])}_{DATASET_NAME}_{MODEL_NAME}_{net_params["how_residual"]}_rk{net_params["rki"]}_lb{str(lb_delta).split(".")[1]}_ub{str(ub_delta).split(".")[1]}_{net_params["middle_dim"]}_{net_params["bottleneck"]}_{timestampStr}_epoch_files.csv', 'w')
+            csv_file = open(f'./result/epochs/{params["seed"]}_{str(net_params["residual"])}_{DATASET_NAME}_{MODEL_NAME}_{net_params["how_residual"]}_rk{net_params["rki"]}_lb{str(lb_delta).split(".")[1]}_ub{str(ub_delta).split(".")[1]}_{net_params["middle_dim"]}_{net_params["bottleneck"]}_{timestampStr}_epoch_files.csv', 'w')
             csvwriter = csv.writer(csv_file)
             csvwriter.writerow(header)
             for data in (zip(epochs, epoch_train_loss_list, epoch_train_acc_list, epoch_val_loss_list, epoch_val_acc_list,
