@@ -2,6 +2,9 @@ import csv
 import glob
 import re
 import os
+import datetime
+dateTimeObj = datetime.now()
+timestampStr = dateTimeObj.strftime("%d-%b-%Y (%H:%M:%S.%f)")
 
 seeds = [12, 41, 95]
 a_list = [8, 7, 9]
@@ -51,7 +54,7 @@ with open("SBM_test_result.csv", 'w', newline='') as f2:
     csvwriter.writerow(header)
 
 for name in glob.glob('*.csv'):
-    if re.match('(\w+)_test_result.csv', name):
+    if re.match(f'(\w+)_test_result_{timestampStr}.csv', name):
         file_name.append(name)
         if re.match('(\d+)_(True|False)_SBM_(CLUSTER|PATTERN)_(a\d+|w\d+)_*', name):
             name_list = name.split("_")
@@ -69,7 +72,7 @@ for name in glob.glob('*.csv'):
                 for x in csvreader:
                     test_acc = float(x[0])
                     paper_acc[''.join(name_list[:6])] = test_acc
-                with open("SBM_test_result.csv", 'a', newline='') as f2:
+                with open(f"SBM_test_result_{timestampStr}.csv", 'a', newline='') as f2:
                     csvwriter = csv.writer(f2, delimiter=',')
                     csvwriter.writerow([dataset, model_name, seed, residual, paper_acc[paper_dict_name], test_acc, smoothing_name])
         elif re.match('(\w+)_test_result.csv', name):
@@ -92,7 +95,7 @@ for name in glob.glob('*.csv'):
                     for x in csvreader:
                         test_acc = float(x[0])
                         paper_acc[''.join(name_list[:6])] = test_acc
-                    with open("SBM_test_result.csv", 'a', newline='') as f2:
+                    with open(f"SBM_test_result_{timestampStr}.csv", 'a', newline='') as f2:
                         csvwriter = csv.writer(f2, delimiter=',')
                         csvwriter.writerow(
                             [dataset, model_name, seed, residual, paper_acc[paper_dict_name], test_acc, how_residual, delta])
