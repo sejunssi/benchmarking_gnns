@@ -36,7 +36,7 @@ class DotDict(dict):
         self.__dict__ = self
 
 
-import datetime
+from datetime import datetime
 dateTimeObj = datetime.now()
 timestampStr = dateTimeObj.strftime("%d-%b-%Y (%H:%M:%S.%f)")
 

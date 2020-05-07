@@ -47,7 +47,7 @@ class DotDict(dict):
 from nets.SBMs_node_classification.load_net import gnn_model # import GNNs
 from data.data import LoadData # import dataset
 from train.train_SBMs_node_classification import smooth_train_epoch, smooth_evaluate_network # import train functions
-import datetime
+from datetime import datetime
 dateTimeObj = datetime.now()
 timestampStr = dateTimeObj.strftime("%d-%b-%Y (%H:%M:%S.%f)")
 
