@@ -49,11 +49,12 @@ cur_dir = os.getcwd()
 file_name = []
 
 with open(f"SBM_test_result_{timestampStr}.csv", 'w', newline='') as f2:
-    header = ["dataset", "model name", "seed", "residual",  "paper accuracy", "test_accuracy", 'how', 'delta']
+    header = ["dataset", "model name", "seed", "residual",  "paper accuracy", "test_accuracy", 'how',
+              'lb_delta', 'ub_delta', 'middle_dim', 'bottleneck']
     csvwriter = csv.writer(f2, delimiter=',')
     csvwriter.writerow(header)
 
-for name in glob.glob('*.csv'):
+for name in glob.glob(f'*.csv'):
     if re.match(f'(\w+)_test_result.csv', name):
         file_name.append(name)
         if re.match('(\d+)_(True|False)_SBM_(CLUSTER|PATTERN)_(a\d+|w\d+)_*', name):
@@ -66,7 +67,7 @@ for name in glob.glob('*.csv'):
 
             paper_dict_name = residual+'_SBM_'+dataset+"_"+model_name
 
-            with open(name) as f:
+            with open(name, 'r') as f:
                 csvreader = csv.reader(f,  delimiter=',')
                 next(csvreader)
                 for x in csvreader:
@@ -85,11 +86,14 @@ for name in glob.glob('*.csv'):
 
                 model_name = name_list[5]
                 how_residual = name_list[6]
-                delta = name_list[7]
+                lb_delta = name_list[8]
+                ub_delta = name_list[9]
+                middle_dim = name_list[10]
+                bottleneck = name_list[11]
 
                 paper_dict_name = residual + '_SBM_' + dataset + "_" + model_name
 
-                with open(name) as f:
+                with open(name, 'r') as f:
                     csvreader = csv.reader(f, delimiter=',')
                     next(csvreader)
                     for x in csvreader:
@@ -98,5 +102,8 @@ for name in glob.glob('*.csv'):
                     with open(f"SBM_test_result_{timestampStr}.csv", 'a', newline='') as f2:
                         csvwriter = csv.writer(f2, delimiter=',')
                         csvwriter.writerow(
-                            [dataset, model_name, seed, residual, paper_acc[paper_dict_name], test_acc, how_residual, delta])
+                            [dataset, model_name, seed, residual, paper_acc[paper_dict_name], test_acc, how_residual, lb_delta, ub_delta, middle_dim, bottleneck])
 
+# {params["seed"]}_{str(net_params["residual"])}_{DATASET_NAME}_{MODEL_NAME}_{net_params["how_residual"]}_rk{net_params["rki"]}_lb{str(lb_delta).split(".")[1]}_ub{str(ub_delta).split(".")[1]}_md{net_params["middle_dim"]}_{net_params["bottleneck"]}_{timestampStr}_test_result.csv'
+# ex) 41_True_SBM_CLUSTER_SMOOTH_GIN_baseline_rk1_lb0_ub2_md32_True
+#     0  1    2    3       4      5    6       7   8   9  10    11
