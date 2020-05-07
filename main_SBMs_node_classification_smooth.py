@@ -284,7 +284,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, train_soft
     # trained_w = model.w.squeeze().data.numpy().tolist()
     # with open(f'./{params["seed"]}_{str(net_params["residual"])}_{DATASET_NAME}_{MODEL_NAME}_W.csv', 'w') as f:
     #     f.write(",".join(map(str, trained_w)))
-    with open(f'./result/rk/{params["seed"]}_{str(net_params["residual"])}_{DATASET_NAME}_{MODEL_NAME}_{net_params["how_residual"]}_rk{net_params["rki"]}_lb{str(lb_delta).split(".")[1]}_ub{str(ub_delta).split(".")[1]}_md{net_params["middle_dim"]}_{net_params["bottleneck"]}_{timestampStr}_test_result.csv', 'wt',
+    with open(f'./result/{params["seed"]}_{str(net_params["residual"])}_{DATASET_NAME}_{MODEL_NAME}_{net_params["how_residual"]}_rk{net_params["rki"]}_lb{str(lb_delta).split(".")[1]}_ub{str(ub_delta).split(".")[1]}_md{net_params["middle_dim"]}_{net_params["bottleneck"]}_{timestampStr}_test_result.csv', 'wt',
               newline='') as f:
         f.write("Test_Accuracy" + "," + "Train_Accuracy" + "," + "Total_Time_Taken" + "," + "AVG_Time_Per_Epoch")
         f.write("\n")
