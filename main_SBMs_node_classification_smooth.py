@@ -248,7 +248,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, train_soft
             ckpt_dir = os.path.join(root_ckpt_dir, "RUN_")
             torch.save(best_model_dict, '{}.pkl'.format(ckpt_dir + "/epoch_" + str(best_val_epoch) + "_" + "BEST_VAL"))
             with open(
-                    f"./result/model/{params['seed']}_{str(net_params['residual'])}_{DATASET_NAME}_{MODEL_NAME}_{net_params['how_residual']}_rk{net_params['rki']}_lb{str(lb_delta).split('.')[1]}_ub{str(ub_delta).split('.')[1]}_{net_params['middle_dim']}_{net_params['bottleneck']}_ep{best_val_epoch}_{timestampStr}_acc_best_val.csv",
+                    f"./result/{params['seed']}_{str(net_params['residual'])}_{DATASET_NAME}_{MODEL_NAME}_{net_params['how_residual']}_rk{net_params['rki']}_lb{str(lb_delta).split('.')[1]}_ub{str(ub_delta).split('.')[1]}_{net_params['middle_dim']}_{net_params['bottleneck']}_ep{best_val_epoch}_{timestampStr}_acc_best_val.csv",
                     'w') as f:
                 if len(best_acc) == 3:
                     f.write("train acc, val acc, test acc")
