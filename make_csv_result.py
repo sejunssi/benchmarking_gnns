@@ -48,13 +48,13 @@ cur_dir = os.getcwd()
 
 file_name = []
 
-with open("SBM_test_result.csv", 'w', newline='') as f2:
+with open(f"SBM_test_result_{timestampStr}.csv", 'w', newline='') as f2:
     header = ["dataset", "model name", "seed", "residual",  "paper accuracy", "test_accuracy", 'how', 'delta']
     csvwriter = csv.writer(f2, delimiter=',')
     csvwriter.writerow(header)
 
 for name in glob.glob('*.csv'):
-    if re.match(f'(\w+)_test_result_{timestampStr}.csv', name):
+    if re.match(f'(\w+)_test_result.csv', name):
         file_name.append(name)
         if re.match('(\d+)_(True|False)_SBM_(CLUSTER|PATTERN)_(a\d+|w\d+)_*', name):
             name_list = name.split("_")
