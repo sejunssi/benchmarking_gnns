@@ -69,6 +69,7 @@ class SmoothGINNet(nn.Module):
             self.dense_layer = nn.Linear(hidden_dim + n_classes, middle_dim)
             if bottleneck == True:
                 self.widen_layer = nn.Linear(middle_dim, hidden_dim + n_classes)
+                self.fc_layer = nn.Linear(hidden_dim + n_classes, hidden_dim + n_classes)
                 if self.how_residual == 'rki':
                     self.w_layer = RKinetMLPReadout(hidden_dim + n_classes, 1, self.rki)
                 elif self.how_residual == 'rk2m1':
@@ -82,6 +83,7 @@ class SmoothGINNet(nn.Module):
                 else:
                     self.w_layer = BaseLineMLPReadout(hidden_dim + n_classes, 1)
             else:
+                self.fc_layer = nn.Linear(middle_dim, middle_dim)
                 if self.how_residual == 'rki':
                     self.w_layer = RKinetMLPReadout(middle_dim, 1, self.rki)
                 elif self.how_residual == 'rk2m1':
@@ -139,6 +141,7 @@ class SmoothGINNet(nn.Module):
                 h = self.dense_layer(torch.cat((h, label.to(torch.float)), dim=1))
                 if self.bottleneck == True:
                     h = self.widen_layer(h)
+                h = self.fc_layer(h)
             else:
                 h = torch.cat((h, label.to(torch.float)), dim=1)
             score_over_layer_w += self.w_layer(h)

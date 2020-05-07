@@ -94,14 +94,14 @@ class RKinetMLPReadout(nn.Module):
         list_FC_layers.append(nn.Linear(input_dim, output_dim, bias=True))
         self.FC_layers = nn.ModuleList(list_FC_layers)
         if i == 2:
-            list_FC_layers2 = [RK2netMLPReadout(input_dim, input_dim) for _ in range(L)]
-            list_FC_layers2.append(ResnetMLPReadout(input_dim, output_dim))
+            list_FC_layers2 = [RK2netMLPReadout(input_dim, input_dim, L) for _ in range(L)]
+            list_FC_layers2.append(ResnetMLPReadout(input_dim, output_dim, L))
         elif i == 3:
             list_FC_layers2 = [RK3netMLPReadout(input_dim, input_dim) for _ in range(L)]
-            list_FC_layers2.append(ResnetMLPReadout(input_dim, output_dim))
+            list_FC_layers2.append(ResnetMLPReadout(input_dim, output_dim, L))
         else:
-            list_FC_layers2 = [ResnetMLPReadout(input_dim, input_dim) for _ in range(L)]
-            list_FC_layers2.append(ResnetMLPReadout(input_dim, output_dim))
+            list_FC_layers2 = [ResnetMLPReadout(input_dim, input_dim, L) for _ in range(L)]
+            list_FC_layers2.append(ResnetMLPReadout(input_dim, output_dim, L))
         self.FC_layers2 = nn.ModuleList(list_FC_layers2)
         self.L = L
 
