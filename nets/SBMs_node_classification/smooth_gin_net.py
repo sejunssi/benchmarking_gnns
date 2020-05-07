@@ -110,6 +110,8 @@ class SmoothGINNet(nn.Module):
             if self.middle_dim != 'None':
                 h = self.new_fc_layer(torch.cat((h, label.to(torch.float)), dim=1))
                 # h = self.new_fc_layer2(h)
+            else:
+                h = torch.cat((h, label.to(torch.float)), dim=1)
             score_over_layer_w += self.w_layer(h)
 
         w = self.sigmoid(score_over_layer_w).to(torch.float)
