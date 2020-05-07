@@ -20,6 +20,11 @@ seed_list=(41 95 12 35)
 #
 #done
 python main_SBMs_node_classification_smooth.py --dataset SBM_CLUSTER --middle_dim=32 --bottleneck=True --lb_delta=0 --ub_delta=0.2 --gpu_id 0 --seed 41 --config configs/SBMs_node_clustering_GIN_CLUSTER_SMOOTH.json
+
+python main_SBMs_node_classification_smooth.py --dataset SBM_CLUSTER --middle_dim=32 --bottleneck=True --lb_delta=0 --ub_delta=0.2 --how_residual=rki --rki=1 --gpu_id 1 --seed 1  --config configs/SBMs_node_clustering_GIN_CLUSTER_SMOOTH.json
+
+python main_SBMs_node_classification_smooth.py --dataset SBM_CLUSTER --middle_dim=32 --bottleneck=True --lb_delta=0 --ub_delta=0.2 --how_residual=rki --rki=1 --gpu_id 2 --seed 1  --config configs/SBMs_node_clustering_GAT_CLUSTER_SMOOTH.json
+
 for seed in ${seed_list[@]}
 do
 
