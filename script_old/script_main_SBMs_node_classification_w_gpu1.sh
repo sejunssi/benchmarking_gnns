@@ -38,7 +38,7 @@ done
 
 # residual w
 # shellcheck disable=SC2068
-for w in ${a_list[@]}
+for w in ${w_list[@]}
 do
   dataset=SBM_PATTERN_w${w}
 
