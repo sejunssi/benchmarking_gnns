@@ -69,7 +69,7 @@ class SmoothGATNet(nn.Module):
                     self.w_layer = RK2M1netMLPReadout(hidden_dim + n_classes, 1)
                 elif self.how_residual == 'rk2':
                     self.w_layer = RK2netMLPReadout(hidden_dim + n_classes, 1)
-                elif self.how_residual == 'resnet':
+                elif self.how_residual == 'rk1':
                     self.w_layer = ResnetMLPReadout(hidden_dim + n_classes, 1)
                 elif self.how_residual == 'rk3':
                     self.w_layer = RK3netMLPReadout(hidden_dim + n_classes, 1)
@@ -82,7 +82,7 @@ class SmoothGATNet(nn.Module):
                     self.w_layer = RK2M1netMLPReadout(middle_dim, 1)
                 elif self.how_residual == 'rk2':
                     self.w_layer = RK2netMLPReadout(middle_dim, 1)
-                elif self.how_residual == 'resnet':
+                elif self.how_residual == 'rk1':
                     self.w_layer = ResnetMLPReadout(middle_dim, 1)
                 elif self.how_residual == 'rk3':
                     self.w_layer = RK3netMLPReadout(middle_dim, 1)
@@ -95,7 +95,7 @@ class SmoothGATNet(nn.Module):
                 self.w_layer = RK2M1netMLPReadout(hidden_dim + n_classes, 1)
             elif self.how_residual == 'rk2':
                 self.w_layer = RK2netMLPReadout(hidden_dim + n_classes, 1)
-            elif self.how_residual == 'resnet':
+            elif self.how_residual == 'rk1':
                 self.w_layer = ResnetMLPReadout(hidden_dim + n_classes, 1)
             elif self.how_residual == 'rk3':
                 self.w_layer = RK3netMLPReadout(hidden_dim + n_classes, 1)
