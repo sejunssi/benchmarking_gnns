@@ -499,7 +499,10 @@ def main():
     if args.bottleneck is None:
         net_params['bottleneck'] = False
     else:
-        net_params['bottleneck'] = True
+        if str(args.bottleneck) == 'True':
+            net_params['bottleneck'] = True
+        elif str(args.bottleneck) == 'False':
+            net_params['bottleneck'] = False
 
     if args.rki is None:
         net_params['rki'] = 1
