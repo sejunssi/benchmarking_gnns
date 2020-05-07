@@ -479,10 +479,10 @@ def main():
     else:
         net_params['ub_delta'] = 0.2
 
-    if args.lb_data is not None:
-        net_params['lb_data'] = float(args.lb_data)
+    if args.lb_delta is not None:
+        net_params['lb_delta'] = float(args.lb_delta)
     else:
-        net_params['lb_data'] = 0.0
+        net_params['lb_delta'] = 0.0
 
     if args.how_residual is not None:
         net_params['how_residual'] = str(args.how_residual)
