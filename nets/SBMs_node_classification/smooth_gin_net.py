@@ -13,7 +13,7 @@ from dgl.nn.pytorch.glob import SumPooling, AvgPooling, MaxPooling
 """
 
 from layers.gin_layer import GINLayer, ApplyNodeFunc, MLP
-from layers.mlp_readout_layer import MLPReadout, ResnetMLPReadout, RK2netMLPReadout, RK3netMLPReadout
+from layers.mlp_readout_layer import MLPReadout, ResnetMLPReadout, RK2netMLPReadout, RK3netMLPReadout, RK2M1netMLPReadout
 
 class SmoothGINNet(nn.Module):
     
@@ -39,15 +39,19 @@ class SmoothGINNet(nn.Module):
             self.middle_dim = net_params['middle_dim']
             middle_dim = self.middle_dim
             self.new_fc_layer = nn.Linear(hidden_dim + n_classes, middle_dim)
-            self.new_fc_layer2 = nn.Linear(middle_dim, hidden_dim + n_classes)
-            if self.how_residual == 'rk2':
-               self.w_layer = RK2netMLPReadout(hidden_dim + n_classes, 1)
+            # self.new_fc_layer2 = nn.Linear(middle_dim, hidden_dim + n_classes)
+            if self.how_residual == 'rk2_m1':
+                self.w_layer = RK2M1netMLPReadout(middle_dim + n_classes, 1)
+            elif self.how_residual == 'rk2':
+               self.w_layer = RK2netMLPReadout(middle_dim + n_classes, 1)
             elif self.how_residual == 'resnet':
-               self.w_layer = ResnetMLPReadout(hidden_dim + n_classes, 1)
+               self.w_layer = ResnetMLPReadout(middle_dim + n_classes, 1)
             elif self.how_residual == 'rk3':
-               self.w_layer = RK3netMLPReadout(hidden_dim + n_classes, 1)
+               self.w_layer = RK3netMLPReadout(middle_dim + n_classes, 1)
         else:
-            if self.how_residual == 'rk2':
+            if self.how_residual == 'rk2_m1':
+                self.w_layer = RK2M1netMLPReadout(hidden_dim + n_classes, 1)
+            elif self.how_residual == 'rk2':
                 self.w_layer = RK2netMLPReadout(hidden_dim+n_classes, 1)
             elif self.how_residual == 'resnet':
                 self.w_layer = ResnetMLPReadout(hidden_dim+n_classes, 1)
@@ -104,7 +108,7 @@ class SmoothGINNet(nn.Module):
             score_over_layer_p += self.linears_prediction1[i](h)
             if self.middle_dim != 'None':
                 h = self.new_fc_layer(torch.cat((h, label.to(torch.float)), dim=1))
-                h = self.new_fc_layer2(h)
+                # h = self.new_fc_layer2(h)
             score_over_layer_w += self.w_layer(h)
 
         w = self.sigmoid(score_over_layer_w).to(torch.float)
