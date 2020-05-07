@@ -49,7 +49,7 @@ from data.data import LoadData # import dataset
 from train.train_SBMs_node_classification import smooth_train_epoch, smooth_evaluate_network # import train functions
 from datetime import datetime
 dateTimeObj = datetime.now()
-timestampStr = dateTimeObj.strftime("%d-%b-%Y (%H:%M:%S.%f)")
+timestampStr = dateTimeObj.strftime("%d-%b-%Y-%H-%M")
 
 """
     GPU Setup

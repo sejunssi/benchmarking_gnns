@@ -4,7 +4,7 @@ import re
 import os
 from datetime import datetime
 dateTimeObj = datetime.now()
-timestampStr = dateTimeObj.strftime("%d-%b-%Y (%H:%M:%S.%f)")
+timestampStr = dateTimeObj.strftime("%d-%b-%Y-%H-%M")
 
 seeds = [12, 41, 95]
 a_list = [8, 7, 9]
