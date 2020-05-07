@@ -47,9 +47,9 @@ class DotDict(dict):
 from nets.SBMs_node_classification.load_net import gnn_model # import GNNs
 from data.data import LoadData # import dataset
 from train.train_SBMs_node_classification import smooth_train_epoch, smooth_evaluate_network # import train functions
-
-
-
+import datetime
+dateTimeObj = datetime.now()
+timestampStr = dateTimeObj.strftime("%d-%b-%Y (%H:%M:%S.%f)")
 
 """
     GPU Setup
@@ -237,7 +237,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, train_soft
                     print("Max_time for training elapsed {:.2f} hours, so stopping".format(params['max_time']))
                     break
 
-            csv_file = open(f'./result/{params["seed"]}_{str(net_params["residual"])}_{DATASET_NAME}_{MODEL_NAME}_{net_params["how_residual"]}_rk{net_params["rki"]}_lb{str(lb_delta).split(".")[1]}_ub{str(ub_delta).split(".")[1]}_{net_params["middle_dim"]}_{net_params["bottleneck"]}_epoch_files.csv', 'w')
+            csv_file = open(f'./result/{params["seed"]}_{str(net_params["residual"])}_{DATASET_NAME}_{MODEL_NAME}_{net_params["how_residual"]}_rk{net_params["rki"]}_lb{str(lb_delta).split(".")[1]}_ub{str(ub_delta).split(".")[1]}_{net_params["middle_dim"]}_{net_params["bottleneck"]}_{timestampStr}_epoch_files.csv', 'w')
             csvwriter = csv.writer(csv_file)
             csvwriter.writerow(header)
             for data in (zip(epochs, epoch_train_loss_list, epoch_train_acc_list, epoch_val_loss_list, epoch_val_acc_list,
@@ -248,7 +248,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, train_soft
             ckpt_dir = os.path.join(root_ckpt_dir, "RUN_")
             torch.save(best_model_dict, '{}.pkl'.format(ckpt_dir + "/epoch_" + str(best_val_epoch) + "_" + "BEST_VAL"))
             with open(
-                    f"./result/model/{params['seed']}_{str(net_params['residual'])}_{DATASET_NAME}_{MODEL_NAME}_{net_params['how_residual']}_rk{net_params['rki']}_lb{str(lb_delta).split('.')[1]}_ub{str(ub_delta).split('.')[1]}_{net_params['middle_dim']}_{net_params['bottleneck']}_ep{best_val_epoch}_acc_best_val.csv",
+                    f"./result/{params['seed']}_{str(net_params['residual'])}_{DATASET_NAME}_{MODEL_NAME}_{net_params['how_residual']}_rk{net_params['rki']}_lb{str(lb_delta).split('.')[1]}_ub{str(ub_delta).split('.')[1]}_{net_params['middle_dim']}_{net_params['bottleneck']}_ep{best_val_epoch}_{timestampStr}_acc_best_val.csv",
                     'w') as f:
                 if len(best_acc) == 3:
                     f.write("train acc, val acc, test acc")
@@ -264,7 +264,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, train_soft
         print('-' * 89)
         print('Exiting from training early because of KeyboardInterrupt')
 
-    with open(f'./result/weight/{params["seed"]}_{str(net_params["residual"])}_{DATASET_NAME}_{MODEL_NAME}_{net_params["how_residual"]}_rk{net_params["rki"]}_lb{str(lb_delta).split(".")[1]}_ub{str(ub_delta).split(".")[1]}_{net_params["middle_dim"]}_{net_params["bottleneck"]}.pkl', 'wb') as f:
+    with open(f'./result/weight/{params["seed"]}_{str(net_params["residual"])}_{DATASET_NAME}_{MODEL_NAME}_{net_params["how_residual"]}_rk{net_params["rki"]}_lb{str(lb_delta).split(".")[1]}_ub{str(ub_delta).split(".")[1]}_{net_params["middle_dim"]}_{net_params["bottleneck"]}_{timestampStr}.pkl', 'wb') as f:
         print("writing pickle file")
         graph_dict = {
             'g': batch_graph_list,
@@ -284,7 +284,7 @@ def train_val_pipeline(MODEL_NAME, dataset, params, net_params, dirs, train_soft
     # trained_w = model.w.squeeze().data.numpy().tolist()
     # with open(f'./{params["seed"]}_{str(net_params["residual"])}_{DATASET_NAME}_{MODEL_NAME}_W.csv', 'w') as f:
     #     f.write(",".join(map(str, trained_w)))
-    with open(f'./result/{params["seed"]}_{str(net_params["residual"])}_{DATASET_NAME}_{MODEL_NAME}_{net_params["how_residual"]}_rk{net_params["rki"]}_lb{str(lb_delta).split(".")[1]}_ub{str(ub_delta).split(".")[1]}_{net_params["middle_dim"]}_{net_params["bottleneck"]}_test_result.csv', 'wt',
+    with open(f'./result/{params["seed"]}_{str(net_params["residual"])}_{DATASET_NAME}_{MODEL_NAME}_{net_params["how_residual"]}_rk{net_params["rki"]}_lb{str(lb_delta).split(".")[1]}_ub{str(ub_delta).split(".")[1]}_{net_params["middle_dim"]}_{net_params["bottleneck"]}_{timestampStr}_test_result.csv', 'wt',
               newline='') as f:
         f.write("Test_Accuracy" + "," + "Train_Accuracy" + "," + "Total_Time_Taken" + "," + "AVG_Time_Per_Epoch")
         f.write("\n")
