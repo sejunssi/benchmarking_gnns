@@ -36,7 +36,7 @@ do
     #####
     tmux send-keys "
     python main_SBMs_node_classification_smooth.py --dataset SBM_CLUSTER --middle_dim=32 --bottleneck=True --lb_delta=0 --ub_delta=0.2 --gpu_id 0 --seed $seed --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_SMOOTH.json' &
-    python main_SBMs_node_classification_smooth.py --dataset SBM_CLUSTER --middle_dim=32 --bottleneck=True --lb_delta=0 --ub_delta=0.2 --how_residual=rk1 --gpu_id 1 --seed $seed  --config 'configs/SBMs_node_clustering_GIN_CLUSTER_SMOOTH.json' &
+    python main_SBMs_node_classification_smooth.py --dataset SBM_CLUSTER --middle_dim=32 --bottleneck=True --lb_delta=0 --ub_delta=0.2 --how_residual=rk1 --gpu_id 1 --seed $seed  --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_SMOOTH.json' &
     python main_SBMs_node_classification_smooth.py --dataset SBM_CLUSTER --middle_dim=32 --bottleneck=True --lb_delta=0 --ub_delta=0.2 --how_residual=rk2 --gpu_id 2 --seed $seed --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_SMOOTH.json' &
     wait" C-m
 
@@ -57,7 +57,7 @@ do
     #####
     tmux send-keys "
     python main_SBMs_node_classification_smooth.py --dataset SBM_CLUSTER --middle_dim=32 --bottleneck=True --lb_delta=0 --ub_delta=0.2 --gpu_id 0 --seed $seed --config 'configs/SBMs_node_clustering_GAT_CLUSTER_SMOOTH.json' &
-    python main_SBMs_node_classification_smooth.py --dataset SBM_CLUSTER --middle_dim=32 --bottleneck=True --lb_delta=0 --ub_delta=0.2 --how_residual=rk1 --gpu_id 1 --seed $seed --config 'configs/SBMs_node_clustering_GIN_CLUSTER_SMOOTH.json' &
+    python main_SBMs_node_classification_smooth.py --dataset SBM_CLUSTER --middle_dim=32 --bottleneck=True --lb_delta=0 --ub_delta=0.2 --how_residual=rk1 --gpu_id 1 --seed $seed --config 'configs/SBMs_node_clustering_GAT_CLUSTER_SMOOTH.json' &
     python main_SBMs_node_classification_smooth.py --dataset SBM_CLUSTER --middle_dim=32 --bottleneck=True --lb_delta=0 --ub_delta=0.2 --how_residual=rk2 --gpu_id 2 --seed $seed --config 'configs/SBMs_node_clustering_GAT_CLUSTER_SMOOTH.json' &
     wait" C-m
 
@@ -100,7 +100,7 @@ do
     #####
     tmux send-keys "
     python main_SBMs_node_classification_smooth.py --dataset SBM_CLUSTER --middle_dim=32 --residual=False --bottleneck=True --lb_delta=0 --ub_delta=0.2 --gpu_id 0 --seed $seed --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_SMOOTH.json' &
-    python main_SBMs_node_classification_smooth.py --dataset SBM_CLUSTER --middle_dim=32 --residual=False --bottleneck=True --lb_delta=0 --ub_delta=0.2 --how_residual=rk1 --gpu_id 1 --seed $seed  --config 'configs/SBMs_node_clustering_GIN_CLUSTER_SMOOTH.json' &
+    python main_SBMs_node_classification_smooth.py --dataset SBM_CLUSTER --middle_dim=32 --residual=False --bottleneck=True --lb_delta=0 --ub_delta=0.2 --how_residual=rk1 --gpu_id 1 --seed $seed  --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_SMOOTH.json' &
     python main_SBMs_node_classification_smooth.py --dataset SBM_CLUSTER --middle_dim=32 --residual=False --bottleneck=True --lb_delta=0 --ub_delta=0.2 --how_residual=rk2 --gpu_id 2 --seed $seed --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_SMOOTH.json' &
     wait" C-m
 
@@ -121,7 +121,7 @@ do
     #####
     tmux send-keys "
     python main_SBMs_node_classification_smooth.py --dataset SBM_CLUSTER --middle_dim=32 --residual=False --bottleneck=True --lb_delta=0 --ub_delta=0.2 --gpu_id 0 --seed $seed --config 'configs/SBMs_node_clustering_GAT_CLUSTER_SMOOTH.json' &
-    python main_SBMs_node_classification_smooth.py --dataset SBM_CLUSTER --middle_dim=32 --residual=False --bottleneck=True --lb_delta=0 --ub_delta=0.2 --how_residual=rk1 --gpu_id 1 --seed $seed --config 'configs/SBMs_node_clustering_GIN_CLUSTER_SMOOTH.json' &
+    python main_SBMs_node_classification_smooth.py --dataset SBM_CLUSTER --middle_dim=32 --residual=False --bottleneck=True --lb_delta=0 --ub_delta=0.2 --how_residual=rk1 --gpu_id 1 --seed $seed --config 'configs/SBMs_node_clustering_GAT_CLUSTER_SMOOTH.json' &
     python main_SBMs_node_classification_smooth.py --dataset SBM_CLUSTER --middle_dim=32 --residual=False --bottleneck=True --lb_delta=0 --ub_delta=0.2 --how_residual=rk2 --gpu_id 2 --seed $seed --config 'configs/SBMs_node_clustering_GAT_CLUSTER_SMOOTH.json' &
     wait" C-m
 
@@ -163,7 +163,7 @@ do
     #####
     tmux send-keys "
     python main_SBMs_node_classification_smooth.py --dataset SBM_PATTERN --middle_dim=32 --bottleneck=True --lb_delta=0 --ub_delta=0.2 --gpu_id 0 --seed $seed --config 'configs/SBMs_node_clustering_GatedGCN_PATTERN_SMOOTH.json' &
-    python main_SBMs_node_classification_smooth.py --dataset SBM_PATTERN --middle_dim=32 --bottleneck=True --lb_delta=0 --ub_delta=0.2 --how_residual=rk1 --gpu_id 1 --seed $seed  --config 'configs/SBMs_node_clustering_GIN_PATTERN_SMOOTH.json' &
+    python main_SBMs_node_classification_smooth.py --dataset SBM_PATTERN --middle_dim=32 --bottleneck=True --lb_delta=0 --ub_delta=0.2 --how_residual=rk1 --gpu_id 1 --seed $seed  --config 'configs/SBMs_node_clustering_GatedGCN_PATTERN_SMOOTH.json' &
     python main_SBMs_node_classification_smooth.py --dataset SBM_PATTERN --middle_dim=32 --bottleneck=True --lb_delta=0 --ub_delta=0.2 --how_residual=rk2 --gpu_id 2 --seed $seed --config 'configs/SBMs_node_clustering_GatedGCN_PATTERN_SMOOTH.json' &
     wait" C-m
 
@@ -184,7 +184,7 @@ do
     #####
     tmux send-keys "
     python main_SBMs_node_classification_smooth.py --dataset SBM_PATTERN --middle_dim=32 --bottleneck=True --lb_delta=0 --ub_delta=0.2 --gpu_id 0 --seed $seed --config 'configs/SBMs_node_clustering_GAT_PATTERN_SMOOTH.json' &
-    python main_SBMs_node_classification_smooth.py --dataset SBM_PATTERN --middle_dim=32 --bottleneck=True --lb_delta=0 --ub_delta=0.2 --how_residual=rk1 --gpu_id 1 --seed $seed --config 'configs/SBMs_node_clustering_GIN_PATTERN_SMOOTH.json' &
+    python main_SBMs_node_classification_smooth.py --dataset SBM_PATTERN --middle_dim=32 --bottleneck=True --lb_delta=0 --ub_delta=0.2 --how_residual=rk1 --gpu_id 1 --seed $seed --config 'configs/SBMs_node_clustering_GAT_PATTERN_SMOOTH.json' &
     python main_SBMs_node_classification_smooth.py --dataset SBM_PATTERN --middle_dim=32 --bottleneck=True --lb_delta=0 --ub_delta=0.2 --how_residual=rk2 --gpu_id 2 --seed $seed --config 'configs/SBMs_node_clustering_GAT_PATTERN_SMOOTH.json' &
     wait" C-m
 
@@ -227,7 +227,7 @@ do
     #####
     tmux send-keys "
     python main_SBMs_node_classification_smooth.py --dataset SBM_PATTERN --middle_dim=32 --residual=False --bottleneck=True --lb_delta=0 --ub_delta=0.2 --gpu_id 0 --seed $seed --config 'configs/SBMs_node_clustering_GatedGCN_PATTERN_SMOOTH.json' &
-    python main_SBMs_node_classification_smooth.py --dataset SBM_PATTERN --middle_dim=32 --residual=False --bottleneck=True --lb_delta=0 --ub_delta=0.2 --how_residual=rk1 --gpu_id 1 --seed $seed  --config 'configs/SBMs_node_clustering_GIN_PATTERN_SMOOTH.json' &
+    python main_SBMs_node_classification_smooth.py --dataset SBM_PATTERN --middle_dim=32 --residual=False --bottleneck=True --lb_delta=0 --ub_delta=0.2 --how_residual=rk1 --gpu_id 1 --seed $seed  --config 'configs/SBMs_node_clustering_GatedGCN_PATTERN_SMOOTH.json' &
     python main_SBMs_node_classification_smooth.py --dataset SBM_PATTERN --middle_dim=32 --residual=False --bottleneck=True --lb_delta=0 --ub_delta=0.2 --how_residual=rk2 --gpu_id 2 --seed $seed --config 'configs/SBMs_node_clustering_GatedGCN_PATTERN_SMOOTH.json' &
     wait" C-m
 
@@ -248,7 +248,7 @@ do
     #####
     tmux send-keys "
     python main_SBMs_node_classification_smooth.py --dataset SBM_PATTERN --middle_dim=32 --residual=False --bottleneck=True --lb_delta=0 --ub_delta=0.2 --gpu_id 0 --seed $seed --config 'configs/SBMs_node_clustering_GAT_PATTERN_SMOOTH.json' &
-    python main_SBMs_node_classification_smooth.py --dataset SBM_PATTERN --middle_dim=32 --residual=False --bottleneck=True --lb_delta=0 --ub_delta=0.2 --how_residual=rk1 --gpu_id 1 --seed $seed --config 'configs/SBMs_node_clustering_GIN_PATTERN_SMOOTH.json' &
+    python main_SBMs_node_classification_smooth.py --dataset SBM_PATTERN --middle_dim=32 --residual=False --bottleneck=True --lb_delta=0 --ub_delta=0.2 --how_residual=rk1 --gpu_id 1 --seed $seed --config 'configs/SBMs_node_clustering_GAT_PATTERN_SMOOTH.json' &
     python main_SBMs_node_classification_smooth.py --dataset SBM_PATTERN --middle_dim=32 --residual=False --bottleneck=True --lb_delta=0 --ub_delta=0.2 --how_residual=rk2 --gpu_id 2 --seed $seed --config 'configs/SBMs_node_clustering_GAT_PATTERN_SMOOTH.json' &
     wait" C-m
 
