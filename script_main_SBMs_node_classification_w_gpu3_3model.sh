@@ -12,7 +12,7 @@ tmux new -s benchmark_SBMs_node_classification -d
 tmux send-keys "source activate benchmark_gnn" C-m
 
 w_list=(05 1 15)
-
+seed_list=(41 95 12 35)
 # shellcheck disable=SC2068
 for seed in ${seed_list[@]}
 do
@@ -75,3 +75,5 @@ do
 
   done
 done
+
+tmux send-keys "tmux kill-session -t benchmark_SBMs_node_classification" C-m
