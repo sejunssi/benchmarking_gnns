@@ -14,6 +14,8 @@ import dgl
 from layers.graphsage_layer import GraphSageLayer
 from layers.mlp_readout_layer import MLPReadout, ResnetMLPReadout
 from layers.mlp_readout_layer import MLPReadout, ResnetMLPReadout, RK2netMLPReadout, RK3netMLPReadout
+from layers.mlp_readout_layer \
+    import MLPReadout, ResnetMLPReadout, RK2netMLPReadout, RK3netMLPReadout, RK2M1netMLPReadout, RKinetMLPReadout, BaseLineMLPReadout
 
 class SmoothGraphSageNet(nn.Module):
     """
@@ -36,12 +38,13 @@ class SmoothGraphSageNet(nn.Module):
         self.n_classes = n_classes
         self.device = net_params['device']
         self.how_residual = net_params['how_residual']
-        if self.how_residual == 'resnet':
-            self.w_layer = ResnetMLPReadout(out_dim + n_classes, 1)
-        elif self.how_residual == 'rk2':
-            self.w_layer = RK2netMLPReadout(out_dim + n_classes, 1)
-        elif self.how_residual == 'rk3':
-            self.w_layer = RK3netMLPReadout(out_dim + n_classes, 1)
+
+        bottleneck = net_params['bottleneck']
+        self.bottleneck = bottleneck
+        self.how_residual = net_params['how_residual']
+        self.middle_dim = net_params['middle_dim']
+        self.rki = net_params['rki']
+        self.rk_middle_layer(bottleneck, hidden_dim, n_classes, net_params)
         
         self.embedding_h = nn.Embedding(in_dim_node, hidden_dim) # node feat is an integer
         self.in_feat_dropout = nn.Dropout(in_feat_dropout)
@@ -59,7 +62,8 @@ class SmoothGraphSageNet(nn.Module):
         g = kwargs['g']
         h = kwargs['h']
         e = kwargs['e']
-        delta = kwargs['delta']
+        lb_delta = kwargs['lb_delta']
+        ub_delta = kwargs['ub_delta']
         snorm_n = kwargs['snorm_n']
         snorm_e = kwargs['snorm_e']
         label = kwargs['label']
@@ -76,16 +80,70 @@ class SmoothGraphSageNet(nn.Module):
         p = self.MLP_layer(h)
 
         h = torch.cat((h, label.to(torch.float)), dim=1)
-        w = self.w_layer(h)
+        if self.middle_dim != 'None':
+            h = self.dense_layer(h)
+            if self.bottleneck:
+                h = self.widen_layer(h)
+            h = self.fc_layer(h)
+        w = self.w_layer(h).to(torch.float)
+
         w = self.sigmoid(w).to(torch.float)
         w = w.data
+        saved_w = w
         w = w.repeat(1, self.n_classes)
-        w = torch.clamp(w, min=0, max=delta).to(device=self.device)
+        w = torch.clamp(w, min=lb_delta, max=ub_delta).to(device=self.device)
         ones = torch.ones(label.shape[0], label.shape[1]).to(torch.float).to(device=self.device)
         max_entropy = torch.Tensor([1 / label.shape[1]]).repeat(label.shape[0], label.shape[1]).to(torch.float).to(device=self.device)
         g_hat = (ones - w) * label.to(torch.float)+ w * max_entropy
-        return p, g_hat
-    
+        return  p, g_hat, g, saved_w
+
+    def rk_middle_layer(self, bottleneck, hidden_dim, n_classes, net_params):
+        if self.middle_dim != 'None':
+            self.middle_dim = net_params['middle_dim']
+            middle_dim = self.middle_dim
+            self.dense_layer = nn.Linear(hidden_dim + n_classes, middle_dim)
+            if bottleneck == True:
+                self.widen_layer = nn.Linear(middle_dim, hidden_dim + n_classes)
+                self.fc_layer = nn.Linear(hidden_dim + n_classes, hidden_dim + n_classes)
+                if self.how_residual == 'rki':
+                    self.w_layer = RKinetMLPReadout(hidden_dim + n_classes, 1, self.rki)
+                elif self.how_residual == 'rk2m1':
+                    self.w_layer = RK2M1netMLPReadout(hidden_dim + n_classes, 1)
+                elif self.how_residual == 'rk2':
+                    self.w_layer = RK2netMLPReadout(hidden_dim + n_classes, 1)
+                elif self.how_residual == 'rk1':
+                    self.w_layer = ResnetMLPReadout(hidden_dim + n_classes, 1)
+                elif self.how_residual == 'rk3':
+                    self.w_layer = RK3netMLPReadout(hidden_dim + n_classes, 1)
+                else:
+                    self.w_layer = BaseLineMLPReadout(hidden_dim + n_classes, 1)
+            else:
+                self.fc_layer = nn.Linear(middle_dim, middle_dim)
+                if self.how_residual == 'rki':
+                    self.w_layer = RKinetMLPReadout(middle_dim, 1, self.rki)
+                elif self.how_residual == 'rk2m1':
+                    self.w_layer = RK2M1netMLPReadout(middle_dim, 1)
+                elif self.how_residual == 'rk2':
+                    self.w_layer = RK2netMLPReadout(middle_dim, 1)
+                elif self.how_residual == 'rk1':
+                    self.w_layer = ResnetMLPReadout(middle_dim, 1)
+                elif self.how_residual == 'rk3':
+                    self.w_layer = RK3netMLPReadout(middle_dim, 1)
+                else:
+                    self.w_layer = BaseLineMLPReadout(middle_dim, 1)
+        else:
+            if self.how_residual == 'rki':
+                self.w_layer = RKinetMLPReadout(hidden_dim + n_classes, 1, self.rki)
+            elif self.how_residual == 'rk2m1':
+                self.w_layer = RK2M1netMLPReadout(hidden_dim + n_classes, 1)
+            elif self.how_residual == 'rk2':
+                self.w_layer = RK2netMLPReadout(hidden_dim + n_classes, 1)
+            elif self.how_residual == 'rk1':
+                self.w_layer = ResnetMLPReadout(hidden_dim + n_classes, 1)
+            elif self.how_residual == 'rk3':
+                self.w_layer = RK3netMLPReadout(hidden_dim + n_classes, 1)
+            else:
+                self.w_layer = BaseLineMLPReadout(hidden_dim + n_classes, 1)
 
     def loss(self, pred, label, train_soft_target=False):
         if train_soft_target == True:
