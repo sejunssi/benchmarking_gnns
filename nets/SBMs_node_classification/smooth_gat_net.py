@@ -63,6 +63,7 @@ class SmoothGATNet(nn.Module):
             self.dense_layer = nn.Linear(hidden_dim + n_classes, middle_dim)
             if bottleneck == True:
                 self.widen_layer = nn.Linear(middle_dim, hidden_dim + n_classes)
+                self.fc_layer = nn.Linear(hidden_dim + n_classes, hidden_dim + n_classes)
                 if self.how_residual == 'rki':
                     self.w_layer = RKinetMLPReadout(hidden_dim + n_classes, 1, self.rki)
                 elif self.how_residual == 'rk2m1':
@@ -76,6 +77,7 @@ class SmoothGATNet(nn.Module):
                 else:
                     self.w_layer = BaseLineMLPReadout(hidden_dim + n_classes, 1)
             else:
+                self.fc_layer = nn.Linear(middle_dim, middle_dim)
                 if self.how_residual == 'rki':
                     self.w_layer = RKinetMLPReadout(middle_dim, 1, self.rki)
                 elif self.how_residual == 'rk2m1':
@@ -128,6 +130,7 @@ class SmoothGATNet(nn.Module):
             h = self.dense_layer(h)
             if self.bottleneck:
                 h = self.widen_layer(h)
+            h = self.fc_layer(h)
 
         w = self.w_layer(h).to(torch.float)
         w = self.sigmoid(w)
