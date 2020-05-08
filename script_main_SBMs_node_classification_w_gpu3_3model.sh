@@ -25,7 +25,7 @@ do
     wait" C-m
 
     tmux send-keys "
-    python $code --dataset $dataset     --gpu_id 3 --train_soft_target True --seed $seed --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_w${w}.json' &
+    python $code --dataset $dataset     --gpu_id 3 --train_soft_target True --seed $seed --config 'configs/SBMs_node_clustering_GraphSage_CLUSTER_w${w}.json' &
     wait" C-m
 
     tmux send-keys "
@@ -38,7 +38,7 @@ do
     wait" C-m
 
     tmux send-keys "
-    python $code --dataset $dataset  --residual=False   --gpu_id 3 --train_soft_target True --seed $seed --config 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_w${w}.json' &
+    python $code --dataset $dataset  --residual=False   --gpu_id 3 --train_soft_target True --seed $seed --config 'configs/SBMs_node_clustering_GraphSage_CLUSTER_w${w}.json' &
     wait" C-m
 
     tmux send-keys "
@@ -54,7 +54,7 @@ do
     wait" C-m
 
     tmux send-keys "
-    python $code --dataset $dataset     --gpu_id 3 --train_soft_target True --seed $seed --config 'configs/SBMs_node_clustering_GatedGCN_PATTERN_w${w}.json' &
+    python $code --dataset $dataset     --gpu_id 3 --train_soft_target True --seed $seed --config 'configs/SBMs_node_clustering_GraphSage_PATTERN_w${w}.json' &
     wait" C-m
 
     tmux send-keys "
@@ -66,7 +66,7 @@ do
     wait" C-m
 
     tmux send-keys "
-    python $code --dataset $dataset  --residual=False   --gpu_id 3 --train_soft_target True --seed $seed --config 'configs/SBMs_node_clustering_GatedGCN_PATTERN_w${w}.json' &
+    python $code --dataset $dataset  --residual=False   --gpu_id 3 --train_soft_target True --seed $seed --config 'configs/SBMs_node_clustering_GraphSage_PATTERN_w${w}.json' &
     wait" C-m
 
     tmux send-keys "
