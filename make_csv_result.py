@@ -6,10 +6,6 @@ from datetime import datetime
 dateTimeObj = datetime.now()
 timestampStr = dateTimeObj.strftime("%d-%b-%Y-%H-%M")
 
-seeds = [12, 41, 95]
-a_list = [8, 7, 9]
-w_list = [0.5, 1, 1.5]
-
 paper_acc = {
     'False_SBM_PATTERN_MLP': '50.13+-0.00', # MLP and MLP GATED is same
     'True_SBM_PATTERN_GCN': '74.36+-1.59',
