@@ -82,10 +82,7 @@ def read_data(data_dir):
                         test_acc = float(x[0])
                         wo_acc[''.join(name_list[:6])] = test_acc
                         data_dict['test_acc'] = test_acc
-                    # with open(f"{data_dir}/SBM_test_result_{timestampStr}.csv", 'a', newline='') as f2:
-                    #     csvwriter = csv.writer(f2, delimiter=',')
-                    #     csvwriter.writerow([dataset, model_name, seed, residual, wo_acc[bengio_dict_name], test_acc, smoothing_name])
-                 data_dict_list.append(data_dict)
+                data_dict_list.append(data_dict)
 
             elif re.match('(\d+)_(True|False)_SBM_(CLUSTER|PATTERN)_(SMOOTH)_(\w+)_(\w+)_(\d+)*', name):
                     print(name, 3)
@@ -122,7 +119,8 @@ def read_data(data_dir):
                             wo_acc[''.join(name_list[:6])] = test_acc
                             data_dict['wo_acc'] = bengio_dict_name[bengio_dict_name]
                             data_dict['test_acc'] = test_acc
-        return  data_dict_list
+                    data_dict_list.append(data_dict)
+        return data_dict_list
 
 
 new_data_dict_list = read_data('result')
