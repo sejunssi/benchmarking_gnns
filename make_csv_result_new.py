@@ -54,7 +54,7 @@ def read_data(data_dir):
         data_dict = {}
         if name is None or name == '':
             continue
-        name = str(name.split("/")[1]).replace("./",'')
+        name = str(name.split("\\")[1]).replace("./",'')
         print(name, 0)
         if re.match('[a-zA-Z0-9_-]+_test_result.csv', name):
             print(name, 1)
@@ -80,7 +80,7 @@ def read_data(data_dir):
                     next(csvreader)
                     for x in csvreader:
                         test_acc = float(x[0])
-                        data_dict['wo_acc'] = bengio_dict_name[bengio_dict_name]
+                        data_dict['wo_acc'] = wo_acc[bengio_dict_name]
                         data_dict['test_acc'] = test_acc
                 data_dict_list.append(data_dict)
 
@@ -102,7 +102,7 @@ def read_data(data_dir):
 
                     bengio_dict_name = residual + '_SBM_' + dataset + "_" + model_name
 
-                    data_dict['dataset'] = model_name
+                    data_dict['dataset'] = dataset
                     data_dict['model'] = model_name
                     data_dict['seed'] = seed
                     data_dict['residual'] = residual
@@ -117,8 +117,8 @@ def read_data(data_dir):
                         for x in csvreader:
                             test_acc = float(x[0])
                             wo_acc[''.join(name_list[:6])] = test_acc
-                            data_dict['wo_acc'] = bengio_dict_name[bengio_dict_name]
-                            data_dict['test_acc'] = test_acc
+                            data_dict['wo_acc'] = wo_acc[bengio_dict_name]
+                            data_dict['test_acc'] = str(test_acc)
                     data_dict_list.append(data_dict)
         return data_dict_list
 
@@ -145,7 +145,7 @@ def get_table_dict(new_data_dict_list, classic_data_dict_list, residual='True'):
             for seed in seed_list:
                 bengio_dict_name = residual + '_SBM_' + dataset_name + "_" + model
                 total_data_dict[bengio_dict_name + "_" + seed] = OrderedDict()
-                total_data_dict[bengio_dict_name + "_" + seed]['wo_acc'] = wo_acc(bengio_dict_name)
+                total_data_dict[bengio_dict_name + "_" + seed]['wo_acc'] = wo_acc[bengio_dict_name]
 
     for dataset_name in dataset_name_list:
         for model in model_list:
@@ -162,7 +162,7 @@ def get_table_dict(new_data_dict_list, classic_data_dict_list, residual='True'):
         model_name = data_w['model']
         seed = data_w['seed']
         bengio_dict_name = residual + '_SBM_' + dataset_name + "_" + model_name
-        total_data_dict[bengio_dict_name+"_"+seed][bengio_dict_name+"_"+seed][data_w['smoothing_name']] = data_w['test_acc']
+        total_data_dict[bengio_dict_name+"_"+seed][data_w['smoothing_name']] = data_w['test_acc']
 
 
     for data_n in new_data_dict_list:
@@ -170,7 +170,7 @@ def get_table_dict(new_data_dict_list, classic_data_dict_list, residual='True'):
         model_name = data_n['model']
         seed = data_n['seed']
         bengio_dict_name = residual + '_SBM_' + dataset_name + "_" + model_name
-        total_data_dict[bengio_dict_name + "_" + seed][bengio_dict_name + "_" + seed][data_n['lb']+"_"+data_n['ub']+"_"+data_n['how_residual']] = data_w['test_acc']
+        total_data_dict[bengio_dict_name + "_" + seed][data_n['lb']+"_"+data_n['ub']+"_"+data_n['how_residual']] = data_n['test_acc']
     return total_data_dict
 
 
@@ -178,17 +178,17 @@ residual_total_data_dict = get_table_dict(new_data_dict_list, classic_data_dict_
 nonresidual_total_data_dict = get_table_dict(new_data_dict_list, classic_data_dict_list, residual='False')
 
 
-with open(f'output_{timestampStr}.csv', 'w') as f:
+with open(f'result_merge/output_{timestampStr}.csv', 'w') as f:
     for k1, v1 in residual_total_data_dict.items():
         for k2, v2 in nonresidual_total_data_dict.items():
-            k2_split_data = k2.split.data("_")
+            k2_split_data = k2.split("_")
             if k1 == k2:
                 k_split_data = k1.split("_")
-                f.write(k_split_data[0])
+                f.write("_".join(k_split_data[1:3]))
                 f.write(",")
-                f.write(k_split_data[1])
+                f.write(k_split_data[3])
                 f.write(",")
-                f.write(k_split_data[2])
+                f.write(k_split_data[4])
                 f.write(",")
                 for data in v1.values():
                     f.write(data)
@@ -198,17 +198,17 @@ with open(f'output_{timestampStr}.csv', 'w') as f:
                     f.write(data)
                     f.write(",")
 
-                for data in k2.values():
+                for data in v2.values():
                     f.write(data)
                     f.write(",")
                 f.write("\n")
             else:
                 k_split_data = k1.split("_")
-                f.write(k_split_data[0])
+                f.write("_".join(k_split_data[1:3]))
                 f.write(",")
-                f.write(k_split_data[1])
+                f.write(k_split_data[3])
                 f.write(",")
-                f.write(k_split_data[2])
+                f.write(k_split_data[4])
                 f.write(",")
                 for data in v1.values():
                     f.write(data)
