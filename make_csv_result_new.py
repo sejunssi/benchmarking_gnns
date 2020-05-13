@@ -54,7 +54,9 @@ def read_data(data_dir):
         data_dict = {}
         if name is None or name == '':
             continue
-        name = str(name.split("\\")[1]).replace("./",'')
+        print(name)
+        name = str(name.split("/")[1]).replace("./",'')
+        #name = str(name.split("\\")[1]).replace("./",'')
         print(name, 0)
         if re.match('[a-zA-Z0-9_-]+_test_result.csv', name):
             print(name, 1)
@@ -73,7 +75,7 @@ def read_data(data_dir):
                 data_dict['smoothing_name'] = smoothing_name
                 data_dict['wo_acc'] = wo_acc
                 data_dict['seed'] = seed
-                data_dict['model_name'] = model_name
+                data_dict['model'] = model_name
 
                 with open(data_dir+"/"+name, 'r') as f:
                     csvreader = csv.reader(f,  delimiter=',')
@@ -81,7 +83,7 @@ def read_data(data_dir):
                     for x in csvreader:
                         test_acc = float(x[0])
                         data_dict['wo_acc'] = wo_acc[bengio_dict_name]
-                        data_dict['test_acc'] = test_acc
+                        data_dict['test_acc'] = str(test_acc)
                 data_dict_list.append(data_dict)
 
             elif re.match('(\d+)_(True|False)_SBM_(CLUSTER|PATTERN)_(SMOOTH)_(\w+)_(\w+)_(\d+)*', name):
@@ -137,7 +139,6 @@ def get_table_dict(new_data_dict_list, classic_data_dict_list, residual='True'):
     model_list = ['GIN', 'GraphSage', 'GAT']
     dataset_name_list = ['CLUSTER', 'PATTERN']
 
-    residual = 'True'
 
     # generate data empty dict list
     for dataset_name in dataset_name_list:
