@@ -46,7 +46,7 @@ d = '.'
 
 cur_dir = os.getcwd()
 
-data_dir = './result'
+data_dir = './result/'
 file_name = []
 
 with open(f"{data_dir}/SBM_test_result_{timestampStr}.csv", 'w', newline='') as f2:
