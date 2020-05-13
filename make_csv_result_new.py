@@ -54,7 +54,8 @@ def read_data(data_dir):
         data_dict = {}
         if name is None or name == '':
             continue
-        name = str(name.split("/")[2]).replace("./",'')
+        print(name)
+        name = str(name.split("/")[1]).replace("./",'')
         print(name, 0)
         if re.match('[a-zA-Z0-9_-]+_test_result.csv', name):
             print(name, 1)
@@ -137,7 +138,6 @@ def get_table_dict(new_data_dict_list, classic_data_dict_list, residual='True'):
     model_list = ['GIN', 'GraphSage', 'GAT']
     dataset_name_list = ['CLUSTER', 'PATTERN']
 
-    residual = 'True'
 
     # generate data empty dict list
     for dataset_name in dataset_name_list:

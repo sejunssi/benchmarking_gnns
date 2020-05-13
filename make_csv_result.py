@@ -38,7 +38,6 @@ paper_acc = {
 
 }
 
-d = '.'
 
 cur_dir = os.getcwd()
 
