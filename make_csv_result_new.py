@@ -55,8 +55,8 @@ def read_data(data_dir):
         if name is None or name == '':
             continue
         print(name)
-        name = str(name.split("/")[1]).replace("./",'')
-        #name = str(name.split("\\")[1]).replace("./",'')
+        # name = str(name.split("/")[1]).replace("./",'')
+        name = str(name.split("\\")[1]).replace("./",'')
         print(name, 0)
         if re.match('[a-zA-Z0-9_-]+_test_result.csv', name):
             print(name, 1)
@@ -73,7 +73,7 @@ def read_data(data_dir):
 
                 data_dict['dataset'] = dataset
                 data_dict['smoothing_name'] = smoothing_name
-                data_dict['wo_acc'] = wo_acc
+                data_dict['residual'] = residual
                 data_dict['seed'] = seed
                 data_dict['model'] = model_name
 
@@ -118,19 +118,16 @@ def read_data(data_dir):
                         next(csvreader)
                         for x in csvreader:
                             test_acc = float(x[0])
-                            wo_acc[''.join(name_list[:6])] = test_acc
                             data_dict['wo_acc'] = wo_acc[bengio_dict_name]
                             data_dict['test_acc'] = str(test_acc)
                     data_dict_list.append(data_dict)
-        return data_dict_list
+    return data_dict_list
 
 
 new_data_dict_list = read_data('result')
 classic_data_dict_list = read_data('result_w')
 
 def get_table_dict(new_data_dict_list, classic_data_dict_list, residual='True'):
-
-
     total_data_dict = OrderedDict()
     lb_ub_list = [('0.0', '0.2'), ('0.05', '0.15'), ('0.08', '0.12')]
     w_list = ['w05', 'w1', 'w15']
@@ -159,165 +156,238 @@ def get_table_dict(new_data_dict_list, classic_data_dict_list, residual='True'):
                             total_data_dict[bengio_dict_name + "_" + seed][lb_ub[0]+"_"+lb_ub[1]+"_"+dnm] = ''
 
     for data_w in classic_data_dict_list:
-        dataset_name = data_w['dataset']
-        model_name = data_w['model']
-        seed = data_w['seed']
-        bengio_dict_name = residual + '_SBM_' + dataset_name + "_" + model_name
-        total_data_dict[bengio_dict_name+"_"+seed][data_w['smoothing_name']] = data_w['test_acc']
+        r = data_w['residual']
+        if r == residual:
+            dataset_name = data_w['dataset']
+            model_name = data_w['model']
+            seed = data_w['seed']
+            bengio_dict_name = residual + '_SBM_' + dataset_name + "_" + model_name
+            total_data_dict[bengio_dict_name+"_"+seed][data_w['smoothing_name']] = data_w['test_acc']
 
 
     for data_n in new_data_dict_list:
-        dataset_name = data_n['dataset']
-        model_name = data_n['model']
-        seed = data_n['seed']
-        bengio_dict_name = residual + '_SBM_' + dataset_name + "_" + model_name
-        total_data_dict[bengio_dict_name + "_" + seed][data_n['lb']+"_"+data_n['ub']+"_"+data_n['how_residual']] = data_n['test_acc']
+        r = data_n['residual']
+        if r == residual:
+            dataset_name = data_n['dataset']
+            model_name = data_n['model']
+            seed = data_n['seed']
+            bengio_dict_name = residual + '_SBM_' + dataset_name + "_" + model_name
+            total_data_dict[bengio_dict_name + "_" + seed][data_n['lb']+"_"+data_n['ub']+"_"+data_n['how_residual']] = data_n['test_acc']
     return total_data_dict
 
 
 residual_total_data_dict = get_table_dict(new_data_dict_list, classic_data_dict_list, residual='True')
 nonresidual_total_data_dict = get_table_dict(new_data_dict_list, classic_data_dict_list, residual='False')
 
+# header = ['dataset', 'model', 'seed', 'wo_acc', 'w05', 'w1', 'w15', '0.0_0.2_baseline', '0.0_0.2_rk1',
+#           '0.05_0.15_baseline', '0.05_0.15_rk1', '0.05_0.15_rk2', '0.08_0.12_baseline', '0.08_0.12_rk1',
+#           '0.08_0.12_rk2','dataset', 'model', 'seed', 'wo_acc', 'w05', 'w1', 'w15', '0.0_0.2_baseline', '0.0_0.2_rk1',
+#           '0.05_0.15_baseline', '0.05_0.15_rk1', '0.05_0.15_rk2', '0.08_0.12_baseline', '0.08_0.12_rk1',
+#           '0.08_0.12_rk2']
 header = ['dataset', 'model', 'seed', 'wo_acc', 'w05', 'w1', 'w15', '0.0_0.2_baseline', '0.0_0.2_rk1',
-          '0.05_0.15_baseline', '0.05_0.15_rk1', '0.05_0.15_rk2', '0.08_0.12_baseline', '0.08_0.12_rk1',
-          '0.08_0.12_rk2','dataset', 'model', 'seed', 'wo_acc', 'w05', 'w1', 'w15', '0.0_0.2_baseline', '0.0_0.2_rk1',
           '0.05_0.15_baseline', '0.05_0.15_rk1', '0.05_0.15_rk2', '0.08_0.12_baseline', '0.08_0.12_rk1',
           '0.08_0.12_rk2']
 import csv
-with open(f'result_merge/output_{timestampStr}.csv', 'w', newline='') as f:
+with open(f'result_merge/output_{timestampStr}_residual.csv', 'w', newline='') as f:
     csvwriter = csv.writer(f)
     csvwriter.writerow(header)
 
-with open(f'result_merge/output_{timestampStr}.csv', 'a') as f:
-    print('writing')
+with open(f'result_merge/output_{timestampStr}_residual.csv', 'a') as f:
+    print("writing")
     for k1, v1 in residual_total_data_dict.items():
-        for k2, v2 in nonresidual_total_data_dict.items():
-            k2_split_data = k2.split("_")
-            data_list = []
-            if k1 == k2:
-                is_empty = True
-                for k, v in v1.items():
-                    if k == 'wo_acc':
-                        continue
-                    if v != '':
-                        is_empty = False
-                for k, v in v2.items():
-                    if k == 'wo_acc':
-                        continue
-                    if v != '':
-                        is_empty = False
-                if not is_empty:
-                    k_split_data = k1.split("_")
-                    data_list.append('_'.join(k_split_data[1:3]))
-                    data_list.append(k_split_data[3])
-                    data_list.append(k_split_data[4])
-                    data_list.append(v1['wo_acc'])
-                    data_list.append(v1['w05'])
-                    data_list.append(v1['w1'])
-                    data_list.append(v1['w15'])
-                    data_list.append(v1['0.0_0.2_baseline'])
-                    data_list.append(v1['0.0_0.2_rk1'])
-                    data_list.append(v1['0.0_0.2_rk2'])
-                    data_list.append(v1['0.05_0.15_baseline'])
-                    data_list.append(v1['0.05_0.15_rk1'])
-                    data_list.append(v1['0.05_0.15_rk2'])
-                    data_list.append(v1['0.08_0.12_baseline'])
-                    data_list.append(v1['0.08_0.12_rk1'])
-                    data_list.append(v1['0.08_0.12_rk2'])
+        data_list = []
+        k1_split_data = k1.split("_")
+        data_list.append('_'.join(k1_split_data[1:3]))
+        data_list.append(k1_split_data[3])
+        data_list.append(k1_split_data[4])
+        data_list.append(v1['wo_acc'])
+        data_list.append(v1['w05'])
+        data_list.append(v1['w1'])
+        data_list.append(v1['w15'])
+        data_list.append(v1['0.0_0.2_baseline'])
+        data_list.append(v1['0.0_0.2_rk1'])
+        data_list.append(v1['0.0_0.2_rk2'])
+        data_list.append(v1['0.05_0.15_baseline'])
+        data_list.append(v1['0.05_0.15_rk1'])
+        data_list.append(v1['0.05_0.15_rk2'])
+        data_list.append(v1['0.08_0.12_baseline'])
+        data_list.append(v1['0.08_0.12_rk1'])
+        data_list.append(v1['0.08_0.12_rk2'])
 
-                    data_list.append('_'.join(k_split_data[1:3]))
-                    data_list.append(k_split_data[3])
-                    data_list.append(k_split_data[4])
-                    data_list.append(v2['wo_acc'])
-                    data_list.append(v2['w05'])
-                    data_list.append(v2['w1'])
-                    data_list.append(v2['w15'])
-                    data_list.append(v2['0.0_0.2_baseline'])
-                    data_list.append(v2['0.0_0.2_rk1'])
-                    data_list.append(v2['0.0_0.2_rk2'])
-                    data_list.append(v2['0.05_0.15_baseline'])
-                    data_list.append(v2['0.05_0.15_rk1'])
-                    data_list.append(v2['0.05_0.15_rk2'])
-                    data_list.append(v2['0.08_0.12_baseline'])
-                    data_list.append(v2['0.08_0.12_rk1'])
-                    data_list.append(v2['0.08_0.12_rk2'])
-                    for data in data_list:
-                        f.write(data)
-                        f.write(',')
-                    f.write('\n')
-            else:
-                is_empty1 = True
-                for k, v in v1.items():
-                    if k == 'wo_acc':
-                        continue
-                    if v != '':
-                        is_empty1 = False
 
-                is_empty2 = True
-                for k, v in v2.items():
-                    if k == 'wo_acc':
-                        continue
-                    if v != '':
-                        is_empty2 = False
-                if not is_empty1:
-                    k_split_data = k1.split("_")
-                    data_list.append('_'.join(k_split_data[1:3]))
-                    data_list.append(k_split_data[3])
-                    data_list.append(k_split_data[4])
-                    data_list.append(v1['wo_acc'])
-                    data_list.append(v1['w05'])
-                    data_list.append(v1['w1'])
-                    data_list.append(v1['w15'])
-                    data_list.append(v1['0.0_0.2_baseline'])
-                    data_list.append(v1['0.0_0.2_rk1'])
-                    data_list.append(v1['0.0_0.2_rk2'])
-                    data_list.append(v1['0.05_0.15_baseline'])
-                    data_list.append(v1['0.05_0.15_rk1'])
-                    data_list.append(v1['0.05_0.15_rk2'])
-                    data_list.append(v1['0.08_0.12_baseline'])
-                    data_list.append(v1['0.08_0.12_rk1'])
-                    data_list.append(v1['0.08_0.12_rk2'])
-
-                    data_list.append('_'.join(k_split_data[1:3]))
-                    data_list.append(k_split_data[3])
-                    data_list.append(k_split_data[4])
-                    data_list.append(v1['wo_acc'])
-                    for _ in range(12):
-                        data_list.append('')
-                    for data in data_list:
-                        f.write(data)
-                        f.write(',')
-                    f.write('\n')
-
-                if not is_empty2:
-                    k_split_data = k1.split("_")
-                    data_list.append('_'.join(k_split_data[1:3]))
-                    data_list.append(k_split_data[3])
-                    data_list.append(k_split_data[4])
-                    data_list.append(v1['wo_acc'])
-                    for _ in range(12):
-                        data_list.append('')
-                    data_list.append('_'.join(k_split_data[1:3]))
-                    data_list.append(k_split_data[3])
-                    data_list.append(k_split_data[4])
-                    data_list.append(v2['wo_acc'])
-                    data_list.append(v2['w05'])
-                    data_list.append(v2['w1'])
-                    data_list.append(v2['w15'])
-                    data_list.append(v2['0.0_0.2_baseline'])
-                    data_list.append(v2['0.0_0.2_rk1'])
-                    data_list.append(v2['0.0_0.2_rk2'])
-                    data_list.append(v2['0.05_0.15_baseline'])
-                    data_list.append(v2['0.05_0.15_rk1'])
-                    data_list.append(v2['0.05_0.15_rk2'])
-                    data_list.append(v2['0.08_0.12_baseline'])
-                    data_list.append(v2['0.08_0.12_rk1'])
-                    data_list.append(v2['0.08_0.12_rk2'])
-                    for data in data_list:
-                        f.write(data)
-                        f.write(',')
-                    f.write('\n')
+        for data in data_list:
+            f.write(data)
+            f.write(',')
+        f.write('\n')
     print('done')
+
+
+import csv
+with open(f'result_merge/output_{timestampStr}_nonresiudal.csv', 'w', newline='') as f:
+    csvwriter = csv.writer(f)
+    csvwriter.writerow(header)
+
+with open(f'result_merge/output_{timestampStr}_nonresiudal.csv', 'a') as f:
+    print("writing")
+    for k1, v1 in nonresidual_total_data_dict.items():
+        data_list = []
+        k1_split_data = k1.split("_")
+        data_list.append('_'.join(k1_split_data[1:3]))
+        data_list.append(k1_split_data[3])
+        data_list.append(k1_split_data[4])
+        data_list.append(v1['wo_acc'])
+        data_list.append(v1['w05'])
+        data_list.append(v1['w1'])
+        data_list.append(v1['w15'])
+        data_list.append(v1['0.0_0.2_baseline'])
+        data_list.append(v1['0.0_0.2_rk1'])
+        data_list.append(v1['0.0_0.2_rk2'])
+        data_list.append(v1['0.05_0.15_baseline'])
+        data_list.append(v1['0.05_0.15_rk1'])
+        data_list.append(v1['0.05_0.15_rk2'])
+        data_list.append(v1['0.08_0.12_baseline'])
+        data_list.append(v1['0.08_0.12_rk1'])
+        data_list.append(v1['0.08_0.12_rk2'])
+
+
+        for data in data_list:
+            f.write(data)
+            f.write(',')
+        f.write('\n')
+    print('done')
+
+
+# with open(f'result_merge/output_{timestampStr}.csv', 'a') as f:
+#     print("writing")
+    # print('writing')
+    # for k1, v1 in residual_total_data_dict.items():
+    #     for k2, v2 in nonresidual_total_data_dict.items():
+    #         k2_split_data = k2.split("_")
+    #         data_list = []
+    #         if k1 == k2:
+    #             is_empty = True
+    #             for k, v in v1.items():
+    #                 if k == 'wo_acc':
+    #                     continue
+    #                 if v != '':
+    #                     is_empty = False
+    #             for k, v in v2.items():
+    #                 if k == 'wo_acc':
+    #                     continue
+    #                 if v != '':
+    #                     is_empty = False
+    #             if not is_empty:
+    #                 k_split_data = k1.split("_")
+    #                 data_list.append('_'.join(k_split_data[1:3]))
+    #                 data_list.append(k_split_data[3])
+    #                 data_list.append(k_split_data[4])
+    #                 data_list.append(v1['wo_acc'])
+    #                 data_list.append(v1['w05'])
+    #                 data_list.append(v1['w1'])
+    #                 data_list.append(v1['w15'])
+    #                 data_list.append(v1['0.0_0.2_baseline'])
+    #                 data_list.append(v1['0.0_0.2_rk1'])
+    #                 data_list.append(v1['0.0_0.2_rk2'])
+    #                 data_list.append(v1['0.05_0.15_baseline'])
+    #                 data_list.append(v1['0.05_0.15_rk1'])
+    #                 data_list.append(v1['0.05_0.15_rk2'])
+    #                 data_list.append(v1['0.08_0.12_baseline'])
+    #                 data_list.append(v1['0.08_0.12_rk1'])
+    #                 data_list.append(v1['0.08_0.12_rk2'])
+    #
+    #                 data_list.append('_'.join(k_split_data[1:3]))
+    #                 data_list.append(k_split_data[3])
+    #                 data_list.append(k_split_data[4])
+    #                 data_list.append(v2['wo_acc'])
+    #                 data_list.append(v2['w05'])
+    #                 data_list.append(v2['w1'])
+    #                 data_list.append(v2['w15'])
+    #                 data_list.append(v2['0.0_0.2_baseline'])
+    #                 data_list.append(v2['0.0_0.2_rk1'])
+    #                 data_list.append(v2['0.0_0.2_rk2'])
+    #                 data_list.append(v2['0.05_0.15_baseline'])
+    #                 data_list.append(v2['0.05_0.15_rk1'])
+    #                 data_list.append(v2['0.05_0.15_rk2'])
+    #                 data_list.append(v2['0.08_0.12_baseline'])
+    #                 data_list.append(v2['0.08_0.12_rk1'])
+    #                 data_list.append(v2['0.08_0.12_rk2'])
+    #                 for data in data_list:
+    #                     f.write(data)
+    #                     f.write(',')
+    #                 f.write('\n')
+    #         else:
+    #             is_empty1 = True
+    #             for k, v in v1.items():
+    #                 if k == 'wo_acc':
+    #                     continue
+    #                 if v != '':
+    #                     is_empty1 = False
+    #
+    #             is_empty2 = True
+    #             for k, v in v2.items():
+    #                 if k == 'wo_acc':
+    #                     continue
+    #                 if v != '':
+    #                     is_empty2 = False
+    #             if not is_empty1:
+    #                 k_split_data = k1.split("_")
+    #                 data_list.append('_'.join(k_split_data[1:3]))
+    #                 data_list.append(k_split_data[3])
+    #                 data_list.append(k_split_data[4])
+    #                 data_list.append(v1['wo_acc'])
+    #                 data_list.append(v1['w05'])
+    #                 data_list.append(v1['w1'])
+    #                 data_list.append(v1['w15'])
+    #                 data_list.append(v1['0.0_0.2_baseline'])
+    #                 data_list.append(v1['0.0_0.2_rk1'])
+    #                 data_list.append(v1['0.0_0.2_rk2'])
+    #                 data_list.append(v1['0.05_0.15_baseline'])
+    #                 data_list.append(v1['0.05_0.15_rk1'])
+    #                 data_list.append(v1['0.05_0.15_rk2'])
+    #                 data_list.append(v1['0.08_0.12_baseline'])
+    #                 data_list.append(v1['0.08_0.12_rk1'])
+    #                 data_list.append(v1['0.08_0.12_rk2'])
+    #
+    #                 data_list.append('_'.join(k_split_data[1:3]))
+    #                 data_list.append(k_split_data[3])
+    #                 data_list.append(k_split_data[4])
+    #                 data_list.append(v1['wo_acc'])
+    #                 for _ in range(12):
+    #                     data_list.append('')
+    #                 for data in data_list:
+    #                     f.write(data)
+    #                     f.write(',')
+    #                 f.write('\n')
+    #
+    #             if not is_empty2:
+    #                 k_split_data = k1.split("_")
+    #                 data_list.append('_'.join(k_split_data[1:3]))
+    #                 data_list.append(k_split_data[3])
+    #                 data_list.append(k_split_data[4])
+    #                 data_list.append(v1['wo_acc'])
+    #                 for _ in range(12):
+    #                     data_list.append('')
+    #                 data_list.append('_'.join(k_split_data[1:3]))
+    #                 data_list.append(k_split_data[3])
+    #                 data_list.append(k_split_data[4])
+    #                 data_list.append(v2['wo_acc'])
+    #                 data_list.append(v2['w05'])
+    #                 data_list.append(v2['w1'])
+    #                 data_list.append(v2['w15'])
+    #                 data_list.append(v2['0.0_0.2_baseline'])
+    #                 data_list.append(v2['0.0_0.2_rk1'])
+    #                 data_list.append(v2['0.0_0.2_rk2'])
+    #                 data_list.append(v2['0.05_0.15_baseline'])
+    #                 data_list.append(v2['0.05_0.15_rk1'])
+    #                 data_list.append(v2['0.05_0.15_rk2'])
+    #                 data_list.append(v2['0.08_0.12_baseline'])
+    #                 data_list.append(v2['0.08_0.12_rk1'])
+    #                 data_list.append(v2['0.08_0.12_rk2'])
+    #                 for data in data_list:
+    #                     f.write(data)
+    #                     f.write(',')
+    #                 f.write('\n')
+    # print('done')
 
 
 
