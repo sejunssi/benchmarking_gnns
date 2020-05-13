@@ -184,7 +184,7 @@ nonresidual_total_data_dict = get_table_dict(new_data_dict_list, classic_data_di
 #           '0.08_0.12_rk2','dataset', 'model', 'seed', 'wo_acc', 'w05', 'w1', 'w15', '0.0_0.2_baseline', '0.0_0.2_rk1',
 #           '0.05_0.15_baseline', '0.05_0.15_rk1', '0.05_0.15_rk2', '0.08_0.12_baseline', '0.08_0.12_rk1',
 #           '0.08_0.12_rk2']
-header = ['dataset', 'model', 'seed', 'wo_acc', 'w05', 'w1', 'w15', '0.0_0.2_baseline', '0.0_0.2_rk1',
+header = ['dataset', 'model', 'seed', 'wo_acc', 'w05', 'w1', 'w15', '0.0_0.2_baseline', '0.0_0.2_rk1', '0.0_0.2_rk2',
           '0.05_0.15_baseline', '0.05_0.15_rk1', '0.05_0.15_rk2', '0.08_0.12_baseline', '0.08_0.12_rk1',
           '0.08_0.12_rk2']
 import csv
