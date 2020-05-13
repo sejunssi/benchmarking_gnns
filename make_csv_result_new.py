@@ -54,7 +54,7 @@ def read_data(data_dir):
         data_dict = {}
         if name is None or name == '':
             continue
-        name = str(name.split("/")[2]).replace("./",'')
+        name = str(name.split("/")[1]).replace("./",'')
         print(name, 0)
         if re.match('[a-zA-Z0-9_-]+_test_result.csv', name):
             print(name, 1)
@@ -80,7 +80,7 @@ def read_data(data_dir):
                     next(csvreader)
                     for x in csvreader:
                         test_acc = float(x[0])
-                        wo_acc[''.join(name_list[:6])] = test_acc
+                        data_dict['wo_acc'] = bengio_dict_name[bengio_dict_name]
                         data_dict['test_acc'] = test_acc
                 data_dict_list.append(data_dict)
 
