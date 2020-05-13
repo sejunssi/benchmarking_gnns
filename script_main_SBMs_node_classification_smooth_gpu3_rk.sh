@@ -1,6 +1,6 @@
 #!/bin/bash
 
-tmux new -s benchmark_SBMs_node_classification_smooth_2 -d
+tmux new -s benchmark_SBMs_node_classification_smooth_3 -d
 tmux send-keys "source activate benchmark_gnn" C-m
 
 
